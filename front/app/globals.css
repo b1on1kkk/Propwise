@@ -1,0 +1,5 @@
+@import url("https://fonts.cdnfonts.com/css/mona-sans");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
