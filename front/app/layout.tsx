@@ -31,8 +31,8 @@ export default function RootLayout({
         </div>
 
         <div
-          className={`absolute left-0 top-0 w-screen h-screen z-20 backdrop-blur-xs ${
-            createModalStatus ? "" : "hidden"
+          className={`absolute left-0 top-0 w-screen h-screen backdrop-blur-xs ${
+            createModalStatus ? "z-20" : "hidden"
           }`}
         ></div>
       </body>

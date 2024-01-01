@@ -16,7 +16,7 @@ export default function Header() {
   return (
     <header className="p-3 py-[9px] border-b-1 flex items-center">
       <div className="flex flex-1">
-        <div className="flex py-2 bg-gray-100 rounded-lg relative select-none">
+        <div className="flex py-2 bg-gray-100 rounded-lg relative select-none z-10">
           {HOMEPAGE_HEADER.map((item, idx) => {
             return (
               <button

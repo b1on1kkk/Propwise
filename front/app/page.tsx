@@ -20,6 +20,7 @@ import { getRightCalendarPosition } from "@/utils/getRightCalendarPosition";
 // constants
 import { CALENDAR_SETTINGS } from "@/constants/CalendarSettings";
 
+// context
 import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
 
 export default function Home() {
@@ -28,8 +29,8 @@ export default function Home() {
 
   return (
     <main className="flex-1">
-      <header className="flex border-b-1">
-        <div className="flex px-5 py-4 gap-1 items-center flex-1">
+      <header className="flex border-b-1 px-5 py-4">
+        <div className="flex gap-1 items-center flex-1">
           <CalendarHeaderButton
             left_icon={<CalendarDays width={17} height={17} />}
             title="September"
