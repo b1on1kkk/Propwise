@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // components
 import CalendarHeader from "@/components/CalendarPage/CalendarHeader/CalendarHeader";
@@ -16,6 +16,8 @@ import {
   startOfWeek,
   parse
 } from "date-fns";
+import { CreateExtendDays } from "@/utils/CreateExtendDays";
+import type { NewDays } from "@/context/CalendarContext";
 
 // context
 import { CalendarContext } from "@/context/CalendarContext";
@@ -30,12 +32,21 @@ export default function Home() {
     end: endOfWeek(endOfMonth(firstDayCurrentMonth))
   });
 
+  const [extendedDays, setExtendedDays] = useState<NewDays[]>(
+    CreateExtendDays(days)
+  );
+
+  useEffect(() => {
+    setExtendedDays(CreateExtendDays(days));
+  }, [currentMonth]);
+
   return (
     <CalendarContext.Provider
       value={{
-        days: days,
-        currentMonth: currentMonth,
-        setCurrentMonth: setCurrentMonth
+        extendedDays,
+        currentMonth,
+        setCurrentMonth,
+        setExtendedDays
       }}
     >
       <CalendarHeader firstDayCurrentMonth={firstDayCurrentMonth} />

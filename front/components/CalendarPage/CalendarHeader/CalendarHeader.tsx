@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // components
 import CalendarHeaderButton from "@/components/CalendarHeaderButton/CalendarHeaderButton";
@@ -21,27 +21,27 @@ import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
 import { useGlobalCalendatContext } from "@/context/CalendarContext";
 
 // utils
-import { add, format } from "date-fns";
+import { NextMonth, PrevMonth } from "./utils/NextAndPrevMonthControlles";
+import { IsAnyDayChosen } from "./utils/IsAnyDayChosen";
 
 export default function CalendarHeader({
   firstDayCurrentMonth
 }: {
   firstDayCurrentMonth: Date;
 }) {
-  const { setCurrentMonth, currentMonth } = useGlobalCalendatContext();
+  const { setCurrentMonth, currentMonth, extendedDays } =
+    useGlobalCalendatContext();
   const { setCreateModalStatus, createModalStatus } = useGlobalModalStatus();
 
   const [moveTo, setMoveTo] = useState<string>("41px");
 
-  function NextMonth() {
-    const firstDayNextMonth = add(firstDayCurrentMonth, { months: 1 });
-    setCurrentMonth(format(firstDayNextMonth, "MMMM-yyyy"));
-  }
+  const [isAnyDayChosenStatus, setIsAnyDayChosenStatus] = useState<boolean>(
+    IsAnyDayChosen(extendedDays)
+  );
 
-  function PrevMonth() {
-    const firstDayNextMonth = add(firstDayCurrentMonth, { months: -1 });
-    setCurrentMonth(format(firstDayNextMonth, "MMMM-yyyy"));
-  }
+  useEffect(() => {
+    setIsAnyDayChosenStatus(IsAnyDayChosen(extendedDays));
+  }, [extendedDays]);
 
   return (
     <div className="flex border-l-1 border-b-1 px-5 py-4">
@@ -96,7 +96,7 @@ export default function CalendarHeader({
         <div>
           <button
             className="p-2 border-1 rounded-lg text-[#56616b] shadow active:translate-y-0.5 transition-all duration-75 cursor-pointer"
-            onClick={PrevMonth}
+            onClick={() => PrevMonth(setCurrentMonth, firstDayCurrentMonth)}
           >
             <ChevronLeft width={15} height={15} />
           </button>
@@ -105,7 +105,7 @@ export default function CalendarHeader({
         <div>
           <button
             className="p-2 border-1 rounded-lg text-[#56616b] shadow active:translate-y-0.5 transition-all duration-75 cursor-pointer"
-            onClick={NextMonth}
+            onClick={() => NextMonth(setCurrentMonth, firstDayCurrentMonth)}
           >
             <ChevronRight width={15} height={15} />
           </button>
@@ -118,8 +118,10 @@ export default function CalendarHeader({
         <CalendarHeaderButton
           left_icon={<Plus width={17} height={17} />}
           title="Create"
-          onClick={() => setCreateModalStatus(!createModalStatus)}
-          bg_color="bg-green-600"
+          onClick={() => {
+            if (isAnyDayChosenStatus) setCreateModalStatus(!createModalStatus);
+          }}
+          bg_color={`${isAnyDayChosenStatus ? "bg-green-600" : "bg-gray-400"}`}
           text_color="text-white"
         />
 

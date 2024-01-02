@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+// components
 import { Search, Bell } from "lucide-react";
 
 // constants

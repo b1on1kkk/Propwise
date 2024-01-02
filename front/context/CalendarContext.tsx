@@ -2,16 +2,26 @@
 
 import { createContext, useContext } from "react";
 
+export interface NewDays {
+  id: number;
+  day: Date;
+  month: string;
+  week_day: string;
+  createEvent: boolean;
+}
+
 export interface TCalendarContent {
-  days: Date[];
+  extendedDays: NewDays[];
   currentMonth: string;
   setCurrentMonth: (c: string) => void;
+  setExtendedDays: (c: NewDays[]) => void;
 }
 
 export const CalendarContext = createContext<TCalendarContent>({
-  days: [],
+  extendedDays: [],
   currentMonth: "",
-  setCurrentMonth: () => {}
+  setCurrentMonth: () => {},
+  setExtendedDays: () => {}
 });
 
 export const useGlobalCalendatContext = () => useContext(CalendarContext);

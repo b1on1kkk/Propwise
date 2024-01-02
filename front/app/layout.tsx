@@ -6,9 +6,12 @@ import { useState } from "react";
 // components
 import LeftAsideMenu from "@/components/LeftAsideMenu/LeftAsideMenu";
 import Header from "@/components/Header/Header";
+import AddingEventModal from "@/components/AddingEventModal/AddingEventModal";
 
 // context
 import { MyGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
+
+import type { NewDays } from "@/context/CalendarContext";
 
 export default function RootLayout({
   children
@@ -16,25 +19,30 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const [createModalStatus, setCreateModalStatus] = useState<boolean>(false);
+  const [chosenDay, setChosenDay] = useState<NewDays | null>(null);
 
   return (
     <html lang="en">
-      <body className="flex max-h-screen">
+      <body
+        className={`flex max-h-screen ${
+          createModalStatus && "overflow-hidden"
+        }`}
+      >
         <LeftAsideMenu />
         <div className="flex flex-col flex-1">
           <Header />
           <MyGlobalModalStatus.Provider
-            value={{ createModalStatus, setCreateModalStatus }}
+            value={{ createModalStatus, setCreateModalStatus, setChosenDay }}
           >
             {children}
           </MyGlobalModalStatus.Provider>
         </div>
 
-        <div
-          className={`absolute left-0 top-0 w-screen h-screen backdrop-blur-xs ${
-            createModalStatus ? "z-20" : "hidden"
-          }`}
-        ></div>
+        <AddingEventModal
+          chosenDay={chosenDay}
+          createModalStatus={createModalStatus}
+          setCreateModalStatus={setCreateModalStatus}
+        />
       </body>
     </html>
   );

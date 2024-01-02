@@ -16,7 +16,7 @@ export default function LeftAsideMenu() {
   return (
     <aside
       className={`${
-        hideAsideMenu ? "w-24" : "w-60"
+        hideAsideMenu ? "w-24" : "w-48"
       } h-screen overflow-hidden transition-all duration-200 bg-white flex flex-col`}
     >
       <AsideMenuContext.Provider value={{ hideAsideMenu, setHideAsideMenu }}>

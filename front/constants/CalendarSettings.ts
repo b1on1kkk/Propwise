@@ -4,7 +4,7 @@ export const CALENDAR_SETTINGS = [
     move_to: "80px"
   },
   {
-    text: "M",
+    text: "W",
     move_to: "41px"
   },
   {

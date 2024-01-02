@@ -1,15 +1,17 @@
-"use client";
-
 // context
 import { useGlobalCalendatContext } from "@/context/CalendarContext";
+import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
 
 // utils
-import { format, getDay, isSameMonth, startOfToday } from "date-fns";
+import { format, getDay, isSameMonth } from "date-fns";
 import { months } from "@/constants/Months";
 import { ColStartClasses } from "@/constants/ColStartClasses";
+import { ChangeStatusChosenDate } from "@/utils/ChangeStatusChosenDate";
 
 export default function CalendarMain() {
-  const { days, currentMonth } = useGlobalCalendatContext();
+  const { extendedDays, currentMonth, setExtendedDays } =
+    useGlobalCalendatContext();
+  const { setChosenDay } = useGlobalModalStatus();
 
   return (
     <main className="flex-1 overflow-auto">
@@ -27,17 +29,30 @@ export default function CalendarMain() {
           })}
         </div>
         <div className="grid grid-cols-7 grid-rows-5">
-          {days.map((day, idx) => {
+          {extendedDays.map((day, idx) => {
             return (
               <div
                 key={idx}
-                className={`border-1 h-60 text-[#56616b] font-semibold ${
-                  idx === 0 && ColStartClasses[getDay(day)]
-                } ${!isSameMonth(day, currentMonth) && "bg-gray-50"}`}
+                className={`border-1 h-60 text-[#56616b] font-semibold flex flex-col ${
+                  idx === 0 && ColStartClasses[getDay(day.day)]
+                } ${!isSameMonth(day.day, currentMonth) && "bg-gray-50"} ${
+                  day.createEvent && "border-green-500"
+                }`}
+                onClick={() => {
+                  if (isSameMonth(day.day, currentMonth)) {
+                    ChangeStatusChosenDate(
+                      extendedDays,
+                      day,
+                      setExtendedDays,
+                      currentMonth
+                    );
+                    setChosenDay(day);
+                  }
+                }}
               >
                 <div className="inline-block m-2">
-                  <time dateTime={format(day, "yyyy-mm-dd")}>
-                    {format(day, "d")}
+                  <time dateTime={format(day.day, "yyyy-mm-dd")}>
+                    {format(day.day, "d")}
                   </time>
                 </div>
               </div>
