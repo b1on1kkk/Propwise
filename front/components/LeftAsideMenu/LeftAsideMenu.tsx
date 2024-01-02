@@ -11,13 +11,13 @@ import Footer from "./Footer/Footer";
 import { AsideMenuContext } from "../../context/LeftAsideMenuHeaderContext";
 
 export default function LeftAsideMenu() {
-  const [hideAsideMenu, setHideAsideMenu] = useState<boolean>(false);
+  const [hideAsideMenu, setHideAsideMenu] = useState<boolean>(true);
 
   return (
     <aside
       className={`${
         hideAsideMenu ? "w-24" : "w-60"
-      } border-r-1 h-screen overflow-hidden transition-all duration-200 bg-white flex flex-col`}
+      } h-screen overflow-hidden transition-all duration-200 bg-white flex flex-col`}
     >
       <AsideMenuContext.Provider value={{ hideAsideMenu, setHideAsideMenu }}>
         {/* header */}

@@ -7,14 +7,11 @@ import { Search, Bell } from "lucide-react";
 // constants
 import { HOMEPAGE_HEADER } from "@/constants/HomepageHeader";
 
-// utils
-import { getRightPosition } from "@/utils/getRightPosition";
-
 export default function Header() {
   const [moveTo, setMoveTo] = useState<string>("-2px");
 
   return (
-    <header className="p-3 py-[9px] border-b-1 flex items-center">
+    <header className="p-3 py-[9px] border-b-1 flex items-center border-l-1">
       <div className="flex flex-1">
         <div className="flex py-2 bg-gray-100 rounded-lg relative select-none z-10">
           {HOMEPAGE_HEADER.map((item, idx) => {
@@ -29,9 +26,17 @@ export default function Header() {
             );
           })}
           <div
-            className={`w-88 h-10 bg-white top-0 absolute border-1 rounded-lg ${getRightPosition(
-              moveTo
-            )} shadow-sm transition-all duration-300 ease-[cubic-bezier(0.68,-0.55,0.27,1.55)]`}
+            className={`w-88 h-10 bg-white top-0 absolute border-1 rounded-lg ${
+              moveTo === "-2"
+                ? "right-minus"
+                : moveTo === "248px"
+                ? "right-248px"
+                : moveTo === "165px"
+                ? "right-165px"
+                : moveTo === "84px"
+                ? "right-84px"
+                : "right-minus"
+            } shadow-sm transition-all duration-300 ease-[cubic-bezier(0.68,-0.55,0.27,1.55)]`}
           />
         </div>
       </div>

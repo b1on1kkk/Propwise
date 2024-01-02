@@ -19,7 +19,7 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body className="flex">
+      <body className="flex max-h-screen">
         <LeftAsideMenu />
         <div className="flex flex-col flex-1">
           <Header />
