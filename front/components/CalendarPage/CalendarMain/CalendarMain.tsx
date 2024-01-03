@@ -8,12 +8,12 @@ import { months } from "@/constants/Months";
 import { ColStartClasses } from "@/constants/ColStartClasses";
 import { ChangeStatusChosenDate } from "@/utils/ChangeStatusChosenDate";
 
-// import { GraduationCap, MoreVertical } from "lucide-react";
+import { GraduationCap, MoreVertical } from "lucide-react";
 
 export default function CalendarMain() {
   const { extendedDays, currentMonth, setExtendedDays } =
     useGlobalCalendatContext();
-  const { setChosenDay } = useGlobalModalStatus();
+  const { setChosenDay, events } = useGlobalModalStatus();
 
   return (
     <main className="flex-1 overflow-auto">
@@ -32,6 +32,8 @@ export default function CalendarMain() {
         </div>
         <div className="grid grid-cols-7 grid-rows-5">
           {extendedDays.map((day, idx) => {
+            let counter = 0;
+
             return (
               <div
                 key={idx}
@@ -48,7 +50,10 @@ export default function CalendarMain() {
                       setExtendedDays,
                       currentMonth
                     );
-                    setChosenDay(day);
+                    setChosenDay({
+                      ...day,
+                      month: format(day.day, "MMMM-yyyy")
+                    });
                   }
                 }}
               >
@@ -58,33 +63,49 @@ export default function CalendarMain() {
                   </time>
                 </div>
 
-                {/* tasks */}
                 <div className="flex flex-col gap-2">
-                  {/*  */}
-                  {/* <div className="flex flex-col border-1 shadow p-2 rounded-lg gap-1 border-green-600">
-                    <div className="flex gap-3 items-center">
-                      <div>
-                        <GraduationCap
-                          width={20}
-                          height={20}
-                          color="rgb(22 163 74)"
-                        />
-                      </div>
+                  {events.map((event) => {
+                    if (
+                      event.month === currentMonth &&
+                      event.day === format(day.day, "d") &&
+                      event.week_day === day.week_day
+                    ) {
+                      if (counter < 1) {
+                        counter++;
+                        return (
+                          <div className="flex flex-col border-1 shadow p-2 rounded-lg gap-1 border-green-600">
+                            <div className="flex gap-3 items-center">
+                              <div>
+                                <GraduationCap
+                                  width={20}
+                                  height={20}
+                                  color="rgb(22 163 74)"
+                                />
+                              </div>
 
-                      <div className="text-black flex-1">
-                        469 Pinehurts Suites
-                      </div>
+                              <div className="text-black flex-1">
+                                {event.eventName}
+                              </div>
 
-                      <div>
-                        <MoreVertical width={18} height={18} />
-                      </div>
+                              <div>
+                                <MoreVertical width={18} height={18} />
+                              </div>
+                            </div>
+
+                            <div className="text-sm">{event.description}</div>
+                          </div>
+                        );
+                      }
+                      counter++;
+                    }
+                  })}
+
+                  {counter >= 1 && counter - 1 !== 0 && (
+                    <div className="p-1 border-2 border-dashed rounded-lg text-center border-white bg-[#009965] text-white hover:bg-green-600 transition-all duration-200 ease-in">
+                      +{counter - 1}
                     </div>
-
-                    <div className="text-sm">Tenant move-in</div>
-                  </div> */}
-                  {/*  */}
+                  )}
                 </div>
-                {/*  */}
               </div>
             );
           })}

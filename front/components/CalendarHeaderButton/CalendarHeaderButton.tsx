@@ -1,11 +1,4 @@
-interface TCalendarHeaderButton {
-  left_icon?: React.ReactNode;
-  title?: string;
-  onClick: () => void;
-  right_icon?: React.ReactNode;
-  bg_color: string;
-  text_color: string;
-}
+import type { TCalendarHeaderButton } from "@/interfaces/interfaces";
 
 export default function CalendarHeaderButton({
   left_icon,

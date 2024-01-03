@@ -22,3 +22,66 @@ export interface TNewEventInitialState {
   timeTo: string;
   shortDescription: string;
 }
+
+export interface SessionEstablishedAnswer {
+  status: number;
+  message: string;
+}
+
+export interface User {
+  id: number;
+  name: string;
+  lastname: string;
+  email: string;
+  avatar: string;
+  role: string;
+}
+
+export interface TCalendarHeaderButton {
+  left_icon?: React.ReactNode;
+  title?: string;
+  onClick: () => void;
+  right_icon?: React.ReactNode;
+  bg_color: string;
+  text_color: string;
+}
+
+export interface TCreateEventTimeInput {
+  text: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  value: string;
+}
+
+export interface MenuData {
+  id: number;
+  icon_name: string;
+  text: string;
+  status: boolean;
+}
+
+export interface TLinksBlock {
+  title?: string;
+  data: MenuData[];
+  onMouseFunction: (
+    data: MenuData[],
+    chosen: MenuData,
+    setter: React.Dispatch<React.SetStateAction<MenuData[]>>
+  ) => void;
+  setter: React.Dispatch<React.SetStateAction<MenuData[]>>;
+  till_end_status?: boolean;
+}
+
+export interface TRegistrationInput {
+  icon_name: string;
+  type: string;
+  placeholder: string;
+  eye_active: boolean;
+  error_text: string;
+  registr_new_accout: boolean;
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  value: string;
+  validity_status: boolean;
+  onBlur: (e: React.FocusEvent<HTMLInputElement>) => void;
+  showPassword?: boolean;
+  setShowPassword?: React.Dispatch<React.SetStateAction<boolean>>;
+}

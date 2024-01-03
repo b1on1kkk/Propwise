@@ -11,7 +11,7 @@ import Footer from "./Footer/Footer";
 import { AsideMenuContext } from "../../context/LeftAsideMenuHeaderContext";
 
 export default function LeftAsideMenu() {
-  const [hideAsideMenu, setHideAsideMenu] = useState<boolean>(true);
+  const [hideAsideMenu, setHideAsideMenu] = useState<boolean>(false);
 
   return (
     <aside

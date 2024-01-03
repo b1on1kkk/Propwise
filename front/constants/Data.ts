@@ -1,4 +1,4 @@
-import type { MenuData } from "./Menu";
+import type { MenuData } from "@/interfaces/interfaces";
 
 export const LEFT_ASIDEMENU_DATA: MenuData[] = [
   {

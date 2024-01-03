@@ -5,11 +5,13 @@ import { useState } from "react";
 import LinksBlock from "./LinksBlock/LinksBlock";
 
 // utils
-import type { MenuData } from "@/constants/Menu";
 import { LEFT_ASIDEMENU_DATA } from "@/constants/Data";
 import { LEFT_ASIDEMENU_MENU_DATA } from "@/constants/Menu";
 import { Change_aside_data } from "./utils/Change_aside_data";
 import { LEFT_ASIDEMENU_SETTINGS_DATA } from "@/constants/SettingsHelp";
+
+// interfaces
+import type { MenuData } from "@/interfaces/interfaces";
 
 export default function Main() {
   const [MENU_ASIDE_DATA, SET_MENU_ASIDE_DATA] = useState<MenuData[]>(

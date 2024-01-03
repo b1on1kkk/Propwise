@@ -1,7 +1,8 @@
 "use client";
 
 import "./globals.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 // components
 import LeftAsideMenu from "@/components/LeftAsideMenu/LeftAsideMenu";
@@ -11,8 +12,20 @@ import AddingEventModal from "@/components/AddingEventModal/AddingEventModal";
 // context
 import { MyGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
 
-import type { NewDays } from "@/interfaces/interfaces";
-import type { Events } from "@/interfaces/interfaces";
+// utils
+import { getUsersLoggedStatus } from "@/utils/getUsersLoggedStatus";
+import { GetLoggedInUserInf } from "@/utils/GetLoggedInUserInf";
+
+// interfaces
+import type {
+  NewDays,
+  SessionEstablishedAnswer,
+  Events,
+  User
+} from "@/interfaces/interfaces";
+
+// for sessions
+axios.defaults.withCredentials = true;
 
 export default function RootLayout({
   children
@@ -21,35 +34,52 @@ export default function RootLayout({
 }) {
   const [createModalStatus, setCreateModalStatus] = useState<boolean>(false);
   const [chosenDay, setChosenDay] = useState<NewDays | null>(null);
+  const [userStatus, setUserStatus] = useState<SessionEstablishedAnswer | null>(
+    null
+  );
+  const [loggedUser, setLoggedUser] = useState<User[] | null>(null);
 
+  // temporary event storage
   const [events, setEvents] = useState<Events[]>([]);
+
+  // getting logged in user status
+  useEffect(() => {
+    getUsersLoggedStatus().then((data) => setUserStatus(data));
+  }, []);
+
+  // getting users inf when and only when status have changed
+  useEffect(() => {
+    if (userStatus?.status === 200)
+      GetLoggedInUserInf().then((user) => setLoggedUser(user));
+  }, [userStatus]);
 
   return (
     <html lang="en">
-      <body
-        className={`flex max-h-screen ${
-          createModalStatus && "overflow-hidden"
-        }`}
-      >
-        <LeftAsideMenu />
+      <body className={createModalStatus ? "overflow-hidden" : ""}>
+        <div className="flex max-h-screen">
+          <MyGlobalModalStatus.Provider
+            value={{
+              chosenDay,
+              createModalStatus,
+              events,
+              loggedUser,
+              // setters
+              setCreateModalStatus,
+              setChosenDay,
+              setEvents,
+              setUserStatus
+            }}
+          >
+            <LeftAsideMenu />
 
-        <MyGlobalModalStatus.Provider
-          value={{
-            chosenDay,
-            createModalStatus,
-            events,
-            setCreateModalStatus,
-            setChosenDay,
-            setEvents
-          }}
-        >
-          <div className="flex flex-col flex-1">
-            <Header />
-            {children}
-          </div>
+            <div className="flex flex-col flex-1">
+              {userStatus?.status === 200 && <Header />}
+              {children}
+            </div>
 
-          <AddingEventModal />
-        </MyGlobalModalStatus.Provider>
+            <AddingEventModal />
+          </MyGlobalModalStatus.Provider>
+        </div>
       </body>
     </html>
   );

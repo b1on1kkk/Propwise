@@ -1,9 +1,4 @@
-export interface MenuData {
-  id: number;
-  icon_name: string;
-  text: string;
-  status: boolean;
-}
+import type { MenuData } from "@/interfaces/interfaces";
 
 export const LEFT_ASIDEMENU_MENU_DATA: MenuData[] = [
   {

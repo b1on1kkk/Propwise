@@ -11,6 +11,7 @@ import { X, Calendar, ArrowRight } from "lucide-react";
 import { format } from "date-fns";
 import { useOutsideClick } from "@/hooks/useOutsideClick ";
 import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
+import { CheckForEmptyFields } from "@/utils/CheckForEmptyFields";
 
 // reducers
 import {
@@ -18,17 +19,6 @@ import {
   NewEventInitialState,
   AddingNewEventTypes
 } from "./NewEventReducer/NewEventReducer";
-
-import type { TNewEventInitialState } from "@/interfaces/interfaces";
-
-function CheckForEmptyFields(data: TNewEventInitialState): boolean {
-  const dataArray: string[] = Object.values(data);
-
-  for (let i = 0; i < dataArray.length; i++)
-    if (!dataArray[i].replace(/\s/g, "")) return false;
-
-  return true;
-}
 
 export default function AddingEventModal() {
   const {
@@ -48,6 +38,25 @@ export default function AddingEventModal() {
   });
 
   const emptyFields = CheckForEmptyFields(state);
+
+  function CreateEvent() {
+    if (emptyFields) {
+      setEvents([
+        ...events,
+        {
+          eventName: state.eventName,
+          month: chosenDay!.month,
+          week_day: chosenDay!.week_day,
+          day: format(chosenDay!.day, "d"),
+          time_from: state.timeFrom,
+          time_to: state.timeTo,
+          description: state.shortDescription
+        }
+      ]);
+      setCreateModalStatus(!createModalStatus);
+      dispatch({ type: AddingNewEventTypes.CLEAR, payload: "" });
+    }
+  }
 
   return (
     <div
@@ -89,7 +98,7 @@ export default function AddingEventModal() {
             <div>
               {chosenDay && (
                 <span>
-                  {chosenDay?.week_day}, {chosenDay?.month}{" "}
+                  {chosenDay?.week_day}, {chosenDay?.month},{" "}
                   {format(chosenDay?.day, "d")}
                 </span>
               )}
@@ -154,25 +163,11 @@ export default function AddingEventModal() {
           <button
             className={`flex-1 py-3 border-1 shadow rounded-lg ${
               emptyFields
-                ? "bg-green-600 hover:bg-green-700 border-green-700"
+                ? "bg-[#009965] hover:bg-green-700 border-green-700"
                 : "bg-gray-400"
             } text-white transition-all duration-200 ease-in`}
             type="submit"
-            onClick={() => {
-              if (emptyFields)
-                setEvents([
-                  ...events,
-                  {
-                    eventName: state.eventName,
-                    month: chosenDay!.month,
-                    week_day: chosenDay!.week_day,
-                    day: format(chosenDay!.day, "d"),
-                    time_from: state.timeFrom,
-                    time_to: state.timeTo,
-                    description: state.shortDescription
-                  }
-                ]);
-            }}
+            onClick={CreateEvent}
           >
             Create event
           </button>

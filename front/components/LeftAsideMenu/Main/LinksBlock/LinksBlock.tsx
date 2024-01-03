@@ -3,23 +3,11 @@ import Link from "next/link";
 // components
 import Icon from "../Icon/Icon";
 
-// utils
-import type { MenuData } from "@/constants/Menu";
-
 // context
 import { useAsideMenuContext } from "../../../../context/LeftAsideMenuHeaderContext";
 
-interface TLinksBlock {
-  title?: string;
-  data: MenuData[];
-  onMouseFunction: (
-    data: MenuData[],
-    chosen: MenuData,
-    setter: React.Dispatch<React.SetStateAction<MenuData[]>>
-  ) => void;
-  setter: React.Dispatch<React.SetStateAction<MenuData[]>>;
-  till_end_status?: boolean;
-}
+// interfaces
+import type { TLinksBlock } from "@/interfaces/interfaces";
 
 export default function LinksBlock({
   title,
@@ -45,7 +33,11 @@ export default function LinksBlock({
         return (
           <Link
             key={idx}
-            href={item.text === "Home" ? "/" : item.text.toLowerCase().trim()}
+            href={
+              item.text === "Reports"
+                ? "https://github.com/b1on1kkk/Propwise/issues"
+                : item.text.toLowerCase().trim()
+            }
           >
             <div
               className="text-[#56616b] transition-all duration-200 select-none"

@@ -1,4 +1,4 @@
-import type { MenuData } from "@/constants/Menu";
+import type { MenuData } from "@/interfaces/interfaces";
 
 export function Change_aside_data(
   data: MenuData[],

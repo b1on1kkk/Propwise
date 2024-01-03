@@ -1,15 +1,15 @@
+// components
 import CreateEventInputWrapper from "../CreateEventInputWrapper/CreateEventInputWrapper";
 import { Clock } from "lucide-react";
+
+// interfaces
+import type { TCreateEventTimeInput } from "@/interfaces/interfaces";
 
 export default function CreateEventTimeInput({
   text,
   onChange,
   value
-}: {
-  text: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  value: string;
-}) {
+}: TCreateEventTimeInput) {
   return (
     <div className="flex-1">
       <CreateEventInputWrapper>

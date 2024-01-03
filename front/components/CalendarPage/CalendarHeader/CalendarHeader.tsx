@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 // components
 import CalendarHeaderButton from "@/components/CalendarHeaderButton/CalendarHeaderButton";
 import {
-  CalendarDays,
+  Calendar,
   SlidersHorizontalIcon,
   ChevronRight,
   ChevronLeft,
@@ -47,7 +47,7 @@ export default function CalendarHeader({
     <div className="flex border-l-1 border-b-1 px-5 py-4">
       <div className="flex gap-1 items-center flex-1">
         <CalendarHeaderButton
-          left_icon={<CalendarDays width={17} height={17} />}
+          left_icon={<Calendar width={17} height={17} />}
           title={currentMonth}
           onClick={() => {}}
           bg_color="bg-white"
@@ -121,7 +121,7 @@ export default function CalendarHeader({
           onClick={() => {
             if (isAnyDayChosenStatus) setCreateModalStatus(!createModalStatus);
           }}
-          bg_color={`${isAnyDayChosenStatus ? "bg-green-600" : "bg-gray-400"}`}
+          bg_color={`${isAnyDayChosenStatus ? "bg-[#009965]" : "bg-gray-400"}`}
           text_color="text-white"
         />
 
