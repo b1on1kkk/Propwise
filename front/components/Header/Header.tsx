@@ -12,7 +12,7 @@ export default function Header() {
   const [moveTo, setMoveTo] = useState<string>("-2px");
 
   return (
-    <header className="p-3 py-[9px] border-b-1 flex items-center border-l-1">
+    <header className="p-3 py-[9px] border-b-1 flex items-center border-l-1 bg-white">
       <div className="flex flex-1">
         <div className="flex py-2 bg-gray-100 rounded-lg relative select-none z-10">
           {HOMEPAGE_HEADER.map((item, idx) => {

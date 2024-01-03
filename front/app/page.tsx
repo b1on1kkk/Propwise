@@ -17,7 +17,7 @@ import {
   parse
 } from "date-fns";
 import { CreateExtendDays } from "@/utils/CreateExtendDays";
-import type { NewDays } from "@/context/CalendarContext";
+import type { NewDays } from "@/interfaces/interfaces";
 
 // context
 import { CalendarContext } from "@/context/CalendarContext";

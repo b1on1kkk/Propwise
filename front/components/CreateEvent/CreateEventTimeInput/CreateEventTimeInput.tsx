@@ -3,10 +3,12 @@ import { Clock } from "lucide-react";
 
 export default function CreateEventTimeInput({
   text,
-  onChange
+  onChange,
+  value
 }: {
   text: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  value: string;
 }) {
   return (
     <div className="flex-1">
@@ -19,6 +21,7 @@ export default function CreateEventTimeInput({
           placeholder={text}
           className="w-full focus:outline-none"
           onChange={onChange}
+          value={value}
         />
       </CreateEventInputWrapper>
     </div>

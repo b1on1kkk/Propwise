@@ -30,11 +30,5 @@ export const LEFT_ASIDEMENU_DATA: MenuData[] = [
     icon_name: "Percent",
     text: "Commisions",
     status: false
-  },
-  {
-    id: 10,
-    icon_name: "Bug",
-    text: "Reports",
-    status: false
   }
 ];

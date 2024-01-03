@@ -11,7 +11,8 @@ import AddingEventModal from "@/components/AddingEventModal/AddingEventModal";
 // context
 import { MyGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
 
-import type { NewDays } from "@/context/CalendarContext";
+import type { NewDays } from "@/interfaces/interfaces";
+import type { Events } from "@/interfaces/interfaces";
 
 export default function RootLayout({
   children
@@ -21,6 +22,8 @@ export default function RootLayout({
   const [createModalStatus, setCreateModalStatus] = useState<boolean>(false);
   const [chosenDay, setChosenDay] = useState<NewDays | null>(null);
 
+  const [events, setEvents] = useState<Events[]>([]);
+
   return (
     <html lang="en">
       <body
@@ -29,20 +32,24 @@ export default function RootLayout({
         }`}
       >
         <LeftAsideMenu />
-        <div className="flex flex-col flex-1">
-          <Header />
-          <MyGlobalModalStatus.Provider
-            value={{ createModalStatus, setCreateModalStatus, setChosenDay }}
-          >
-            {children}
-          </MyGlobalModalStatus.Provider>
-        </div>
 
-        <AddingEventModal
-          chosenDay={chosenDay}
-          createModalStatus={createModalStatus}
-          setCreateModalStatus={setCreateModalStatus}
-        />
+        <MyGlobalModalStatus.Provider
+          value={{
+            chosenDay,
+            createModalStatus,
+            events,
+            setCreateModalStatus,
+            setChosenDay,
+            setEvents
+          }}
+        >
+          <div className="flex flex-col flex-1">
+            <Header />
+            {children}
+          </div>
+
+          <AddingEventModal />
+        </MyGlobalModalStatus.Provider>
       </body>
     </html>
   );

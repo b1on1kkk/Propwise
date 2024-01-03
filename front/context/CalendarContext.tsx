@@ -1,14 +1,7 @@
 "use client";
 
 import { createContext, useContext } from "react";
-
-export interface NewDays {
-  id: number;
-  day: Date;
-  month: string;
-  week_day: string;
-  createEvent: boolean;
-}
+import type { NewDays } from "@/interfaces/interfaces";
 
 export interface TCalendarContent {
   extendedDays: NewDays[];

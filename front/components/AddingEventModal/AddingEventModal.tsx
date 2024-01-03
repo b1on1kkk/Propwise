@@ -1,5 +1,7 @@
 "use client";
 
+import { useReducer } from "react";
+
 // components
 import CreateEventInputWrapper from "../CreateEvent/CreateEventInputWrapper/CreateEventInputWrapper";
 import CreateEventTimeInput from "../CreateEvent/CreateEventTimeInput/CreateEventTimeInput";
@@ -8,22 +10,44 @@ import { X, Calendar, ArrowRight } from "lucide-react";
 // utils
 import { format } from "date-fns";
 import { useOutsideClick } from "@/hooks/useOutsideClick ";
-import type { NewDays } from "@/context/CalendarContext";
+import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
 
-interface TAddingEventModal {
-  chosenDay: NewDays | null;
-  createModalStatus: boolean;
-  setCreateModalStatus: (c: boolean) => void;
+// reducers
+import {
+  AddingEventReducer,
+  NewEventInitialState,
+  AddingNewEventTypes
+} from "./NewEventReducer/NewEventReducer";
+
+import type { TNewEventInitialState } from "@/interfaces/interfaces";
+
+function CheckForEmptyFields(data: TNewEventInitialState): boolean {
+  const dataArray: string[] = Object.values(data);
+
+  for (let i = 0; i < dataArray.length; i++)
+    if (!dataArray[i].replace(/\s/g, "")) return false;
+
+  return true;
 }
 
-export default function AddingEventModal({
-  chosenDay,
-  createModalStatus,
-  setCreateModalStatus
-}: TAddingEventModal) {
+export default function AddingEventModal() {
+  const {
+    createModalStatus,
+    setCreateModalStatus,
+    chosenDay,
+    events,
+    setEvents
+  } = useGlobalModalStatus();
+
   const handleClickOutside = () => {
     if (createModalStatus) setCreateModalStatus(!createModalStatus);
   };
+
+  const [state, dispatch] = useReducer(AddingEventReducer, {
+    ...NewEventInitialState
+  });
+
+  const emptyFields = CheckForEmptyFields(state);
 
   return (
     <div
@@ -48,7 +72,13 @@ export default function AddingEventModal({
               type="text"
               placeholder="Enter name"
               className="w-full focus:outline-none"
-              onChange={() => {}}
+              onChange={(e) =>
+                dispatch({
+                  type: AddingNewEventTypes.EVENT_NAME,
+                  payload: e.target.value
+                })
+              }
+              value={state.eventName}
             />
           </CreateEventInputWrapper>
 
@@ -67,11 +97,29 @@ export default function AddingEventModal({
           </CreateEventInputWrapper>
 
           <div className="flex gap-2 items-center">
-            <CreateEventTimeInput text="From" onChange={() => {}} />
+            <CreateEventTimeInput
+              text="From"
+              onChange={(e) =>
+                dispatch({
+                  type: AddingNewEventTypes.TIME_FROM,
+                  payload: e.target.value
+                })
+              }
+              value={state.timeFrom}
+            />
 
             <ArrowRight width={20} height={20} color="#56616b" />
 
-            <CreateEventTimeInput text="To" onChange={() => {}} />
+            <CreateEventTimeInput
+              text="To"
+              onChange={(e) =>
+                dispatch({
+                  type: AddingNewEventTypes.TIME_TO,
+                  payload: e.target.value
+                })
+              }
+              value={state.timeTo}
+            />
           </div>
 
           <div className="mt-3">
@@ -80,6 +128,13 @@ export default function AddingEventModal({
                 <textarea
                   className="resize-none w-full h-full focus:outline-none"
                   placeholder="Add a descriptions..."
+                  onChange={(e) =>
+                    dispatch({
+                      type: AddingNewEventTypes.SHORT_DESCRIPTION,
+                      payload: e.target.value
+                    })
+                  }
+                  value={state.shortDescription}
                 />
               </div>
             </CreateEventInputWrapper>
@@ -89,13 +144,35 @@ export default function AddingEventModal({
         <footer className="px-5 py-3 flex text-sm font-semibold gap-2">
           <button
             className="flex-1 py-3 border-1 shadow rounded-lg hover:bg-gray-100 transition-all duration-200 ease-in"
-            onClick={() => setCreateModalStatus(!createModalStatus)}
+            onClick={() => {
+              setCreateModalStatus(!createModalStatus);
+              dispatch({ type: AddingNewEventTypes.CLEAR, payload: "" });
+            }}
           >
             Cancel
           </button>
           <button
-            className="flex-1 py-3 border-1 shadow rounded-lg bg-green-600 border-green-700 text-white hover:bg-green-700 transition-all duration-200 ease-in"
+            className={`flex-1 py-3 border-1 shadow rounded-lg ${
+              emptyFields
+                ? "bg-green-600 hover:bg-green-700 border-green-700"
+                : "bg-gray-400"
+            } text-white transition-all duration-200 ease-in`}
             type="submit"
+            onClick={() => {
+              if (emptyFields)
+                setEvents([
+                  ...events,
+                  {
+                    eventName: state.eventName,
+                    month: chosenDay!.month,
+                    week_day: chosenDay!.week_day,
+                    day: format(chosenDay!.day, "d"),
+                    time_from: state.timeFrom,
+                    time_to: state.timeTo,
+                    description: state.shortDescription
+                  }
+                ]);
+            }}
           >
             Create event
           </button>
