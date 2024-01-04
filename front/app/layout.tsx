@@ -1,7 +1,8 @@
 "use client";
 
 import "./globals.css";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { usePathname } from "next/navigation";
 import axios from "axios";
 
 // components
@@ -12,17 +13,8 @@ import AddingEventModal from "@/components/AddingEventModal/AddingEventModal";
 // context
 import { MyGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
 
-// utils
-import { getUsersLoggedStatus } from "@/utils/getUsersLoggedStatus";
-import { GetLoggedInUserInf } from "@/utils/GetLoggedInUserInf";
-
 // interfaces
-import type {
-  NewDays,
-  SessionEstablishedAnswer,
-  Events,
-  User
-} from "@/interfaces/interfaces";
+import type { NewDays, Events } from "@/interfaces/interfaces";
 
 // for sessions
 axios.defaults.withCredentials = true;
@@ -32,26 +24,13 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const path = usePathname();
+
   const [createModalStatus, setCreateModalStatus] = useState<boolean>(false);
   const [chosenDay, setChosenDay] = useState<NewDays | null>(null);
-  const [userStatus, setUserStatus] = useState<SessionEstablishedAnswer | null>(
-    null
-  );
-  const [loggedUser, setLoggedUser] = useState<User[] | null>(null);
 
   // temporary event storage
   const [events, setEvents] = useState<Events[]>([]);
-
-  // getting logged in user status
-  useEffect(() => {
-    getUsersLoggedStatus().then((data) => setUserStatus(data));
-  }, []);
-
-  // getting users inf when and only when status have changed
-  useEffect(() => {
-    if (userStatus?.status === 200)
-      GetLoggedInUserInf().then((user) => setLoggedUser(user));
-  }, [userStatus]);
 
   return (
     <html lang="en">
@@ -62,18 +41,16 @@ export default function RootLayout({
               chosenDay,
               createModalStatus,
               events,
-              loggedUser,
               // setters
               setCreateModalStatus,
               setChosenDay,
-              setEvents,
-              setUserStatus
+              setEvents
             }}
           >
-            <LeftAsideMenu />
+            {path !== "/login" && path !== "/registration" && <LeftAsideMenu />}
 
             <div className="flex flex-col flex-1">
-              {userStatus?.status === 200 && <Header />}
+              {path !== "/login" && path !== "/registration" && <Header />}
               {children}
             </div>
 

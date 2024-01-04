@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 
 export default function NotFoud() {
@@ -9,7 +11,7 @@ export default function NotFoud() {
         The page you are looking for might have been removed
         <br /> had its name changed or is temporarily unavailable
       </span>
-      <Link href={"/home"}>
+      <Link href={"/"}>
         <button className="px-11 py-3 rounded-full drop-shadow-md bg-gray-300 text-white font-bold mt-5 hover:bg-[#009965] active:translate-y-0.5 transition-colors duration-200 ease-in">
           GO TO HOMEPAGE
         </button>

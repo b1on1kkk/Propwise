@@ -23,11 +23,6 @@ export interface TNewEventInitialState {
   shortDescription: string;
 }
 
-export interface SessionEstablishedAnswer {
-  status: number;
-  message: string;
-}
-
 export interface User {
   id: number;
   name: string;

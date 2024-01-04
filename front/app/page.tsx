@@ -1,15 +1,59 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-import Loading from "@/components/Loading/Loading";
+// components
+import CalendarHeader from "@/components/CalendarPage/CalendarHeader/CalendarHeader";
+import CalendarMain from "@/components/CalendarPage/CalendarMain/CalendarMain";
+
+// context
+import { CalendarContext } from "@/context/CalendarContext";
+
+// utils
+import {
+  eachDayOfInterval,
+  endOfMonth,
+  format,
+  startOfToday,
+  endOfWeek,
+  startOfWeek,
+  parse
+} from "date-fns";
+import { CreateExtendDays } from "@/utils/CreateExtendDays";
+
+// interfaces
+import type { NewDays } from "@/interfaces/interfaces";
 
 export default function Home() {
-  const router = useRouter();
+  const today = startOfToday();
+  let [currentMonth, setCurrentMonth] = useState(format(today, "MMMM-yyyy"));
+  const firstDayCurrentMonth = parse(currentMonth, "MMMM-yyyy", new Date());
 
-  setTimeout(() => {
-    router.push("/home");
-  }, 2000);
+  const days = eachDayOfInterval({
+    start: startOfWeek(firstDayCurrentMonth),
+    end: endOfWeek(endOfMonth(firstDayCurrentMonth))
+  });
 
-  return <Loading />;
+  const [extendedDays, setExtendedDays] = useState<NewDays[]>(
+    CreateExtendDays(days)
+  );
+
+  useEffect(() => {
+    setExtendedDays(CreateExtendDays(days));
+  }, [currentMonth]);
+
+  return (
+    <CalendarContext.Provider
+      value={{
+        extendedDays,
+        currentMonth,
+        setCurrentMonth,
+        setExtendedDays
+      }}
+    >
+      <CalendarHeader firstDayCurrentMonth={firstDayCurrentMonth} />
+
+      <CalendarMain />
+    </CalendarContext.Provider>
+  );
 }

@@ -58,7 +58,7 @@ export default function Registration() {
           hash_key: unique_key
         });
 
-        router.push("/home");
+        router.push("/");
       } catch (error) {
         console.log(error);
       }

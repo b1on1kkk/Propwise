@@ -62,7 +62,7 @@ export default function LogIn() {
           password: registrationFromState.password
         });
 
-        router.push("/home");
+        router.push("/");
       } catch (error) {
         const AxiosError = error as AxiosError;
         const textError = AxiosError.response?.data as string;

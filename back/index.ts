@@ -1,7 +1,6 @@
 import express, { Express, Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 
-const session = require("express-session");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
@@ -29,17 +28,6 @@ app.use(
 );
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(
-  session({
-    key: "user_id",
-    secret: uuidv4(),
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      expires: 10800000
-    }
-  })
-);
 
 app.post("/login", (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -50,10 +38,26 @@ app.post("/login", (req: Request, res: Response) => {
     (error: Error, result: any) => {
       if (error) return res.status(500).send(error);
 
-      console.log(result);
-
+      // when user was found
       if (result.length > 0) {
-        req.session!.user_key = result[0].hash_key;
+        // generate new hash-key
+        const new_hashkey = uuidv4();
+
+        // then update old hash-key with brand new one
+        db.query(
+          "UPDATE users SET hash_key = ? WHERE hash_key = ?",
+          [new_hashkey, result[0].hash_key],
+          (error: Error) => {
+            if (error) return res.status(500).send(error);
+          }
+        );
+
+        // set new cookie
+        res.cookie("user_hashkey", new_hashkey, {
+          maxAge: 14 * 24 * 3600000, // cookie exist for 2 week
+          httpOnly: true
+        });
+
         return res.status(200).send("Logged in!");
       }
 
@@ -67,7 +71,10 @@ app.post("/sing_up", (req: Request, res: Response) => {
     if (error) return res.status(500).send(error);
   });
 
-  req.session!.user_key = req.body.hash_key;
+  res.cookie("user_hashkey", req.body.hash_key, {
+    maxAge: 14 * 24 * 3600000, // cookie exist for 2 week
+    httpOnly: true
+  });
 
   return res.status(200).send("Successfully!");
 });
@@ -75,28 +82,34 @@ app.post("/sing_up", (req: Request, res: Response) => {
 app.get("/logged_user", (req: Request, res: Response) => {
   db.query(
     "SELECT id, name, lastname, email, avatar, role FROM users WHERE hash_key = ?",
-    [req.session?.user_key],
+    [req.cookies.user_hashkey],
     (error: Error, result: any) => {
       if (error) return res.status(500).send("Server error occur :(");
-      if (result.length === 0)
-        res
-          .status(401)
-          .json({ code: 401, message: "To get data logged in first" });
 
       return res.status(200).json(result);
     }
   );
 });
 
-app.get("/session_status", (req: Request, res: Response) => {
-  if (req.session?.user_key) {
-    return res.json({
-      status: 200,
-      message: "Logged!"
-    });
-  } else {
-    return res.json({ status: 401, message: "Log in first!" });
-  }
+app.post("/session_status", (req: Request, res: Response) => {
+  const { key } = req.body;
+
+  db.query(
+    "SELECT * FROM users WHERE hash_key = ?",
+    [key],
+    (error: Error, result: any) => {
+      if (error) return res.status(500).send(error);
+
+      if (result.length > 0) {
+        return res.status(200).json({
+          status: 200,
+          message: "Logged!"
+        });
+      }
+
+      return res.status(401).json({ status: 401, message: "Log in first!" });
+    }
+  );
 });
 
 app.listen(2000, () => {

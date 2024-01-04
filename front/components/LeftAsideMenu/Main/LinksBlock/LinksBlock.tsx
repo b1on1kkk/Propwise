@@ -8,6 +8,7 @@ import { useAsideMenuContext } from "../../../../context/LeftAsideMenuHeaderCont
 
 // interfaces
 import type { TLinksBlock } from "@/interfaces/interfaces";
+import { usePathname } from "next/navigation";
 
 export default function LinksBlock({
   title,
@@ -36,6 +37,8 @@ export default function LinksBlock({
             href={
               item.text === "Reports"
                 ? "https://github.com/b1on1kkk/Propwise/issues"
+                : item.text === "Home"
+                ? "/"
                 : item.text.toLowerCase().trim()
             }
           >
