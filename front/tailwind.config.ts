@@ -32,6 +32,9 @@ const config: Config = {
       },
       backdropBlur: {
         xs: "2px"
+      },
+      maxWidth: {
+        screen: "100vw"
       }
     }
   },

@@ -2,6 +2,8 @@
 
 import { useReducer } from "react";
 
+import axios from "axios";
+
 // components
 import CreateEventInputWrapper from "../CreateEvent/CreateEventInputWrapper/CreateEventInputWrapper";
 import CreateEventTimeInput from "../CreateEvent/CreateEventTimeInput/CreateEventTimeInput";
@@ -12,6 +14,7 @@ import { format } from "date-fns";
 import { useOutsideClick } from "@/hooks/useOutsideClick ";
 import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
 import { CheckForEmptyFields } from "@/utils/CheckForEmptyFields";
+import { GetEvents } from "@/API/GetUsersEvents";
 
 // reducers
 import {
@@ -20,13 +23,16 @@ import {
   AddingNewEventTypes
 } from "./NewEventReducer/NewEventReducer";
 
+// interfaces
+import type { Events } from "@/interfaces/interfaces";
+
 export default function AddingEventModal() {
   const {
     createModalStatus,
     setCreateModalStatus,
     chosenDay,
-    events,
-    setEvents
+    setEvents,
+    user
   } = useGlobalModalStatus();
 
   const handleClickOutside = () => {
@@ -39,20 +45,26 @@ export default function AddingEventModal() {
 
   const emptyFields = CheckForEmptyFields(state);
 
-  function CreateEvent() {
+  async function CreateEvent() {
     if (emptyFields) {
-      setEvents([
-        ...events,
-        {
-          eventName: state.eventName,
-          month: chosenDay!.month,
-          week_day: chosenDay!.week_day,
+      try {
+        await axios.post("http://localhost:2000/insert_event", {
+          user_id: user[0].id,
+          description: state.shortDescription,
+          event_name: state.eventName,
           day: format(chosenDay!.day, "d"),
+          week_day: chosenDay!.week_day,
+          month: chosenDay!.month,
           time_from: state.timeFrom,
-          time_to: state.timeTo,
-          description: state.shortDescription
-        }
-      ]);
+          time_to: state.timeTo
+        });
+
+        GetEvents(user[0].id, chosenDay!.month).then((events: Events[]) =>
+          setEvents(events)
+        );
+      } catch (error) {
+        console.log(error);
+      }
       setCreateModalStatus(!createModalStatus);
       dispatch({ type: AddingNewEventTypes.CLEAR, payload: "" });
     }

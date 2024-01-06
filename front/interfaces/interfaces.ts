@@ -1,5 +1,7 @@
 export interface Events {
-  eventName: string;
+  event_id: number;
+  user_id: number;
+  event_name: string;
   month: string;
   week_day: string;
   day: string;
@@ -79,4 +81,21 @@ export interface TRegistrationInput {
   onBlur: (e: React.FocusEvent<HTMLInputElement>) => void;
   showPassword?: boolean;
   setShowPassword?: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export interface OnlineSocketUsers {
+  user_id: number;
+  socket_id: string;
+}
+
+export interface TAvatarAndRole {
+  hideAsideMenu: boolean;
+  user: User[];
+  onlineUsers: OnlineSocketUsers[];
+}
+
+export interface TCalendarSettings {
+  id: number;
+  text: string;
+  move_to: string;
 }

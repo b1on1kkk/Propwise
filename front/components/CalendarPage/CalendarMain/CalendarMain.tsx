@@ -4,7 +4,7 @@ import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
 
 // utils
 import { format, getDay, isSameMonth } from "date-fns";
-import { months } from "@/constants/Months";
+import { months } from "@/constants/WeekDays";
 import { ColStartClasses } from "@/constants/ColStartClasses";
 import { ChangeStatusChosenDate } from "@/utils/ChangeStatusChosenDate";
 
@@ -64,7 +64,7 @@ export default function CalendarMain() {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  {events.map((event) => {
+                  {events.map((event, idx) => {
                     if (
                       event.month === currentMonth &&
                       event.day === format(day.day, "d") &&
@@ -73,7 +73,10 @@ export default function CalendarMain() {
                       if (counter < 1) {
                         counter++;
                         return (
-                          <div className="flex flex-col border-1 shadow p-2 rounded-lg gap-1 border-green-600">
+                          <div
+                            className="flex flex-col border-1 shadow p-2 rounded-lg gap-1 border-green-600"
+                            key={idx}
+                          >
                             <div className="flex gap-3 items-center">
                               <div>
                                 <GraduationCap
@@ -84,7 +87,7 @@ export default function CalendarMain() {
                               </div>
 
                               <div className="text-black flex-1">
-                                {event.eventName}
+                                {event.event_name}
                               </div>
 
                               <div>

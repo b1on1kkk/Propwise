@@ -5,9 +5,12 @@ import { useEffect, useState } from "react";
 // components
 import CalendarHeader from "@/components/CalendarPage/CalendarHeader/CalendarHeader";
 import CalendarMain from "@/components/CalendarPage/CalendarMain/CalendarMain";
+import CalendarDays from "@/components/CalendarPage/CalendarDays/CalendarDays";
+import Loading from "@/components/Loading/Loading";
 
 // context
 import { CalendarContext } from "@/context/CalendarContext";
+import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
 
 // utils
 import {
@@ -20,9 +23,27 @@ import {
   parse
 } from "date-fns";
 import { CreateExtendDays } from "@/utils/CreateExtendDays";
+import { GetEvents } from "@/API/GetUsersEvents";
 
 // interfaces
-import type { NewDays } from "@/interfaces/interfaces";
+import type { NewDays, TCalendarSettings } from "@/interfaces/interfaces";
+
+function ShowTypeOfCalendar(type: TCalendarSettings | null): React.ReactNode {
+  if (type) {
+    const { text } = type;
+
+    switch (text) {
+      case "M":
+        return <CalendarMain />;
+      case "D":
+        return <CalendarDays />;
+      default:
+        return <></>;
+    }
+  }
+
+  return <Loading />;
+}
 
 export default function Home() {
   const today = startOfToday();
@@ -38,9 +59,18 @@ export default function Home() {
     CreateExtendDays(days)
   );
 
+  const { setEvents, user } = useGlobalModalStatus();
+
   useEffect(() => {
     setExtendedDays(CreateExtendDays(days));
-  }, [currentMonth]);
+    if (user.length > 0) {
+      GetEvents(user[0].id, currentMonth).then((events) => setEvents(events));
+    }
+  }, [currentMonth, user]);
+
+  const [showCalendar, setShowCalendar] = useState<TCalendarSettings | null>(
+    null
+  );
 
   return (
     <CalendarContext.Provider
@@ -48,12 +78,12 @@ export default function Home() {
         extendedDays,
         currentMonth,
         setCurrentMonth,
-        setExtendedDays
+        setExtendedDays,
+        setShowCalendar
       }}
     >
       <CalendarHeader firstDayCurrentMonth={firstDayCurrentMonth} />
-
-      <CalendarMain />
+      {ShowTypeOfCalendar(showCalendar)}
     </CalendarContext.Provider>
   );
 }

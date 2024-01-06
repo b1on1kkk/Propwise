@@ -23,17 +23,36 @@ import { useGlobalCalendatContext } from "@/context/CalendarContext";
 // utils
 import { NextMonth, PrevMonth } from "./utils/NextAndPrevMonthControlles";
 import { IsAnyDayChosen } from "./utils/IsAnyDayChosen";
+import { SetToLocalStorageTypeofCalendar } from "./utils/SetToLocalStorageTypeofCalendar";
 
 export default function CalendarHeader({
   firstDayCurrentMonth
 }: {
   firstDayCurrentMonth: Date;
 }) {
-  const { setCurrentMonth, currentMonth, extendedDays } =
+  const { setCurrentMonth, currentMonth, extendedDays, setShowCalendar } =
     useGlobalCalendatContext();
   const { setCreateModalStatus, createModalStatus } = useGlobalModalStatus();
 
-  const [moveTo, setMoveTo] = useState<string>("41px");
+  // set default calendar status
+  useEffect(() => {
+    if (!localStorage.getItem("calendar_to_show")) {
+      setShowCalendar(CALENDAR_SETTINGS[1]);
+      SetToLocalStorageTypeofCalendar(CALENDAR_SETTINGS[1]);
+
+      return;
+    }
+
+    setShowCalendar(JSON.parse(localStorage.getItem("calendar_to_show")!));
+    SetToLocalStorageTypeofCalendar(
+      JSON.parse(localStorage.getItem("calendar_to_show")!)
+    );
+  }, []);
+
+  // use default calendar status
+  const [moveTo, setMoveTo] = useState<string>(
+    JSON.parse(localStorage.getItem("calendar_to_show")!).move_to
+  );
 
   const [isAnyDayChosenStatus, setIsAnyDayChosenStatus] = useState<boolean>(
     IsAnyDayChosen(extendedDays)
@@ -72,7 +91,11 @@ export default function CalendarHeader({
               <button
                 className={`font-semibold px-[14px] z-10 cursor-pointer text-[#56616b]`}
                 key={idx}
-                onClick={() => setMoveTo(item.move_to)}
+                onClick={() => {
+                  SetToLocalStorageTypeofCalendar(item);
+                  setShowCalendar(item);
+                  setMoveTo(item.move_to);
+                }}
               >
                 {item.text}
               </button>

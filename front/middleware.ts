@@ -10,9 +10,6 @@ export async function middleware(request: NextRequest) {
     headers: { "Content-Type": "application/json" }
   });
 
-  console.log(res.status);
-  console.log(request.url);
-
   // then check status, if status is not 401 - move on
   if (res.status !== 401) {
     return NextResponse.next();

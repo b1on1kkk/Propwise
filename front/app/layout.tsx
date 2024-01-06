@@ -1,9 +1,11 @@
 "use client";
 
 import "./globals.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+
 import axios from "axios";
+axios.defaults.withCredentials = true;
 
 // components
 import LeftAsideMenu from "@/components/LeftAsideMenu/LeftAsideMenu";
@@ -14,10 +16,25 @@ import AddingEventModal from "@/components/AddingEventModal/AddingEventModal";
 import { MyGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
 
 // interfaces
-import type { NewDays, Events } from "@/interfaces/interfaces";
+import type {
+  NewDays,
+  Events,
+  User,
+  OnlineSocketUsers
+} from "@/interfaces/interfaces";
+import { GetLoggedInUserInf } from "@/API/GetLoggedInUserInf";
 
-// for sessions
-axios.defaults.withCredentials = true;
+// socket
+import { io, Socket } from "socket.io-client";
+
+import {
+  ServerToClientEvents,
+  ClientToServerEvents
+} from "@/socket_io_typings";
+
+export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
+  "http://localhost:2000"
+);
 
 export default function RootLayout({
   children
@@ -29,34 +46,58 @@ export default function RootLayout({
   const [createModalStatus, setCreateModalStatus] = useState<boolean>(false);
   const [chosenDay, setChosenDay] = useState<NewDays | null>(null);
 
-  // temporary event storage
+  // event storage
   const [events, setEvents] = useState<Events[]>([]);
+
+  const [user, setUser] = useState<User[]>([]);
+  const [onlineUsers, setOnlineUsers] = useState<OnlineSocketUsers[]>([]);
+
+  // get users inf if path name changes
+  useEffect(() => {
+    GetLoggedInUserInf().then((data: User[]) => {
+      if (data.length > 0) {
+        setUser(data);
+
+        // get inf about connected users
+        socket.emit("userConnected", { new_connected_user_id: data[0].id });
+
+        // and get inf about online users
+        socket.on("getOnlineUsersId", (data) => {
+          setOnlineUsers(data);
+        });
+      }
+    });
+  }, [path]);
 
   return (
     <html lang="en">
-      <body className={createModalStatus ? "overflow-hidden" : ""}>
-        <div className="flex max-h-screen">
-          <MyGlobalModalStatus.Provider
-            value={{
-              chosenDay,
-              createModalStatus,
-              events,
-              // setters
-              setCreateModalStatus,
-              setChosenDay,
-              setEvents
-            }}
-          >
-            {path !== "/login" && path !== "/registration" && <LeftAsideMenu />}
+      <body
+        className={`${
+          createModalStatus ? "overflow-hidden" : ""
+        } flex max-h-screen max-w-screen`}
+      >
+        <MyGlobalModalStatus.Provider
+          value={{
+            chosenDay,
+            createModalStatus,
+            events,
+            user,
+            onlineUsers,
+            // setters
+            setCreateModalStatus,
+            setChosenDay,
+            setEvents
+          }}
+        >
+          {path !== "/login" && path !== "/registration" && <LeftAsideMenu />}
 
-            <div className="flex flex-col flex-1">
-              {path !== "/login" && path !== "/registration" && <Header />}
-              {children}
-            </div>
+          <div className="flex flex-col flex-1">
+            {path !== "/login" && path !== "/registration" && <Header />}
+            {children}
+          </div>
 
-            <AddingEventModal />
-          </MyGlobalModalStatus.Provider>
-        </div>
+          <AddingEventModal />
+        </MyGlobalModalStatus.Provider>
       </body>
     </html>
   );

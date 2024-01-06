@@ -9,20 +9,14 @@ export const LEFT_ASIDEMENU_MENU_DATA: MenuData[] = [
   },
   {
     id: 2,
-    icon_name: "CreditCard",
-    text: "Payments",
+    icon_name: "Inbox",
+    text: "Indox",
     status: false
   },
   {
     id: 3,
-    icon_name: "HardHat",
-    text: "Maintenance",
-    status: false
-  },
-  {
-    id: 4,
-    icon_name: "Inbox",
-    text: "Indox",
+    icon_name: "Users",
+    text: "Members",
     status: false
   }
 ];
