@@ -1,10 +1,15 @@
-import type { TNewEventInitialState } from "@/interfaces/interfaces";
+import type {
+  TNewEventInitialState,
+  AddingEventAction,
+  AddingEventState
+} from "@/interfaces/interfaces";
 
 export const NewEventInitialState: TNewEventInitialState = {
   eventName: "",
   timeFrom: "",
   timeTo: "",
-  shortDescription: ""
+  shortDescription: "",
+  link: ""
 };
 
 export enum AddingNewEventTypes {
@@ -12,19 +17,8 @@ export enum AddingNewEventTypes {
   TIME_FROM = "TIME_FROM",
   TIME_TO = "TIME_TO",
   SHORT_DESCRIPTION = "SHORT_DESCRIPTION",
+  LINK = "LINK",
   CLEAR = "CLEAR"
-}
-
-interface AddingEventAction {
-  type: AddingNewEventTypes;
-  payload: string;
-}
-
-interface AddingEventState {
-  eventName: string;
-  timeFrom: string;
-  timeTo: string;
-  shortDescription: string;
 }
 
 export function AddingEventReducer(
@@ -52,6 +46,11 @@ export function AddingEventReducer(
       return {
         ...state,
         timeTo: payload
+      };
+    case AddingNewEventTypes.LINK:
+      return {
+        ...state,
+        link: payload
       };
     case AddingNewEventTypes.CLEAR:
       return { ...NewEventInitialState };

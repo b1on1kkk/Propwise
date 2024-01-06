@@ -1,10 +1,9 @@
 import type { TNewEventInitialState } from "@/interfaces/interfaces";
 
 export function CheckForEmptyFields(data: TNewEventInitialState): boolean {
-  const dataArray: string[] = Object.values(data);
-
-  for (let i = 0; i < dataArray.length; i++)
-    if (!dataArray[i].replace(/\s/g, "")) return false;
+  for (const [key, value] of Object.entries(data)) {
+    if (!value.replace(/\s/g, "") && key !== "link") return false;
+  }
 
   return true;
 }

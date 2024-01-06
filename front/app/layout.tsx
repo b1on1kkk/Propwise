@@ -11,6 +11,7 @@ axios.defaults.withCredentials = true;
 import LeftAsideMenu from "@/components/LeftAsideMenu/LeftAsideMenu";
 import Header from "@/components/Header/Header";
 import AddingEventModal from "@/components/AddingEventModal/AddingEventModal";
+import ShowMoreEventsModal from "@/components/ShowMoreEventsModal/ShowMoreEventsModal";
 
 // context
 import { MyGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
@@ -44,7 +45,11 @@ export default function RootLayout({
   const path = usePathname();
 
   const [createModalStatus, setCreateModalStatus] = useState<boolean>(false);
+  const [detailedModalStatus, setDetailedModalStatus] =
+    useState<boolean>(false);
   const [chosenDay, setChosenDay] = useState<NewDays | null>(null);
+  const [chosenToSeeDetailedInfDay, setChosenToSeeDetailedInfDay] =
+    useState<NewDays | null>(null);
 
   // event storage
   const [events, setEvents] = useState<Events[]>([]);
@@ -80,13 +85,16 @@ export default function RootLayout({
           value={{
             chosenDay,
             createModalStatus,
+            detailedModalStatus,
             events,
             user,
             onlineUsers,
             // setters
             setCreateModalStatus,
+            setDetailedModalStatus,
             setChosenDay,
-            setEvents
+            setEvents,
+            setChosenToSeeDetailedInfDay
           }}
         >
           {path !== "/login" && path !== "/registration" && <LeftAsideMenu />}
@@ -97,6 +105,7 @@ export default function RootLayout({
           </div>
 
           <AddingEventModal />
+          <ShowMoreEventsModal day={chosenToSeeDetailedInfDay} />
         </MyGlobalModalStatus.Provider>
       </body>
     </html>

@@ -28,13 +28,13 @@ export default function CalendarDays() {
     setCurrentWeekStart(firstDayCurrentMonth);
   }, [currentMonth]);
 
-  const showNextWeek = () => {
-    setCurrentWeekStart((prevWeekStart) => addWeeks(prevWeekStart, 1));
-  };
+  // const showNextWeek = () => {
+  //   setCurrentWeekStart((prevWeekStart) => addWeeks(prevWeekStart, 1));
+  // };
 
-  const showPreviousWeek = () => {
-    setCurrentWeekStart((prevWeekStart) => subWeeks(prevWeekStart, 1));
-  };
+  // const showPreviousWeek = () => {
+  //   setCurrentWeekStart((prevWeekStart) => subWeeks(prevWeekStart, 1));
+  // };
 
   const daysOfCurrentWeek = eachDayOfInterval({
     start: startOfWeek(currentWeekStart),
@@ -69,14 +69,18 @@ export default function CalendarDays() {
       </header>
 
       <main className="flex flex-1 flex-col">
-        {TIME.map((time) => {
+        {TIME.map((time, idx) => {
           return (
-            <div className="flex">
+            <div className="flex" key={idx}>
               <div className="w-28 py-3 text-[#56616b] px-2 font-semibold border-1">
                 {time}
               </div>
-              {fakeArray.map((_) => {
-                return <div className="flex-1 h-48 border-1">1</div>;
+              {fakeArray.map((_, inner_idx) => {
+                return (
+                  <div className="flex-1 h-48 border-1" key={inner_idx}>
+                    1
+                  </div>
+                );
               })}
             </div>
           );

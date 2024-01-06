@@ -1,18 +1,20 @@
+// utils
 import { isSameMonth } from "date-fns";
 
+// interface
 import type { NewDays } from "@/interfaces/interfaces";
 
-export function ChangeStatusChosenDate(
+export function ShowMoreDateInf(
   days: NewDays[],
   chosen: NewDays,
-  setExtendedDays: (c: NewDays[]) => void,
+  setter: (c: NewDays[]) => void,
   currentMonth: string
 ) {
-  setExtendedDays([
+  setter([
     ...days.map((day) => {
       if (day.id === chosen.id && isSameMonth(day.day, currentMonth))
-        return { ...day, create_event: !chosen.create_event };
-      return { ...day, create_event: false };
+        return { ...day, mouse_over: !chosen.mouse_over };
+      return { ...day, mouse_over: false };
     })
   ]);
 }

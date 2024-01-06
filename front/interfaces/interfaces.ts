@@ -1,3 +1,5 @@
+import { AddingNewEventTypes } from "@/components/AddingEventModal/NewEventReducer/NewEventReducer";
+
 export interface Events {
   event_id: number;
   user_id: number;
@@ -8,6 +10,7 @@ export interface Events {
   time_from: string;
   time_to: string;
   description: string;
+  link: string;
 }
 
 export interface NewDays {
@@ -15,7 +18,8 @@ export interface NewDays {
   day: Date;
   month: string;
   week_day: string;
-  createEvent: boolean;
+  create_event: boolean;
+  mouse_over: boolean;
 }
 
 export interface TNewEventInitialState {
@@ -23,6 +27,7 @@ export interface TNewEventInitialState {
   timeFrom: string;
   timeTo: string;
   shortDescription: string;
+  link: string;
 }
 
 export interface User {
@@ -98,4 +103,43 @@ export interface TCalendarSettings {
   id: number;
   text: string;
   move_to: string;
+}
+
+export interface TEventCard {
+  name: string;
+  week_day: string;
+  month: string;
+  day: string;
+  time_from: string;
+  time_to: string;
+  description: string;
+  link: string;
+}
+
+export interface TShowMoreEventsModal {
+  day: NewDays | null;
+}
+
+export interface TBlockInf {
+  icon: React.ReactNode;
+  text: string;
+}
+
+export interface AddingEventAction {
+  type: AddingNewEventTypes;
+  payload: string;
+}
+
+export interface AddingEventState {
+  eventName: string;
+  timeFrom: string;
+  timeTo: string;
+  shortDescription: string;
+  link: string;
+}
+
+export interface TSmallEventCard {
+  link: string;
+  name: string;
+  description: string;
 }

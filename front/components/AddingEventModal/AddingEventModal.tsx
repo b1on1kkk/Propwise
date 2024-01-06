@@ -2,12 +2,12 @@
 
 import { useReducer } from "react";
 
-import axios from "axios";
-
 // components
 import CreateEventInputWrapper from "../CreateEvent/CreateEventInputWrapper/CreateEventInputWrapper";
 import CreateEventTimeInput from "../CreateEvent/CreateEventTimeInput/CreateEventTimeInput";
 import { X, Calendar, ArrowRight } from "lucide-react";
+import ModalWrapper from "../ModalWrapper/ModalWrapper";
+import CreateEventInputLink from "../CreateEvent/CreateEventInputLink/CreateEventInputLink";
 
 // utils
 import { format } from "date-fns";
@@ -22,6 +22,9 @@ import {
   NewEventInitialState,
   AddingNewEventTypes
 } from "./NewEventReducer/NewEventReducer";
+
+// API
+import { InsertEvent } from "@/API/InsertEvent";
 
 // interfaces
 import type { Events } from "@/interfaces/interfaces";
@@ -45,39 +48,25 @@ export default function AddingEventModal() {
 
   const emptyFields = CheckForEmptyFields(state);
 
-  async function CreateEvent() {
+  function CreateEvent() {
     if (emptyFields) {
-      try {
-        await axios.post("http://localhost:2000/insert_event", {
-          user_id: user[0].id,
-          description: state.shortDescription,
-          event_name: state.eventName,
-          day: format(chosenDay!.day, "d"),
-          week_day: chosenDay!.week_day,
-          month: chosenDay!.month,
-          time_from: state.timeFrom,
-          time_to: state.timeTo
-        });
+      const user_id = user[0].id;
 
-        GetEvents(user[0].id, chosenDay!.month).then((events: Events[]) =>
+      InsertEvent(user_id, state, chosenDay).then(() => {
+        GetEvents(user_id, chosenDay!.month).then((events: Events[]) =>
           setEvents(events)
         );
-      } catch (error) {
-        console.log(error);
-      }
+      });
+
       setCreateModalStatus(!createModalStatus);
       dispatch({ type: AddingNewEventTypes.CLEAR, payload: "" });
     }
   }
 
   return (
-    <div
-      className={`absolute left-0 top-0 w-screen h-screen backdrop-blur-xs flex items-center justify-center ${
-        createModalStatus ? "z-20" : "hidden"
-      }`}
-    >
+    <ModalWrapper status={createModalStatus}>
       <div
-        className="w-[450px] h-[450px] bg-white rounded-lg shadow-2xl"
+        className="w-[450px] h-[500px] bg-white rounded-lg shadow-2xl"
         ref={useOutsideClick(handleClickOutside)}
       >
         <header className="px-5 py-3 border-b-2 flex">
@@ -91,7 +80,7 @@ export default function AddingEventModal() {
           <CreateEventInputWrapper>
             <input
               type="text"
-              placeholder="Enter name"
+              placeholder="Enter title*"
               className="w-full focus:outline-none"
               onChange={(e) =>
                 dispatch({
@@ -119,7 +108,7 @@ export default function AddingEventModal() {
 
           <div className="flex gap-2 items-center">
             <CreateEventTimeInput
-              text="From"
+              text="From*"
               onChange={(e) =>
                 dispatch({
                   type: AddingNewEventTypes.TIME_FROM,
@@ -132,7 +121,7 @@ export default function AddingEventModal() {
             <ArrowRight width={20} height={20} color="#56616b" />
 
             <CreateEventTimeInput
-              text="To"
+              text="To*"
               onChange={(e) =>
                 dispatch({
                   type: AddingNewEventTypes.TIME_TO,
@@ -143,12 +132,23 @@ export default function AddingEventModal() {
             />
           </div>
 
+          <CreateEventInputLink
+            text="Enter link"
+            onChange={(e) =>
+              dispatch({
+                type: AddingNewEventTypes.LINK,
+                payload: e.target.value
+              })
+            }
+            value={state.link}
+          />
+
           <div className="mt-3">
             <CreateEventInputWrapper>
               <div className="h-[90px] w-full">
                 <textarea
                   className="resize-none w-full h-full focus:outline-none"
-                  placeholder="Add a descriptions..."
+                  placeholder="Add a descriptions*"
                   onChange={(e) =>
                     dispatch({
                       type: AddingNewEventTypes.SHORT_DESCRIPTION,
@@ -185,6 +185,6 @@ export default function AddingEventModal() {
           </button>
         </footer>
       </div>
-    </div>
+    </ModalWrapper>
   );
 }

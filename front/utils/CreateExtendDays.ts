@@ -1,5 +1,6 @@
 import { format } from "date-fns";
-import type { NewDays } from "@/context/CalendarContext";
+
+import type { NewDays } from "@/interfaces/interfaces";
 
 export function CreateExtendDays(days: Date[]) {
   const newDays: NewDays[] = [];
@@ -10,7 +11,8 @@ export function CreateExtendDays(days: Date[]) {
       day: day,
       month: format(day, "MMMM"),
       week_day: format(day, "EEEE"),
-      createEvent: false
+      create_event: false,
+      mouse_over: false
     });
   });
 

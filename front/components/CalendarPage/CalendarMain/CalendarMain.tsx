@@ -1,3 +1,9 @@
+"use client";
+
+// components
+import { MoreHorizontal } from "lucide-react";
+import SmallEventCard from "./SmallEventCard/SmallEventCard";
+
 // context
 import { useGlobalCalendatContext } from "@/context/CalendarContext";
 import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
@@ -7,13 +13,18 @@ import { format, getDay, isSameMonth } from "date-fns";
 import { months } from "@/constants/WeekDays";
 import { ColStartClasses } from "@/constants/ColStartClasses";
 import { ChangeStatusChosenDate } from "@/utils/ChangeStatusChosenDate";
-
-import { GraduationCap, MoreVertical } from "lucide-react";
+import { ShowMoreDateInf } from "@/utils/ShowMoreDateInf";
 
 export default function CalendarMain() {
   const { extendedDays, currentMonth, setExtendedDays } =
     useGlobalCalendatContext();
-  const { setChosenDay, events } = useGlobalModalStatus();
+  const {
+    setChosenDay,
+    events,
+    detailedModalStatus,
+    setChosenToSeeDetailedInfDay,
+    setDetailedModalStatus
+  } = useGlobalModalStatus();
 
   return (
     <main className="flex-1 overflow-auto">
@@ -37,11 +48,13 @@ export default function CalendarMain() {
             return (
               <div
                 key={idx}
-                className={`border-1 h-60 text-[#56616b] font-semibold flex flex-col justify-between p-3 ${
+                className={`border-1 h-60 text-[#56616b] font-semibold flex flex-col justify-between p-3 transition-all duration-200 ${
                   idx === 0 && ColStartClasses[getDay(day.day)]
                 } ${!isSameMonth(day.day, currentMonth) && "bg-gray-50"} ${
-                  day.createEvent && "border-green-500"
-                }`}
+                  day.create_event && "border-green-500"
+                } ${
+                  day.mouse_over && !day.create_event && "shadow-inner"
+                } transition-all duration-200 ease-in`}
                 onClick={() => {
                   if (isSameMonth(day.day, currentMonth)) {
                     ChangeStatusChosenDate(
@@ -56,11 +69,39 @@ export default function CalendarMain() {
                     });
                   }
                 }}
+                onMouseEnter={() => {
+                  ShowMoreDateInf(
+                    extendedDays,
+                    day,
+                    setExtendedDays,
+                    currentMonth
+                  );
+                }}
+                onMouseLeave={() => {
+                  ShowMoreDateInf(
+                    extendedDays,
+                    day,
+                    setExtendedDays,
+                    currentMonth
+                  );
+                }}
               >
-                <div className="inline-block">
+                <div className="flex justify-between items-center min-h-7">
                   <time dateTime={format(day.day, "yyyy-mm-dd")}>
                     {format(day.day, "d")}
                   </time>
+
+                  {day.mouse_over && (
+                    <button
+                      className={`p-1 border-1 rounded-lg text-[#b5b5b5] hover:text-[#696969] active:translate-y-0.5 shadow cursor-pointer`}
+                      onClick={() => {
+                        setChosenToSeeDetailedInfDay(day);
+                        setDetailedModalStatus(!detailedModalStatus);
+                      }}
+                    >
+                      <MoreHorizontal width={18} height={18} />
+                    </button>
+                  )}
                 </div>
 
                 <div className="flex flex-col gap-2">
@@ -73,30 +114,12 @@ export default function CalendarMain() {
                       if (counter < 1) {
                         counter++;
                         return (
-                          <div
-                            className="flex flex-col border-1 shadow p-2 rounded-lg gap-1 border-green-600"
+                          <SmallEventCard
                             key={idx}
-                          >
-                            <div className="flex gap-3 items-center">
-                              <div>
-                                <GraduationCap
-                                  width={20}
-                                  height={20}
-                                  color="rgb(22 163 74)"
-                                />
-                              </div>
-
-                              <div className="text-black flex-1">
-                                {event.event_name}
-                              </div>
-
-                              <div>
-                                <MoreVertical width={18} height={18} />
-                              </div>
-                            </div>
-
-                            <div className="text-sm">{event.description}</div>
-                          </div>
+                            link={event.link}
+                            name={event.event_name}
+                            description={event.description}
+                          />
                         );
                       }
                       counter++;
