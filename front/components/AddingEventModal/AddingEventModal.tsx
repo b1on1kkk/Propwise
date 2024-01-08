@@ -64,7 +64,10 @@ export default function AddingEventModal() {
   }
 
   return (
-    <ModalWrapper status={createModalStatus}>
+    <ModalWrapper
+      status={createModalStatus}
+      className="items-center justify-center"
+    >
       <div
         className="w-[450px] h-[500px] bg-white rounded-lg shadow-2xl"
         ref={useOutsideClick(handleClickOutside)}

@@ -11,7 +11,7 @@ axios.defaults.withCredentials = true;
 import LeftAsideMenu from "@/components/LeftAsideMenu/LeftAsideMenu";
 import Header from "@/components/Header/Header";
 import AddingEventModal from "@/components/AddingEventModal/AddingEventModal";
-import ShowMoreEventsModal from "@/components/ShowMoreEventsModal/ShowMoreEventsModal";
+import ShowMoreEventsRightModal from "@/components/ShowMoreEventsRightModal/ShowMoreEventsRightModal";
 
 // context
 import { MyGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
@@ -25,11 +25,14 @@ import type {
 } from "@/interfaces/interfaces";
 import { GetLoggedInUserInf } from "@/API/GetLoggedInUserInf";
 
+// hooks
+import { useLocalStorage } from "@/hooks/useLocalStorage";
+
+// constants
+import { CALENDAR_SETTINGS } from "@/constants/CalendarSettings";
+
 // socket
 import { io, Socket } from "socket.io-client";
-
-import { useLocalStorage } from "@/hooks/useLocalStorage";
-import { CALENDAR_SETTINGS } from "@/constants/CalendarSettings";
 
 import {
   ServerToClientEvents,
@@ -77,6 +80,7 @@ export default function RootLayout({
     });
   }, [path]);
 
+  // save to localstorage static if about blocks status
   const { storedLocalStorageValue, setLocalStorageValue } = useLocalStorage(
     "settings",
     { ...CALENDAR_SETTINGS[1], status: false }
@@ -86,7 +90,7 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${
-          createModalStatus ? "overflow-hidden" : ""
+          createModalStatus || detailedModalStatus ? "overflow-hidden" : ""
         } flex max-h-screen max-w-screen`}
       >
         <MyGlobalModalStatus.Provider
@@ -115,7 +119,7 @@ export default function RootLayout({
           </div>
 
           <AddingEventModal />
-          <ShowMoreEventsModal day={chosenToSeeDetailedInfDay} />
+          <ShowMoreEventsRightModal day={chosenToSeeDetailedInfDay} />
         </MyGlobalModalStatus.Provider>
       </body>
     </html>

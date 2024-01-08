@@ -48,7 +48,7 @@ export default function CalendarMain() {
             return (
               <div
                 key={idx}
-                className={`border-1 h-60 text-[#56616b] font-semibold flex flex-col justify-between p-3 transition-all duration-200 ${
+                className={`border-1 h-60 text-[#56616b] font-semibold flex flex-col justify-between p-3 transition-all duration-200${
                   idx === 0 && ColStartClasses[getDay(day.day)]
                 } ${!isSameMonth(day.day, currentMonth) && "bg-gray-50"} ${
                   day.create_event && "border-green-500"

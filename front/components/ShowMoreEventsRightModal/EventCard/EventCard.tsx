@@ -1,8 +1,6 @@
-import Link from "next/link";
-
 // components
 import { BookText, Calendar, Clock } from "lucide-react";
-import BlockInf from "../BlockInf/BlockInf";
+import BlockInf from "./BlockInf/BlockInf";
 
 // interfaces
 import type { TEventCard } from "@/interfaces/interfaces";
@@ -21,9 +19,9 @@ export default function EventCard({
     <div className="border-1 rounded-lg shadow flex p-3 text-[#56616b] flex-col gap-1">
       <div className="text-xl font-semibold text-center">
         {link ? (
-          <Link href={link}>
+          <a href={link} target="_blank" rel="noreferrer">
             <span className="text-indigo-500">{name}</span>
-          </Link>
+          </a>
         ) : (
           <>{name}</>
         )}

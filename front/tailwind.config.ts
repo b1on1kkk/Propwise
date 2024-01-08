@@ -8,11 +8,6 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))"
-      },
       borderWidth: {
         1: "1px"
       },
@@ -35,6 +30,18 @@ const config: Config = {
       },
       maxWidth: {
         screen: "100vw"
+      },
+      boxShadow: {
+        rme_shadow: "-10px 0px 10px 2px rgba(34, 60, 80, 0.2)"
+      },
+      animation: {
+        overlay_motion_anim:
+          "overlay_motion .25s cubic-bezier(0.33, 1, 0.68, 1) 0s 1 normal none running;"
+      },
+      keyframes: {
+        overlay_motion: {
+          "0%": { transform: "translateX(100%)" }
+        }
       }
     }
   },

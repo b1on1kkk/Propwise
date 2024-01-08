@@ -1,7 +1,8 @@
+// components
+import AvatarAndRole from "@/components/AvatarAndRole/AvatarAndRole";
+
 // context
 import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
-
-import AvatarAndRole from "@/components/AvatarAndRole/AvatarAndRole";
 
 export default function Footer() {
   const { user, onlineUsers, storedLocalStorageValue } = useGlobalModalStatus();

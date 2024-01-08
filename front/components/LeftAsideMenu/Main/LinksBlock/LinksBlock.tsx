@@ -54,7 +54,7 @@ export default function LinksBlock({
                 }`}
               >
                 <div
-                  className={`p-2 border-1 rounded-lg transition-all duration-200 ${
+                  className={`p-2 border-1 rounded-lg transition-all duration-200${
                     item.status ? "border-green-400 shadow drop-shadow-lg" : ""
                   }`}
                 >

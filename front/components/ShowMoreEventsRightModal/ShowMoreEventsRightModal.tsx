@@ -1,11 +1,12 @@
-"use client";
-
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 // components
+import { X, Calendar } from "lucide-react";
 import EventCard from "./EventCard/EventCard";
-import { Calendar, X } from "lucide-react";
 import ModalWrapper from "../ModalWrapper/ModalWrapper";
+
+// interfaces
+import type { Events, TShowMoreEventsModal } from "@/interfaces/interfaces";
 
 // context
 import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
@@ -16,10 +17,9 @@ import { useOutsideClick } from "@/hooks/useOutsideClick ";
 // utils
 import { FindChosenDayEvents } from "@/utils/FindChosenDayEvents";
 
-// interfaces
-import type { Events, TShowMoreEventsModal } from "@/interfaces/interfaces";
-
-export default function ShowMoreEventsModal({ day }: TShowMoreEventsModal) {
+export default function ShowMoreEventsRightModal({
+  day
+}: TShowMoreEventsModal) {
   const [dayEvents, setDayEvents] = useState<Events[]>([]);
 
   const { events, detailedModalStatus, setDetailedModalStatus } =
@@ -36,14 +36,17 @@ export default function ShowMoreEventsModal({ day }: TShowMoreEventsModal) {
   }, [day]);
 
   return (
-    <ModalWrapper status={detailedModalStatus}>
+    <ModalWrapper
+      status={detailedModalStatus}
+      className="items-center justify-end"
+    >
       <div
-        className="w-[450px] h-[450px] bg-white rounded-lg shadow-2xl flex flex-col"
+        className="h-screen w-[400px] bg-white shadow-rme_shadow flex flex-col animate-overlay_motion_anim"
         ref={useOutsideClick(handleClickOutside)}
       >
-        <header className="px-5 py-3 border-b-2 flex drop-shadow">
+        <header className="px-5 py-3 border-b-2 flex">
           <span className="font-semibold flex-1 text-lg">
-            Detailed Events Information
+            Detailed Event Information
           </span>
           <button
             onClick={() => {

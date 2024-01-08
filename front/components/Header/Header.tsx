@@ -8,11 +8,14 @@ import { Search, Bell } from "lucide-react";
 // constants
 import { HOMEPAGE_HEADER } from "@/constants/HomepageHeader";
 
+// import Toggle from "react-toggle";
+// import { MoonStar, Sun } from "lucide-react";
+
 export default function Header() {
   const [moveTo, setMoveTo] = useState<string>("-2px");
 
   return (
-    <header className="p-3 py-[9px] border-b-1 flex items-center border-l-1 bg-white">
+    <header className="p-3 py-[9px] border-b-1 flex items-center border-l-1">
       <div className="flex flex-1">
         <div className="flex py-2 bg-gray-100 rounded-lg relative select-none z-10">
           {HOMEPAGE_HEADER.map((item, idx) => {
@@ -40,6 +43,16 @@ export default function Header() {
             } shadow-sm transition-all duration-300 ease-[cubic-bezier(0.68,-0.55,0.27,1.55)]`}
           />
         </div>
+
+        {/* <label>
+          <Toggle
+            defaultChecked={false}
+            icons={{
+              checked: <Sun width={20} />,
+              unchecked: <MoonStar width={20} />
+            }}
+          />
+        </label> */}
       </div>
       <div className="flex gap-2">
         <div className="flex items-center bg-gray-100 border-1 px-3 rounded-lg gap-2">
