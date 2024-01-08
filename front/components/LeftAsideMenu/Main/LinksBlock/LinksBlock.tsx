@@ -4,11 +4,10 @@ import Link from "next/link";
 import Icon from "../Icon/Icon";
 
 // context
-import { useAsideMenuContext } from "../../../../context/LeftAsideMenuHeaderContext";
+import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
 
 // interfaces
 import type { TLinksBlock } from "@/interfaces/interfaces";
-import { usePathname } from "next/navigation";
 
 export default function LinksBlock({
   title,
@@ -17,14 +16,14 @@ export default function LinksBlock({
   setter,
   till_end_status
 }: TLinksBlock) {
-  const { hideAsideMenu } = useAsideMenuContext();
+  const { storedLocalStorageValue } = useGlobalModalStatus();
 
   return (
     <div className={till_end_status ? "flex-1" : ""}>
       {title && (
         <div
           className={`text-sm font-semibold pt-4 pb-1 ${
-            hideAsideMenu ? "text-center" : "pl-3"
+            storedLocalStorageValue.status ? "text-center" : "pl-3"
           }`}
         >
           {title}
@@ -51,7 +50,7 @@ export default function LinksBlock({
                 className={`p-3 flex items-center gap-3 ${
                   item.status ? "bg-[#e7f5ee]" : ""
                 } transition-all duration-200 ${
-                  hideAsideMenu ? "justify-center" : ""
+                  storedLocalStorageValue.status ? "justify-center" : ""
                 }`}
               >
                 <div
@@ -61,7 +60,7 @@ export default function LinksBlock({
                 >
                   <Icon icon_name={item.icon_name} hover_status={item.status} />
                 </div>
-                {!hideAsideMenu && (
+                {!storedLocalStorageValue.status && (
                   <div
                     className={`font-semibold transition-all duration-200 ${
                       item.status ? "text-black" : ""

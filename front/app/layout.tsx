@@ -28,6 +28,9 @@ import { GetLoggedInUserInf } from "@/API/GetLoggedInUserInf";
 // socket
 import { io, Socket } from "socket.io-client";
 
+import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { CALENDAR_SETTINGS } from "@/constants/CalendarSettings";
+
 import {
   ServerToClientEvents,
   ClientToServerEvents
@@ -74,6 +77,11 @@ export default function RootLayout({
     });
   }, [path]);
 
+  const { storedLocalStorageValue, setLocalStorageValue } = useLocalStorage(
+    "settings",
+    { ...CALENDAR_SETTINGS[1], status: false }
+  );
+
   return (
     <html lang="en">
       <body
@@ -89,12 +97,14 @@ export default function RootLayout({
             events,
             user,
             onlineUsers,
+            storedLocalStorageValue,
             // setters
             setCreateModalStatus,
             setDetailedModalStatus,
             setChosenDay,
             setEvents,
-            setChosenToSeeDetailedInfDay
+            setChosenToSeeDetailedInfDay,
+            setLocalStorageValue
           }}
         >
           {path !== "/login" && path !== "/registration" && <LeftAsideMenu />}

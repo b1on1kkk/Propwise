@@ -94,7 +94,7 @@ export interface OnlineSocketUsers {
 }
 
 export interface TAvatarAndRole {
-  hideAsideMenu: boolean;
+  hideAsideMenuStatus: boolean;
   user: User[];
   onlineUsers: OnlineSocketUsers[];
 }
@@ -142,4 +142,8 @@ export interface TSmallEventCard {
   link: string;
   name: string;
   description: string;
+}
+
+export interface ExtendedLocalStorageType extends TCalendarSettings {
+  status: boolean;
 }

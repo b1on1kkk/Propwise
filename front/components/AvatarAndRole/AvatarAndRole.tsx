@@ -5,21 +5,21 @@ import { CheckUserOnline } from "@/utils/CheckUserOnline";
 import type { TAvatarAndRole } from "@/interfaces/interfaces";
 
 export default function AvatarAndRole({
-  hideAsideMenu,
+  hideAsideMenuStatus,
   user,
   onlineUsers
 }: TAvatarAndRole) {
   return (
     <div
       className={`flex gap-3 items-center relative ${
-        hideAsideMenu ? "justify-center" : ""
+        hideAsideMenuStatus ? "justify-center" : ""
       }`}
     >
       <div className="w-10 h-10 bg-gray-400 rounded-lg" />
 
       <div
         className={`w-[14px] h-[14px] bg-white rounded-full absolute right-0 bottom-0 top-6 ${
-          hideAsideMenu ? "left-12" : "left-8"
+          hideAsideMenuStatus ? "left-12" : "left-8"
         } flex items-center justify-center border-1 border-gray-400`}
       >
         {user.length > 0 && (
@@ -36,7 +36,7 @@ export default function AvatarAndRole({
         )}
       </div>
 
-      {!hideAsideMenu && (
+      {!hideAsideMenuStatus && (
         <div className="flex flex-col">
           {user.length > 0 ? (
             <>

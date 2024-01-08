@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import CalendarHeader from "@/components/CalendarPage/CalendarHeader/CalendarHeader";
 import CalendarMain from "@/components/CalendarPage/CalendarMain/CalendarMain";
 import CalendarDays from "@/components/CalendarPage/CalendarDays/CalendarDays";
-import Loading from "@/components/Loading/Loading";
 
 // context
 import { CalendarContext } from "@/context/CalendarContext";
@@ -26,23 +25,17 @@ import { CreateExtendDays } from "@/utils/CreateExtendDays";
 import { GetEvents } from "@/API/GetUsersEvents";
 
 // interfaces
-import type { NewDays, TCalendarSettings } from "@/interfaces/interfaces";
+import type { NewDays } from "@/interfaces/interfaces";
 
-function ShowTypeOfCalendar(type: TCalendarSettings | null): React.ReactNode {
-  if (type) {
-    const { text } = type;
-
-    switch (text) {
-      case "M":
-        return <CalendarMain />;
-      case "D":
-        return <CalendarDays />;
-      default:
-        return <></>;
-    }
+function ShowTypeOfCalendar(type: string): React.ReactNode {
+  switch (type) {
+    case "M":
+      return <CalendarMain />;
+    case "D":
+      return <CalendarDays />;
+    default:
+      return <></>;
   }
-
-  return <Loading />;
 }
 
 export default function Home() {
@@ -59,7 +52,7 @@ export default function Home() {
     CreateExtendDays(days)
   );
 
-  const { setEvents, user } = useGlobalModalStatus();
+  const { setEvents, user, storedLocalStorageValue } = useGlobalModalStatus();
 
   useEffect(() => {
     setExtendedDays(CreateExtendDays(days));
@@ -68,22 +61,17 @@ export default function Home() {
     }
   }, [currentMonth, user]);
 
-  const [showCalendar, setShowCalendar] = useState<TCalendarSettings | null>(
-    null
-  );
-
   return (
     <CalendarContext.Provider
       value={{
         extendedDays,
         currentMonth,
         setCurrentMonth,
-        setExtendedDays,
-        setShowCalendar
+        setExtendedDays
       }}
     >
       <CalendarHeader firstDayCurrentMonth={firstDayCurrentMonth} />
-      {ShowTypeOfCalendar(showCalendar)}
+      {ShowTypeOfCalendar(storedLocalStorageValue.text)}
     </CalendarContext.Provider>
   );
 }
