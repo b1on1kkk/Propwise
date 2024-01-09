@@ -147,3 +147,19 @@ export interface TSmallEventCard {
 export interface ExtendedLocalStorageType extends TCalendarSettings {
   status: boolean;
 }
+
+export interface Members extends User {
+  status: "accepted" | "pending" | "declined" | null;
+}
+
+export interface TMemberCard {
+  member: Members;
+  loggedin_user: User;
+  setMembers: (c: Members[]) => void;
+}
+
+export interface TStatusButton {
+  icon_name: string;
+  className: string;
+  onClick: () => void;
+}

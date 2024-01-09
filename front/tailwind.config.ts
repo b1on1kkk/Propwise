@@ -42,6 +42,9 @@ const config: Config = {
         overlay_motion: {
           "0%": { transform: "translateX(100%)" }
         }
+      },
+      translate: {
+        center_card_avatar: "translate(-50%, -50%);"
       }
     }
   },

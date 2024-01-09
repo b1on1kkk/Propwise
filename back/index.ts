@@ -76,6 +76,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 ////////////////////////////////////////POST////////////////////////////////////////
 
+// logg in user
 app.post("/login", (req: Request, res: Response) => {
   const { email, password } = req.body;
 
@@ -113,6 +114,7 @@ app.post("/login", (req: Request, res: Response) => {
   );
 });
 
+// sing up user
 app.post("/sing_up", (req: Request, res: Response) => {
   db.query("INSERT INTO users SET ?", [req.body], (error: Error) => {
     if (error) return res.status(500).send(error);
@@ -126,6 +128,7 @@ app.post("/sing_up", (req: Request, res: Response) => {
   return res.status(200).send("Successfully!");
 });
 
+// check session status
 app.post("/session_status", (req: Request, res: Response) => {
   const { key } = req.body;
 
@@ -147,6 +150,7 @@ app.post("/session_status", (req: Request, res: Response) => {
   );
 });
 
+// create new event
 app.post("/insert_event", (req: Request, res: Response) => {
   db.query("INSERT INTO events SET ?", [req.body], (error: Error) => {
     if (error) return res.status(500).send(error);
@@ -155,8 +159,18 @@ app.post("/insert_event", (req: Request, res: Response) => {
   });
 });
 
+// create relation ship based on first user id (logged user) and second user id (person whom request was sent)
+app.post("/create_friendship", (req: Request, res: Response) => {
+  db.query("INSERT INTO friendship SET ?", [req.body], (error: Error) => {
+    if (error) return res.status(500).send(error);
+
+    return res.status(200).send("Request to create friendship sent!");
+  });
+});
+
 ////////////////////////////////////////GET////////////////////////////////////////
 
+// get logged user based on hash_key
 app.get("/logged_user", (req: Request, res: Response) => {
   db.query(
     "SELECT id, name, lastname, email, avatar, role FROM users WHERE hash_key = ?",
@@ -169,6 +183,7 @@ app.get("/logged_user", (req: Request, res: Response) => {
   );
 });
 
+// get events based on month and user_id
 app.get("/events", (req: Request, res: Response) => {
   const { user_id, month } = req.query;
 
@@ -181,6 +196,44 @@ app.get("/events", (req: Request, res: Response) => {
       return res.status(200).json(result);
     }
   );
+});
+
+// get all users except logged in user, also get friendship status: accepted, pending, declined
+app.get("/members", (req: Request, res: Response) => {
+  const { user_id } = req.query;
+
+  const query = `
+  SELECT
+    users.id, users.name, users.lastname, users.email, users.role, users.avatar,
+    friendship.status
+  FROM
+    users
+  LEFT JOIN
+    friendship ON users.id = friendship.user1_id OR users.id = friendship.user2_id
+    AND (friendship.user1_id = 1 OR friendship.user2_id = 1)
+  WHERE
+    users.id != 1
+  `;
+
+  db.query(query, [user_id], (error: Error, result: any) => {
+    if (error) return res.status(500).send(error);
+
+    return res.status(200).json(result);
+  });
+});
+
+// get friends of logged user
+app.get("/get_friends", (req: Request, res: Response) => {
+  const { user1_id } = req.query;
+
+  const query =
+    "SELECT users.id, users.name, users.lastname, users.email, users.role, users.avatar, friendship.status FROM users JOIN friendship ON (users.id = friendship.user2_id AND friendship.user1_id = 1) WHERE users.id != 1";
+
+  db.query(query, [user1_id], (error: Error, result: any) => {
+    if (error) return res.status(500).send(error);
+
+    return res.status(200).json(result);
+  });
 });
 
 server.listen(2000, () => {

@@ -1,0 +1,6 @@
+.avatar_position {
+  @apply w-24 h-24 rounded-full bg-gray-500 absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

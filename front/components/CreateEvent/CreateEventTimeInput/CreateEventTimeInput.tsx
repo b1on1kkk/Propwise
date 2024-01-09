@@ -17,9 +17,9 @@ export default function CreateEventTimeInput({
           <Clock width={20} height={20} />
         </div>
         <input
-          type="text"
+          type="time"
           placeholder={text}
-          className="w-full focus:outline-none"
+          className="w-full focus:outline-none "
           onChange={onChange}
           value={value}
         />
