@@ -21,19 +21,5 @@ export async function middleware(request: NextRequest) {
 
 // project pages
 export const config = {
-  matcher: [
-    "/properties",
-    "/tenants",
-    "/transactions",
-    "/finance",
-    "/commisions",
-    "/",
-    "/home",
-    "/payments",
-    "/maintenance",
-    "/indox",
-    "/settings",
-    "/help%20&%20support",
-    "/reports"
-  ]
+  matcher: ["/members", "/", "/indox", "/settings", "/help%20&%20support"]
 };

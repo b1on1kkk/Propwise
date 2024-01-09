@@ -26,6 +26,36 @@ const io = new Server(server, {
 
 let onlineUsers: { user_id: number; socket_id: string }[] = [];
 
+// move to utils in future
+function FindUser(
+  to_find_user_id: number,
+  onlineUsers: { user_id: number; socket_id: string }[]
+) {
+  for (let i = 0; i < onlineUsers.length; i++) {
+    if (onlineUsers[i].user_id === to_find_user_id) {
+      return onlineUsers[i].socket_id;
+    }
+  }
+
+  return null;
+}
+
+function SaveNotifications(notification: {
+  user_id: number;
+  notif_type: "system" | "friend_request";
+  context: string;
+}) {
+  db.query(
+    "INSERT INTO notifications SET ?",
+    [notification],
+    (error: Error) => {
+      if (error) return error;
+    }
+  );
+}
+
+//
+
 io.on("connection", (socket: any) => {
   // check if user is online
   socket.on("userConnected", (data: { new_connected_user_id: number }) => {
@@ -37,15 +67,46 @@ io.on("connection", (socket: any) => {
         socket_id: socket.id
       });
     }
+
     io.emit("getOnlineUsersId", onlineUsers);
   });
+
   socket.on("disconnect", () => {
     onlineUsers = [
       ...onlineUsers.filter((user) => user.socket_id !== socket.id)
     ];
+
     io.emit("getOnlineUsersId", onlineUsers);
   });
   //
+
+  // listen for friend request notifications
+  socket.on(
+    "sendNotificationsTo",
+    (data: {
+      user_id: number;
+      notif_type: "system" | "friend_request";
+      message: string;
+    }) => {
+      // find user socket_id
+      const socket_id = FindUser(data.user_id, onlineUsers);
+
+      // if socket_id not null => user is online and we can send him notification straightforward
+      if (socket_id) {
+        io.to(socket_id).emit("sendNotificationsFrom", {
+          message: data.message,
+          notif_type: data.notif_type
+        });
+      }
+
+      // then, in any case, save notification in database
+      SaveNotifications({
+        user_id: data.user_id,
+        notif_type: data.notif_type,
+        context: data.message
+      });
+    }
+  );
 });
 
 instrument(io, {
@@ -209,13 +270,12 @@ app.get("/members", (req: Request, res: Response) => {
   FROM
     users
   LEFT JOIN
-    friendship ON users.id = friendship.user1_id OR users.id = friendship.user2_id
-    AND (friendship.user1_id = 1 OR friendship.user2_id = 1)
+    friendship ON users.id = friendship.user2_id AND (friendship.user1_id = ? OR friendship.user2_id = ?)
   WHERE
-    users.id != 1
+    users.id != ?
   `;
 
-  db.query(query, [user_id], (error: Error, result: any) => {
+  db.query(query, [user_id, user_id, user_id], (error: Error, result: any) => {
     if (error) return res.status(500).send(error);
 
     return res.status(200).json(result);
@@ -223,17 +283,32 @@ app.get("/members", (req: Request, res: Response) => {
 });
 
 // get friends of logged user
-app.get("/get_friends", (req: Request, res: Response) => {
-  const { user1_id } = req.query;
+// app.get("/get_friends", (req: Request, res: Response) => {
+//   const { user1_id } = req.query;
 
-  const query =
-    "SELECT users.id, users.name, users.lastname, users.email, users.role, users.avatar, friendship.status FROM users JOIN friendship ON (users.id = friendship.user2_id AND friendship.user1_id = 1) WHERE users.id != 1";
+//   const query =
+//     "SELECT users.id, users.name, users.lastname, users.email, users.role, users.avatar, friendship.status FROM users JOIN friendship ON (users.id = friendship.user2_id AND friendship.user1_id = ?) WHERE users.id != ?";
 
-  db.query(query, [user1_id], (error: Error, result: any) => {
-    if (error) return res.status(500).send(error);
+//   db.query(query, [user1_id, user1_id], (error: Error, result: any) => {
+//     if (error) return res.status(500).send(error);
 
-    return res.status(200).json(result);
-  });
+//     return res.status(200).json(result);
+//   });
+// });
+
+// get notifications
+app.get("/notificaitons", (req: Request, res: Response) => {
+  const { user_id } = req.query;
+
+  db.query(
+    "SELECT notif_type, context FROM notifications WHERE user_id = ?",
+    [user_id],
+    (error: Error, result: any) => {
+      if (error) return res.status(500).send(error);
+
+      return res.status(200).json(result);
+    }
+  );
 });
 
 server.listen(2000, () => {

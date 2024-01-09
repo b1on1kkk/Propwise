@@ -39,10 +39,6 @@ import {
   ClientToServerEvents
 } from "@/socket_io_typings";
 
-export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
-  "http://localhost:2000"
-);
-
 export default function RootLayout({
   children
 }: {
@@ -63,24 +59,42 @@ export default function RootLayout({
   const [user, setUser] = useState<User[]>([]);
   const [onlineUsers, setOnlineUsers] = useState<OnlineSocketUsers[]>([]);
 
+  const [socket, setScocket] = useState<Socket<
+    ServerToClientEvents,
+    ClientToServerEvents
+  > | null>(null);
+
   // get users inf if path name changes
   useEffect(() => {
     GetLoggedInUserInf().then((data: User[]) => {
-      if (data.length > 0) {
-        setUser(data);
-
-        // get inf about connected users
-        socket.emit("userConnected", { new_connected_user_id: data[0].id });
-
-        // and get inf about online users
-        socket.on("getOnlineUsersId", (data) => {
-          setOnlineUsers(data);
-        });
-      }
+      // set user only when data returned and user array empty
+      if (data.length > 0 && user.length === 0) setUser(data);
     });
   }, [path]);
 
-  // save to localstorage static if about blocks status
+  useEffect(() => {
+    if (user.length > 0 && !socket) {
+      // create socket only when user is connected
+      const socket_io: Socket<ServerToClientEvents, ClientToServerEvents> = io(
+        "http://localhost:2000"
+      );
+
+      // set socket for future import
+      setScocket(socket_io);
+
+      // send if to server that user is connected
+      socket_io.emit("userConnected", {
+        new_connected_user_id: user[0].id
+      });
+
+      // and get inf about online users
+      socket_io.on("getOnlineUsersId", (data) => {
+        setOnlineUsers(data);
+      });
+    }
+  }, [user]);
+
+  // save to localstorage static data that user can change while using app
   const { storedLocalStorageValue, setLocalStorageValue } = useLocalStorage(
     "settings",
     { ...CALENDAR_SETTINGS[1], status: false }
@@ -102,6 +116,7 @@ export default function RootLayout({
             user,
             onlineUsers,
             storedLocalStorageValue,
+            socket,
             // setters
             setCreateModalStatus,
             setDetailedModalStatus,

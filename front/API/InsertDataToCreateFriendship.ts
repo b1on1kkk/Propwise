@@ -8,7 +8,7 @@ export async function InsertDataToCreateFriendship(
     await axios.post("http://localhost:2000/create_friendship", {
       user1_id,
       user2_id,
-      status: "accepted"
+      status: "pending"
     });
   } catch (error) {
     console.log(error);

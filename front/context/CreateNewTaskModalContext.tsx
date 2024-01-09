@@ -14,6 +14,12 @@ import type {
 // constants
 import { CALENDAR_SETTINGS } from "@/constants/CalendarSettings";
 
+import { Socket } from "socket.io-client";
+import {
+  ClientToServerEvents,
+  ServerToClientEvents
+} from "@/socket_io_typings";
+
 export interface GlobalModalStatus {
   createModalStatus: boolean;
   detailedModalStatus: boolean;
@@ -22,6 +28,7 @@ export interface GlobalModalStatus {
   user: User[];
   onlineUsers: OnlineSocketUsers[];
   storedLocalStorageValue: ExtendedLocalStorageType;
+  socket: Socket<ServerToClientEvents, ClientToServerEvents> | null;
   setCreateModalStatus: (c: boolean) => void;
   setDetailedModalStatus: (c: boolean) => void;
   setChosenDay: (c: NewDays) => void;
@@ -38,6 +45,7 @@ export const MyGlobalModalStatus = createContext<GlobalModalStatus>({
   user: [],
   onlineUsers: [],
   storedLocalStorageValue: { ...CALENDAR_SETTINGS[1], status: false },
+  socket: null,
   setCreateModalStatus: () => {},
   setDetailedModalStatus: () => {},
   setChosenDay: () => {},
