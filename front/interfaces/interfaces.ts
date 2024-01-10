@@ -154,12 +154,26 @@ export interface Members extends User {
 
 export interface TMemberCard {
   member: Members;
-  loggedin_user: User;
-  setMembers: (c: Members[]) => void;
 }
 
 export interface TStatusButton {
   icon_name: string;
   className: string;
   onClick: () => void;
+  picture_size: number;
+}
+
+export interface TNotifications {
+  context: {
+    content: string;
+    user: User;
+  };
+  notif_type: "system" | "friend_request";
+  status: number;
+}
+
+export interface TNotificationsFromDatabase {
+  context: string;
+  notif_type: "system" | "friend_request";
+  status: number;
 }

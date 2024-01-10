@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 // components
 import MemberCard from "@/components/MemberCard/MemberCard";
@@ -12,12 +12,8 @@ import { GetAllMembers } from "@/API/GetAllMembers";
 // context
 import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
 
-// interfaces
-import { Members } from "@/interfaces/interfaces";
-
 export default function page() {
-  const { user } = useGlobalModalStatus();
-  const [members, setMembers] = useState<Members[] | null>(null);
+  const { user, members, setMembers } = useGlobalModalStatus();
 
   useEffect(() => {
     if (user.length > 0)
@@ -30,14 +26,7 @@ export default function page() {
         <>
           <div className="grid grid-cols-6">
             {members.map((member, idx) => {
-              return (
-                <MemberCard
-                  key={idx}
-                  member={member}
-                  loggedin_user={user[0]}
-                  setMembers={setMembers}
-                />
-              );
+              return <MemberCard key={idx} member={member} />;
             })}
           </div>
         </>

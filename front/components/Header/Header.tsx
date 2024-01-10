@@ -1,60 +1,42 @@
 "use client";
 
+import axios from "axios";
+
 import { useEffect, useState } from "react";
 
 // components
 import { Search, Bell } from "lucide-react";
+import StatusButton from "../MemberCard/StatusButton/StatusButton";
 
 // constants
 import { HOMEPAGE_HEADER } from "@/constants/HomepageHeader";
 
+// context
 import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
-import type { User } from "@/interfaces/interfaces";
-import StatusButton from "../MemberCard/StatusButton/StatusButton";
-import axios from "axios";
 
-interface FriendRequestNotification {
-  context: {
-    content: string;
-    user: User;
-  };
-  notif_type: "system" | "friend_request";
-}
+// API
+import { GetNotifications } from "@/API/GetNotifications";
 
-interface FriendRequestNotificationFromDatabase {
-  context: string;
-  notif_type: "system" | "friend_request";
-}
-
-async function GetNotifications(user_id: number) {
-  try {
-    const res = await axios.get(
-      `http://localhost:2000/notificaitons?user_id=${user_id}`
-    );
-
-    return res.data as FriendRequestNotificationFromDatabase[];
-  } catch (error) {
-    console.log(error);
-  }
-
-  return [];
-}
+// interfaces
+import type { TNotifications } from "@/interfaces/interfaces";
 
 export default function Header() {
   const [moveTo, setMoveTo] = useState<string>("-2px");
 
-  const { socket, user } = useGlobalModalStatus();
+  const { socket, user, setMembers } = useGlobalModalStatus();
 
-  const [friendRequestNotif, setFriendRequestNotif] = useState<
-    FriendRequestNotification[]
-  >([]);
+  const [notifications, setNotifications] = useState<TNotifications[]>([]);
 
   // if user online - get notification that someone wants to be a friend
   if (socket) {
     socket.on("sendNotificationsFrom", (data) => {
-      setFriendRequestNotif([
-        ...friendRequestNotif,
-        { context: JSON.parse(data.message), notif_type: data.notif_type }
+      setNotifications([
+        ...notifications,
+        {
+          context: JSON.parse(data.message),
+          notif_type: data.notif_type,
+          status: data.status
+        }
       ]);
     });
   }
@@ -62,32 +44,48 @@ export default function Header() {
   // load notifications from database
   useEffect(() => {
     if (user.length > 0) {
-      // get then using API function
-      GetNotifications(user[0].id)
-        .then((notifications) => {
-          // create temp variable to convert JSON to normal obj
-          const parsedNotifications: FriendRequestNotification[] = [];
+      // get notifications using API function
+      GetNotifications(user[0].id).then((notifications) => {
+        // create temp variable to convert JSON to normal obj
+        const parsedNotifications: TNotifications[] = [];
 
-          // converting...
-          notifications.forEach((notif) => {
-            parsedNotifications.push({
-              context: JSON.parse(notif.context),
-              notif_type: notif.notif_type
-            });
+        // converting...
+        notifications.forEach((notif) => {
+          parsedNotifications.push({
+            context: JSON.parse(notif.context),
+            notif_type: notif.notif_type,
+            status: notif.status
           });
+        });
 
-          // setting data
-          setFriendRequestNotif(parsedNotifications);
-        })
-        .catch(() => console.log("Sorry, error occur :("));
+        // setting data
+        setNotifications(parsedNotifications);
+      });
     }
   }, [user]);
 
-  // function AttestToBeFriends(){
+  async function AttestToBeFriends(user1_id: number, user2_id: number) {
+    try {
+      await axios.post("http://localhost:2000/update_friendship", {
+        user1_id,
+        user2_id,
+        status: "accepted"
+      });
 
-  // }
+      socket!.emit("updateMembers", {
+        user1_id: user1_id,
+        user2_id: user2_id
+      });
 
-  console.log(friendRequestNotif);
+      socket!.on("getMembersFromSocket", (data) => {
+        setMembers(data.content);
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  // console.log(friendRequestNotif);
 
   return (
     <header className="p-3 py-[9px] border-b-1 flex items-center border-l-1">
@@ -134,9 +132,9 @@ export default function Header() {
           <Bell width={16} height={16} fill="black"></Bell>
 
           <div className="w-[300px] border-1 shadow-md bg-white h-[400px] absolute right-0 top-11 rounded-lg z-30 p-4 overflow-auto">
-            {friendRequestNotif.length > 0 && (
+            {notifications.length > 0 && (
               <>
-                {friendRequestNotif.map((notification, idx) => {
+                {notifications.map((notification, idx) => {
                   if (notification.notif_type === "friend_request") {
                     return (
                       <div
@@ -155,11 +153,25 @@ export default function Header() {
                           </span>
                         </div>
 
-                        <StatusButton
-                          icon_name="UserRoundPlus"
-                          className="py-2 px-2 border-1 rounded-lg shadow bg-[#009965] text-white active:translate-y-0.5 cursor-pointer flex items-center justify-center"
-                          onClick={() => {}}
-                        />
+                        <div className="flex gap-1">
+                          <StatusButton
+                            icon_name="UserRoundPlus"
+                            className="py-1.5 px-1.5 border-1 rounded-lg shadow bg-[#009965] text-white active:translate-y-0.5 cursor-pointer flex items-center justify-center"
+                            onClick={() =>
+                              AttestToBeFriends(
+                                notifications[idx].context.user.id,
+                                user[0].id
+                              )
+                            }
+                            picture_size={15}
+                          />
+                          <StatusButton
+                            icon_name="UserRoundX"
+                            className="py-1.5 px-1.5 border-1 rounded-lg shadow bg-red-500 text-white active:translate-y-0.5 cursor-pointer flex items-center justify-center"
+                            onClick={() => {}}
+                            picture_size={15}
+                          />
+                        </div>
                       </div>
                     );
                   } else {

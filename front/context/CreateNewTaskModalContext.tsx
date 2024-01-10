@@ -8,7 +8,8 @@ import type {
   NewDays,
   User,
   OnlineSocketUsers,
-  ExtendedLocalStorageType
+  ExtendedLocalStorageType,
+  Members
 } from "@/interfaces/interfaces";
 
 // constants
@@ -29,12 +30,14 @@ export interface GlobalModalStatus {
   onlineUsers: OnlineSocketUsers[];
   storedLocalStorageValue: ExtendedLocalStorageType;
   socket: Socket<ServerToClientEvents, ClientToServerEvents> | null;
+  members: Members[];
   setCreateModalStatus: (c: boolean) => void;
   setDetailedModalStatus: (c: boolean) => void;
   setChosenDay: (c: NewDays) => void;
   setEvents: (c: Events[]) => void;
   setChosenToSeeDetailedInfDay: (c: NewDays) => void;
   setLocalStorageValue: (c: ExtendedLocalStorageType) => void;
+  setMembers: (c: Members[]) => void;
 }
 
 export const MyGlobalModalStatus = createContext<GlobalModalStatus>({
@@ -46,12 +49,14 @@ export const MyGlobalModalStatus = createContext<GlobalModalStatus>({
   onlineUsers: [],
   storedLocalStorageValue: { ...CALENDAR_SETTINGS[1], status: false },
   socket: null,
+  members: [],
   setCreateModalStatus: () => {},
   setDetailedModalStatus: () => {},
   setChosenDay: () => {},
   setEvents: () => {},
   setChosenToSeeDetailedInfDay: () => {},
-  setLocalStorageValue: () => {}
+  setLocalStorageValue: () => {},
+  setMembers: () => {}
 });
 
 export const useGlobalModalStatus = () => useContext(MyGlobalModalStatus);

@@ -21,7 +21,8 @@ import type {
   NewDays,
   Events,
   User,
-  OnlineSocketUsers
+  OnlineSocketUsers,
+  Members
 } from "@/interfaces/interfaces";
 import { GetLoggedInUserInf } from "@/API/GetLoggedInUserInf";
 
@@ -46,23 +47,36 @@ export default function RootLayout({
 }) {
   const path = usePathname();
 
+  // modal, creating new event
   const [createModalStatus, setCreateModalStatus] = useState<boolean>(false);
+
+  // right modal, showing more data about events
   const [detailedModalStatus, setDetailedModalStatus] =
     useState<boolean>(false);
+
+  // chosen day storage
   const [chosenDay, setChosenDay] = useState<NewDays | null>(null);
+
+  // chosen day storage, then its inf used to show in right modal (detailed/more inf modal)
   const [chosenToSeeDetailedInfDay, setChosenToSeeDetailedInfDay] =
     useState<NewDays | null>(null);
 
   // event storage
   const [events, setEvents] = useState<Events[]>([]);
 
+  // logged in user storage
   const [user, setUser] = useState<User[]>([]);
+  // online users storage
   const [onlineUsers, setOnlineUsers] = useState<OnlineSocketUsers[]>([]);
 
+  // socket storage
   const [socket, setScocket] = useState<Socket<
     ServerToClientEvents,
     ClientToServerEvents
   > | null>(null);
+
+  // members storage
+  const [members, setMembers] = useState<Members[]>([]);
 
   // get users inf if path name changes
   useEffect(() => {
@@ -117,13 +131,15 @@ export default function RootLayout({
             onlineUsers,
             storedLocalStorageValue,
             socket,
+            members,
             // setters
             setCreateModalStatus,
             setDetailedModalStatus,
             setChosenDay,
             setEvents,
             setChosenToSeeDetailedInfDay,
-            setLocalStorageValue
+            setLocalStorageValue,
+            setMembers
           }}
         >
           {path !== "/login" && path !== "/registration" && <LeftAsideMenu />}

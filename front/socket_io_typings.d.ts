@@ -3,7 +3,9 @@ export interface ServerToClientEvents {
   sendNotificationsFrom: (data: {
     message: string;
     notif_type: "system" | "friend_request";
+    status: number;
   }) => void;
+  getMembersFromSocket: (data: { content: any }) => void;
 }
 
 export interface ClientToServerEvents {
@@ -12,5 +14,7 @@ export interface ClientToServerEvents {
     user_id: number;
     notif_type: "system" | "friend_request";
     message: string;
+    status: number;
   }) => void;
+  updateMembers: (data: { user1_id: number; user2_id: number }) => void;
 }

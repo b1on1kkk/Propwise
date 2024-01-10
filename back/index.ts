@@ -1,11 +1,13 @@
 import express, { Express, Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
+import { Socket } from "socket.io";
+import { ClientToServerEvents } from "../front/socket_io_typings";
+
+import { db } from "./global/db";
 
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-
-const mysql = require("mysql");
 
 const app: Express = express();
 
@@ -13,6 +15,17 @@ const { instrument } = require("@socket.io/admin-ui");
 const { Server } = require("socket.io");
 const http = require("http");
 const server = http.createServer(app);
+
+// utils
+import { FindUser } from "./utils/FindUser";
+import { SaveNotifications } from "./utils/SaveNotifications";
+import { GetUsers } from "./utils/GetUsers";
+
+// interfaces
+import type {
+  TonlineUsers,
+  TsendNotificationsTo
+} from "./interfaces/interfaces";
 
 ////////////////////////////////////////SOCKET IO////////////////////////////////////////
 
@@ -24,39 +37,9 @@ const io = new Server(server, {
   }
 });
 
-let onlineUsers: { user_id: number; socket_id: string }[] = [];
+let onlineUsers: TonlineUsers[] = [];
 
-// move to utils in future
-function FindUser(
-  to_find_user_id: number,
-  onlineUsers: { user_id: number; socket_id: string }[]
-) {
-  for (let i = 0; i < onlineUsers.length; i++) {
-    if (onlineUsers[i].user_id === to_find_user_id) {
-      return onlineUsers[i].socket_id;
-    }
-  }
-
-  return null;
-}
-
-function SaveNotifications(notification: {
-  user_id: number;
-  notif_type: "system" | "friend_request";
-  context: string;
-}) {
-  db.query(
-    "INSERT INTO notifications SET ?",
-    [notification],
-    (error: Error) => {
-      if (error) return error;
-    }
-  );
-}
-
-//
-
-io.on("connection", (socket: any) => {
+io.on("connection", (socket: Socket<ClientToServerEvents>) => {
   // check if user is online
   socket.on("userConnected", (data: { new_connected_user_id: number }) => {
     if (
@@ -81,45 +64,68 @@ io.on("connection", (socket: any) => {
   //
 
   // listen for friend request notifications
-  socket.on(
-    "sendNotificationsTo",
-    (data: {
-      user_id: number;
-      notif_type: "system" | "friend_request";
-      message: string;
-    }) => {
-      // find user socket_id
-      const socket_id = FindUser(data.user_id, onlineUsers);
+  socket.on("sendNotificationsTo", (data: TsendNotificationsTo) => {
+    // find user socket_id
+    const socket_id = FindUser(data.user_id, onlineUsers);
 
-      // if socket_id not null => user is online and we can send him notification straightforward
-      if (socket_id) {
-        io.to(socket_id).emit("sendNotificationsFrom", {
-          message: data.message,
-          notif_type: data.notif_type
-        });
-      }
-
-      // then, in any case, save notification in database
-      SaveNotifications({
-        user_id: data.user_id,
+    // if socket_id not null => user is online and we can send him notification straightforward
+    if (socket_id) {
+      io.to(socket_id).emit("sendNotificationsFrom", {
+        message: data.message,
         notif_type: data.notif_type,
-        context: data.message
+        status: data.status
       });
+
+      // send updated members to client side if socket_id was found
+      GetUsers((err, data) => {
+        // send new members data only when error prop is null
+        if (!err) {
+          io.to(socket_id).emit("getMembersFromSocket", {
+            content: data
+          });
+        }
+      }, data.user_id.toString());
     }
-  );
+
+    // save notification in database
+    SaveNotifications({
+      user_id: data.user_id,
+      notif_type: data.notif_type,
+      context: data.message,
+      status: false
+    });
+  });
+
+  socket.on("updateMembers", (data: { user1_id: number; user2_id: number }) => {
+    // find users if they are online
+    const socket1_id = FindUser(data.user1_id, onlineUsers);
+    const socket2_id = FindUser(data.user2_id, onlineUsers);
+
+    // if one of them is online - send changed members data
+    if (socket1_id) {
+      GetUsers((err, data) => {
+        if (!err) {
+          io.to(socket1_id).emit("getMembersFromSocket", {
+            content: data
+          });
+        }
+      }, data.user1_id.toString());
+    }
+
+    if (socket2_id) {
+      GetUsers((err, data) => {
+        if (!err) {
+          io.to(socket2_id).emit("getMembersFromSocket", {
+            content: data
+          });
+        }
+      }, data.user2_id.toString());
+    }
+  });
 });
 
 instrument(io, {
   auth: false
-});
-
-////////////////////////////////////////DATABASE CONNECTION////////////////////////////////////////
-
-export const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "propwise"
 });
 
 ////////////////////////////////////////MIDDLEWARES////////////////////////////////////////
@@ -263,23 +269,12 @@ app.get("/events", (req: Request, res: Response) => {
 app.get("/members", (req: Request, res: Response) => {
   const { user_id } = req.query;
 
-  const query = `
-  SELECT
-    users.id, users.name, users.lastname, users.email, users.role, users.avatar,
-    friendship.status
-  FROM
-    users
-  LEFT JOIN
-    friendship ON users.id = friendship.user2_id AND (friendship.user1_id = ? OR friendship.user2_id = ?)
-  WHERE
-    users.id != ?
-  `;
+  // get users inf using custom function
+  GetUsers((err, data) => {
+    if (err) return res.status(500);
 
-  db.query(query, [user_id, user_id, user_id], (error: Error, result: any) => {
-    if (error) return res.status(500).send(error);
-
-    return res.status(200).json(result);
-  });
+    return res.status(200).json(data);
+  }, user_id as string);
 });
 
 // get friends of logged user
@@ -301,7 +296,7 @@ app.get("/notificaitons", (req: Request, res: Response) => {
   const { user_id } = req.query;
 
   db.query(
-    "SELECT notif_type, context FROM notifications WHERE user_id = ?",
+    "SELECT notif_type, context, status FROM notifications WHERE user_id = ?",
     [user_id],
     (error: Error, result: any) => {
       if (error) return res.status(500).send(error);
@@ -309,6 +304,20 @@ app.get("/notificaitons", (req: Request, res: Response) => {
       return res.status(200).json(result);
     }
   );
+});
+
+// update friendship status
+app.post("/update_friendship", (req: Request, res: Response) => {
+  const { user1_id, user2_id, status } = req.body;
+
+  const sql = `UPDATE friendship SET status = ? WHERE user1_id = ? AND user2_id = ?`;
+  const values = [status, user1_id, user2_id];
+
+  db.query(sql, values, (error: Error) => {
+    if (error) return res.status(500).send(error);
+
+    return res.status(200).send("Friendship status updated!");
+  });
 });
 
 server.listen(2000, () => {
