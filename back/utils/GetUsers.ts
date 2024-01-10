@@ -17,9 +17,7 @@ export function GetUsers(
     `;
 
   db.query(query, [user_id], (err: Error, results: any) => {
-    if (err) {
-      return callback(err, null);
-    }
+    if (err) return callback(err, null);
 
     return callback(null, results);
   });

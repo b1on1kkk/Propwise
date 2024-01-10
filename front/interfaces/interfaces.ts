@@ -164,16 +164,31 @@ export interface TStatusButton {
 }
 
 export interface TNotifications {
+  notif_id: number;
   context: {
     content: string;
     user: User;
   };
   notif_type: "system" | "friend_request";
   status: number;
+  timestamp: string;
 }
 
 export interface TNotificationsFromDatabase {
+  notif_id: number;
   context: string;
   notif_type: "system" | "friend_request";
   status: number;
+  timestamp: string;
+}
+
+export interface TFriendRequestNotificationCard {
+  notification: TNotifications;
+  CreateFriendship: () => void;
+  DeleteNotification: () => void;
+}
+
+export interface TNotificationsModal {
+  notifications: TNotifications[];
+  setNotifications: (c: TNotifications[]) => void;
 }

@@ -20,6 +20,7 @@ const server = http.createServer(app);
 import { FindUser } from "./utils/FindUser";
 import { SaveNotifications } from "./utils/SaveNotifications";
 import { GetUsers } from "./utils/GetUsers";
+import { GetNotifNextAutoIncremetIdx } from "./utils/GetNotifNextAutoIncremetIdx";
 
 // interfaces
 import type {
@@ -63,36 +64,44 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
   });
   //
 
-  // listen for friend request notifications
+  // listen for notifications
   socket.on("sendNotificationsTo", (data: TsendNotificationsTo) => {
-    // find user socket_id
-    const socket_id = FindUser(data.user_id, onlineUsers);
+    // get next AUTO_INCREMENT index that well be inserted. (this needed to delete notifications correctly, if user want to)
+    GetNotifNextAutoIncremetIdx((err, next_notification_id) => {
+      if (err) return err;
 
-    // if socket_id not null => user is online and we can send him notification straightforward
-    if (socket_id) {
-      io.to(socket_id).emit("sendNotificationsFrom", {
-        message: data.message,
+      // find user socket_id
+      const socket_id = FindUser(data.user_id, onlineUsers);
+
+      // if socket_id not null => user is online and we can send him notification straightforward
+      if (socket_id) {
+        io.to(socket_id).emit("sendNotificationsFrom", {
+          notif_id: next_notification_id[0].AUTO_INCREMENT,
+          message: data.message,
+          notif_type: data.notif_type,
+          status: data.status,
+          timestamp: data.timestamp
+        });
+
+        // send updated members to client side if socket_id was found
+        GetUsers((err, data) => {
+          // send new members data only when error prop is null
+          if (!err) {
+            io.to(socket_id).emit("getMembersFromSocket", {
+              content: data
+            });
+          }
+        }, data.user_id.toString());
+      }
+
+      // save notification in database
+      SaveNotifications({
+        user_id: data.user_id,
         notif_type: data.notif_type,
-        status: data.status
+        context: data.message,
+        status: false,
+        timestamp: data.timestamp
       });
-
-      // send updated members to client side if socket_id was found
-      GetUsers((err, data) => {
-        // send new members data only when error prop is null
-        if (!err) {
-          io.to(socket_id).emit("getMembersFromSocket", {
-            content: data
-          });
-        }
-      }, data.user_id.toString());
-    }
-
-    // save notification in database
-    SaveNotifications({
-      user_id: data.user_id,
-      notif_type: data.notif_type,
-      context: data.message,
-      status: false
     });
   });
 
@@ -101,7 +110,7 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
     const socket1_id = FindUser(data.user1_id, onlineUsers);
     const socket2_id = FindUser(data.user2_id, onlineUsers);
 
-    // if one of them is online - send changed members data
+    // if one of the sockets are online - send changed members data
     if (socket1_id) {
       GetUsers((err, data) => {
         if (!err) {
@@ -134,7 +143,7 @@ app.use(express.json());
 app.use(
   cors({
     origin: ["http://localhost:3000"],
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "DELETE", "PUT"],
     credentials: true
   })
 );
@@ -296,7 +305,7 @@ app.get("/notificaitons", (req: Request, res: Response) => {
   const { user_id } = req.query;
 
   db.query(
-    "SELECT notif_type, context, status FROM notifications WHERE user_id = ?",
+    "SELECT notif_id, notif_type, context, status, timestamp FROM notifications WHERE user_id = ?",
     [user_id],
     (error: Error, result: any) => {
       if (error) return res.status(500).send(error);
@@ -307,16 +316,27 @@ app.get("/notificaitons", (req: Request, res: Response) => {
 });
 
 // update friendship status
-app.post("/update_friendship", (req: Request, res: Response) => {
+app.put("/update_friendship", (req: Request, res: Response) => {
   const { user1_id, user2_id, status } = req.body;
 
   const sql = `UPDATE friendship SET status = ? WHERE user1_id = ? AND user2_id = ?`;
-  const values = [status, user1_id, user2_id];
 
-  db.query(sql, values, (error: Error) => {
+  db.query(sql, [status, user1_id, user2_id], (error: Error) => {
     if (error) return res.status(500).send(error);
 
     return res.status(200).send("Friendship status updated!");
+  });
+});
+
+app.delete("/delete_notification", (req: Request, res: Response) => {
+  const { notif_id } = req.body;
+
+  const sql = `DELETE FROM notifications WHERE notif_id = ?`;
+
+  db.query(sql, [notif_id], (error: Error) => {
+    if (error) return res.status(500).send(error);
+
+    return res.status(200).send("Notification deleted successfully!");
   });
 });
 

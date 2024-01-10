@@ -5,6 +5,7 @@ export function SaveNotifications(notification: {
   notif_type: "system" | "friend_request";
   context: string;
   status: boolean;
+  timestamp: string;
 }) {
   db.query(
     "INSERT INTO notifications SET ?",

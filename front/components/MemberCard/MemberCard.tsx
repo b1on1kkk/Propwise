@@ -9,7 +9,13 @@ import StatusButton from "./StatusButton/StatusButton";
 // interfaces
 import type { TMemberCard } from "@/interfaces/interfaces";
 
+// context
 import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
+
+// utils
+import { format } from "date-fns";
+
+// API
 import { InsertDataToCreateFriendship } from "@/API/InsertDataToCreateFriendship";
 
 export default function MemberCard({ member }: TMemberCard) {
@@ -28,7 +34,8 @@ export default function MemberCard({ member }: TMemberCard) {
             content: `${loggedin_user.name} wants to be a friends!`,
             user: loggedin_user
           }),
-          status: 0
+          status: 0,
+          timestamp: format(new Date(), "dd.MM.yyyy HH:mm")
         });
 
         // send system notification to logged in user
@@ -39,7 +46,8 @@ export default function MemberCard({ member }: TMemberCard) {
             content: `Sent request to ${member.name} to be friends!`,
             user: loggedin_user
           }),
-          status: 0
+          status: 0,
+          timestamp: format(new Date(), "dd.MM.yyyy HH:mm")
         });
       }
     );

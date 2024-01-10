@@ -3,6 +3,7 @@ export interface TsendNotificationsTo {
   notif_type: "system" | "friend_request";
   message: string;
   status: number;
+  timestamp: string;
 }
 
 export interface TonlineUsers {
