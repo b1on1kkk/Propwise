@@ -185,6 +185,7 @@ export interface TNotificationsFromDatabase {
 export interface TFriendRequestNotificationCard {
   notification: TNotifications;
   CreateFriendship: () => void;
+  DeclinedFriendship: () => void;
   DeleteNotification: () => void;
 }
 

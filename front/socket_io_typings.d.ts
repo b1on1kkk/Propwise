@@ -1,3 +1,5 @@
+import type { TNotificationsFromDatabase } from "./interfaces/interfaces";
+
 export interface ServerToClientEvents {
   getOnlineUsersId: (data: { user_id: number; socket_id: string }[]) => void;
   sendNotificationsFrom: (data: {
@@ -8,6 +10,9 @@ export interface ServerToClientEvents {
     timestamp: string;
   }) => void;
   getMembersFromSocket: (data: { content: any }) => void;
+  updatedNotifications: (data: {
+    notifications: TNotificationsFromDatabase[];
+  }) => void;
 }
 
 export interface ClientToServerEvents {
@@ -20,4 +25,8 @@ export interface ClientToServerEvents {
     timestamp: string;
   }) => void;
   updateMembers: (data: { user1_id: number; user2_id: number }) => void;
+  updateNotificationStatus: (data: {
+    user_id: number;
+    socket_id: string;
+  }) => void;
 }

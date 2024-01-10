@@ -1,26 +1,22 @@
-import axios from "axios";
-
 import { Socket } from "socket.io-client";
-import {
+import type {
   ClientToServerEvents,
   ServerToClientEvents
 } from "@/socket_io_typings";
 
 import type { Members } from "@/interfaces/interfaces";
 
-export async function AttestToBeFriends(
+// API
+import { UpdateFriendshipStatus } from "../API/UpdateFriendshipStatus";
+
+export async function SetFriendshipStatus(
   user1_id: number,
   user2_id: number,
   socket: Socket<ServerToClientEvents, ClientToServerEvents> | null,
+  status: "pending" | "accepted" | "declined",
   setMembers: (c: Members[]) => void
 ) {
-  try {
-    await axios.put("http://localhost:2000/update_friendship", {
-      user1_id,
-      user2_id,
-      status: "accepted"
-    });
-
+  UpdateFriendshipStatus(user1_id, user2_id, status, () => {
     socket!.emit("updateMembers", {
       user1_id: user1_id,
       user2_id: user2_id
@@ -29,7 +25,5 @@ export async function AttestToBeFriends(
     socket!.on("getMembersFromSocket", (data) => {
       setMembers(data.content);
     });
-  } catch (error) {
-    console.log(error);
-  }
+  });
 }

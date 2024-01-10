@@ -7,8 +7,10 @@ import EmptyNotifications from "../EmptyNotifications/EmptyNotifications";
 import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
 
 // API
-import { AttestToBeFriends } from "@/API/AttestToBeFriends";
 import { DeleteNotificationFromDatabase } from "@/API/DeleteNotificationFromDatabase";
+
+// utils
+import { FriendshipSetUpMiddleware } from "@/utils/FriendshipSetUpMiddleware";
 
 // interfaces
 import type { TNotificationsModal } from "@/interfaces/interfaces";
@@ -29,14 +31,28 @@ export default function Notifications({
                 <FriendRequestNotificationCard
                   key={idx}
                   notification={notification}
-                  CreateFriendship={() =>
-                    AttestToBeFriends(
-                      notifications[idx].context.user.id,
-                      user[0].id,
+                  CreateFriendship={() => {
+                    FriendshipSetUpMiddleware(
                       socket,
+                      user[0].id,
+                      notification,
+                      "accepted",
+                      "system",
+                      `${user[0].name} accepted your friend request!`,
                       setMembers
-                    )
-                  }
+                    );
+                  }}
+                  DeclinedFriendship={() => {
+                    FriendshipSetUpMiddleware(
+                      socket,
+                      user[0].id,
+                      notification,
+                      "declined",
+                      "system",
+                      `${user[0].name} declined your friend request :(`,
+                      setMembers
+                    );
+                  }}
                   DeleteNotification={() =>
                     // call function and pass props in it
                     DeleteNotificationFromDatabase(

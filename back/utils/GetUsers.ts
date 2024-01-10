@@ -1,16 +1,16 @@
 import { db } from "../global/db";
 
 export function GetUsers(
-  callback: (error: Error | null, data: any | null) => void,
-  user_id: string
+  user_id: string,
+  callback: (error: Error | null, data: any | null) => void
 ) {
   const query = `
-    SELECT 
+    SELECT
       users.id, users.name, users.lastname, users.email, users.role, users.avatar,
       friendship.status
-  FROM 
+  FROM
       users
-  LEFT JOIN 
+  LEFT JOIN
       friendship ON users.id = friendship.user1_id OR users.id = friendship.user2_id
   WHERE
       users.id != ?

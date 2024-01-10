@@ -13,7 +13,7 @@ import type { TMemberCard } from "@/interfaces/interfaces";
 import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
 
 // utils
-import { format } from "date-fns";
+import { SendingNotificationSocket } from "@/utils/SendingNotificationSocket";
 
 // API
 import { InsertDataToCreateFriendship } from "@/API/InsertDataToCreateFriendship";
@@ -27,28 +27,22 @@ export default function MemberCard({ member }: TMemberCard) {
     InsertDataToCreateFriendship(loggedin_user.id, member.id, "pending").then(
       () => {
         // send notification another user
-        socket!.emit("sendNotificationsTo", {
-          user_id: member.id,
-          notif_type: "friend_request",
-          message: JSON.stringify({
-            content: `${loggedin_user.name} wants to be a friends!`,
-            user: loggedin_user
-          }),
-          status: 0,
-          timestamp: format(new Date(), "dd.MM.yyyy HH:mm")
-        });
+        SendingNotificationSocket(
+          socket,
+          member.id,
+          "friend_request",
+          `${loggedin_user.name} wants to be a friends!`,
+          loggedin_user
+        );
 
         // send system notification to logged in user
-        socket!.emit("sendNotificationsTo", {
-          user_id: loggedin_user.id,
-          notif_type: "system",
-          message: JSON.stringify({
-            content: `Sent request to ${member.name} to be friends!`,
-            user: loggedin_user
-          }),
-          status: 0,
-          timestamp: format(new Date(), "dd.MM.yyyy HH:mm")
-        });
+        SendingNotificationSocket(
+          socket,
+          loggedin_user.id,
+          "system",
+          `Sent request to ${member.name} to be friends!`,
+          loggedin_user
+        );
       }
     );
   }

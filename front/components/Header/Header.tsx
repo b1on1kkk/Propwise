@@ -12,6 +12,7 @@ import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
 
 // utils
 import { NotificationsSerializer } from "@/utils/NotificationsSerializer";
+import { CheckingIfNotReadNotifExist } from "@/utils/CheckingIfNotReadNotifExist";
 
 // API
 import { GetNotifications } from "@/API/GetNotifications";
@@ -25,7 +26,9 @@ export default function Header() {
   const [notifications, setNotifications] = useState<TNotifications[]>([]);
 
   const [notificationsModalStatus, setNotificationsModalStatus] =
-    useState<boolean>(true);
+    useState<boolean>(false);
+
+  const NotReadedStatus = CheckingIfNotReadNotifExist(notifications);
 
   // if user online - get notification that someone wants to be a friend
   if (socket) {
@@ -48,15 +51,11 @@ export default function Header() {
     if (user.length > 0) {
       // get notifications using API function
       GetNotifications(user[0].id).then((notifications) => {
-        const serializedNotifications = NotificationsSerializer(notifications);
-
         // setting serialized notifications
-        setNotifications(serializedNotifications);
+        setNotifications(NotificationsSerializer(notifications));
       });
     }
   }, [user]);
-
-  console.log(notifications);
 
   return (
     <header className="p-3 py-[9px] border-b-1 flex items-center border-l-1">
@@ -76,13 +75,31 @@ export default function Header() {
         </div>
         <div className="relative">
           <button
-            className="flex items-center justify-center p-3 border-1 rounded-lg cursor-pointer"
-            onClick={() =>
-              setNotificationsModalStatus(!notificationsModalStatus)
-            }
+            className="flex items-center justify-center p-3 border-1 rounded-lg cursor-pointer hover:bg-gray-200 transition-all duration-200 ease-in"
+            onClick={() => {
+              setNotificationsModalStatus(!notificationsModalStatus);
+
+              if (NotReadedStatus) {
+                socket!.emit("updateNotificationStatus", {
+                  user_id: user[0].id,
+                  socket_id: socket!.id!
+                });
+
+                socket!.on("updatedNotifications", (data) => {
+                  setNotifications(NotificationsSerializer(data.notifications));
+                });
+              }
+            }}
           >
             <Bell width={16} height={16} fill="black" />
           </button>
+
+          {NotReadedStatus && (
+            <span className="flex absolute h-3 w-3 top-0 right-0 -mt-1 -mr-1">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#009965] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-[#009965]"></span>
+            </span>
+          )}
 
           {notificationsModalStatus && (
             <Notifications

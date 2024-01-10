@@ -21,6 +21,8 @@ import { FindUser } from "./utils/FindUser";
 import { SaveNotifications } from "./utils/SaveNotifications";
 import { GetUsers } from "./utils/GetUsers";
 import { GetNotifNextAutoIncremetIdx } from "./utils/GetNotifNextAutoIncremetIdx";
+import { UpdateNotificationStatus } from "./utils/UpdateNotificationStatus";
+import { GetNotifications } from "./utils/GetNotifications";
 
 // interfaces
 import type {
@@ -84,14 +86,14 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
         });
 
         // send updated members to client side if socket_id was found
-        GetUsers((err, data) => {
+        GetUsers(data.user_id.toString(), (err, data) => {
           // send new members data only when error prop is null
           if (!err) {
             io.to(socket_id).emit("getMembersFromSocket", {
               content: data
             });
           }
-        }, data.user_id.toString());
+        });
       }
 
       // save notification in database
@@ -105,6 +107,7 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
     });
   });
 
+  // socket to update members data if user send friend request
   socket.on("updateMembers", (data: { user1_id: number; user2_id: number }) => {
     // find users if they are online
     const socket1_id = FindUser(data.user1_id, onlineUsers);
@@ -112,25 +115,48 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
 
     // if one of the sockets are online - send changed members data
     if (socket1_id) {
-      GetUsers((err, data) => {
+      GetUsers(data.user1_id.toString(), (err, data) => {
         if (!err) {
           io.to(socket1_id).emit("getMembersFromSocket", {
             content: data
           });
         }
-      }, data.user1_id.toString());
+      });
     }
 
     if (socket2_id) {
-      GetUsers((err, data) => {
+      GetUsers(data.user2_id.toString(), (err, data) => {
         if (!err) {
           io.to(socket2_id).emit("getMembersFromSocket", {
             content: data
           });
         }
-      }, data.user2_id.toString());
+      });
     }
   });
+
+  // socket to update notifications status (read notifications or not)
+  socket.on(
+    "updateNotificationStatus",
+    (data: { user_id: number; socket_id: string }) => {
+      // first of all update status of each notifications
+      UpdateNotificationStatus(data.user_id.toString(), (update_err) => {
+        // return if error occur
+        if (update_err) return update_err;
+
+        // then parse notifications again
+        GetNotifications(data.user_id.toString(), (notif_err, notif_data) => {
+          // return if error occur
+          if (notif_err) return notif_err;
+
+          // push new notifications to frontend
+          io.to(data.socket_id).emit("updatedNotifications", {
+            notifications: notif_data
+          });
+        });
+      });
+    }
+  );
 });
 
 instrument(io, {
@@ -279,11 +305,11 @@ app.get("/members", (req: Request, res: Response) => {
   const { user_id } = req.query;
 
   // get users inf using custom function
-  GetUsers((err, data) => {
-    if (err) return res.status(500);
+  GetUsers(user_id as string, (err, data) => {
+    if (err) return res.status(500).json(err);
 
     return res.status(200).json(data);
-  }, user_id as string);
+  });
 });
 
 // get friends of logged user
@@ -304,15 +330,11 @@ app.get("/members", (req: Request, res: Response) => {
 app.get("/notificaitons", (req: Request, res: Response) => {
   const { user_id } = req.query;
 
-  db.query(
-    "SELECT notif_id, notif_type, context, status, timestamp FROM notifications WHERE user_id = ?",
-    [user_id],
-    (error: Error, result: any) => {
-      if (error) return res.status(500).send(error);
+  GetNotifications(user_id as string, (err, data) => {
+    if (err) return res.status(500).json(err);
 
-      return res.status(200).json(result);
-    }
-  );
+    return res.status(200).json(data);
+  });
 });
 
 // update friendship status
@@ -337,6 +359,18 @@ app.delete("/delete_notification", (req: Request, res: Response) => {
     if (error) return res.status(500).send(error);
 
     return res.status(200).send("Notification deleted successfully!");
+  });
+});
+
+app.delete("/delete_friendship", (req: Request, res: Response) => {
+  const { user1_id, user2_id } = req.body;
+
+  const sql = `DELETE FROM friendship WHERE user1_id = ? AND user2_id = ?`;
+
+  db.query(sql, [user1_id, user2_id], (error: Error) => {
+    if (error) return res.status(500).send(error);
+
+    return res.status(200).send("Friendship has been declined!");
   });
 });
 

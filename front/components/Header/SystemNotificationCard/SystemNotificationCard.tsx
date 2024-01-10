@@ -10,7 +10,7 @@ export default function SystemNotificationCard({
   DeleteNotification: () => void;
 }) {
   return (
-    <div className="border-1 shadow rounded-lg p-2 flex flex-col gap-1">
+    <div className="border-1 shadow rounded-lg p-2 flex flex-col gap-1 mb-2">
       <DeleteNotificationButton
         timestamp={notificaton.timestamp}
         onClick={DeleteNotification}
