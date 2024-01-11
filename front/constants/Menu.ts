@@ -10,7 +10,7 @@ export const LEFT_ASIDEMENU_MENU_DATA: MenuData[] = [
   {
     id: 2,
     icon_name: "Inbox",
-    text: "Indox",
+    text: "Inbox",
     status: false
   },
   {

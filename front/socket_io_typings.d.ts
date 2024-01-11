@@ -1,4 +1,8 @@
-import type { TNotificationsFromDatabase } from "./interfaces/interfaces";
+import type {
+  TNotificationsFromDatabase,
+  TFriendsWithoutChat,
+  TChat
+} from "./interfaces/interfaces";
 
 export interface ServerToClientEvents {
   getOnlineUsersId: (data: { user_id: number; socket_id: string }[]) => void;
@@ -12,6 +16,10 @@ export interface ServerToClientEvents {
   getMembersFromSocket: (data: { content: any }) => void;
   updatedNotifications: (data: {
     notifications: TNotificationsFromDatabase[];
+  }) => void;
+  updateFriendsWithoutChat: (data: {
+    friends: TFriendsWithoutChat[];
+    chats: TChat[];
   }) => void;
 }
 
@@ -28,5 +36,11 @@ export interface ClientToServerEvents {
   updateNotificationStatus: (data: {
     user_id: number;
     socket_id: string;
+  }) => void;
+  createChat: (data: {
+    user1_id: number;
+    user2_id: number;
+    to_send_socket_id: string;
+    chat_status: "pinned" | "all";
   }) => void;
 }

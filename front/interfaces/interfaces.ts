@@ -191,5 +191,40 @@ export interface TFriendRequestNotificationCard {
 
 export interface TNotificationsModal {
   notifications: TNotifications[];
+  notificationsModalStatus: boolean;
+  setNotificationsModalStatus: (c: boolean) => void;
   setNotifications: (c: TNotifications[]) => void;
+}
+
+export interface TAsideChatsHeader {
+  searchValue: string;
+  moreButtonOnClick: () => void;
+  newChatButtonOnClick: () => void;
+  searchOnChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+export interface TChats {
+  icon_name: string;
+  title_text: string;
+  openStatus: boolean;
+  chatStatus: "pinned" | "all";
+  chatArray: TChat[];
+  setOpenStatus: (c: boolean) => void;
+}
+
+export interface TStartMessagingCard {
+  friend: TFriendsWithoutChat;
+  createChatOnClick: () => void;
+}
+
+export interface TFriendsWithoutChat extends User {
+  status: "pending" | "accepted" | "declined";
+  isInChat: "Yes" | "No";
+}
+
+export interface TChat extends User {
+  chat_id: number;
+  user1_id: number;
+  user2_id: number;
+  chat_status: "pinned" | "all";
 }

@@ -23,11 +23,14 @@ import { GetUsers } from "./utils/GetUsers";
 import { GetNotifNextAutoIncremetIdx } from "./utils/GetNotifNextAutoIncremetIdx";
 import { UpdateNotificationStatus } from "./utils/UpdateNotificationStatus";
 import { GetNotifications } from "./utils/GetNotifications";
+import { GetFriends } from "./utils/GetFriends";
+import { GetChats } from "./utils/GetChats";
 
 // interfaces
 import type {
   TonlineUsers,
-  TsendNotificationsTo
+  TsendNotificationsTo,
+  TCreateChat
 } from "./interfaces/interfaces";
 
 ////////////////////////////////////////SOCKET IO////////////////////////////////////////
@@ -157,6 +160,67 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
       });
     }
   );
+
+  socket.on("createChat", (data: TCreateChat) => {
+    // get value from frontend: user1_id - id user that initiate this chat creation
+    // user2_id - user WITH whom initiator wanna create chat
+    // to_send_socket_id - socket of the initiator, then send him new friends list
+    // chat_status - status that shows which type of chat is (by default is "all")
+
+    const value = {
+      user1_id: data.user1_id,
+      user2_id: data.user2_id,
+      chat_status: data.chat_status
+    };
+
+    // get socket of second user with whom we wanna start chat (socket will not be null only when user is online)
+    // in other case user will get data by fetching if directly from database
+    const socket_id = FindUser(data.user2_id, onlineUsers);
+
+    // create chat by creating data to database
+    db.query("INSERT INTO chat SET ?", [value], (error: Error) => {
+      if (error) return error;
+
+      // reget data about "free" friends or friends that are not have chat with initiator
+      GetFriends(data.user1_id.toString(), (err, friends) => {
+        if (err) return err;
+
+        // if socket is not null => user is online, so, send data to initiator (his data) of this chat and his new friend (him another data)
+        if (socket_id) {
+          GetChats(data.user1_id.toString(), (err, chats) => {
+            if (err) return err;
+
+            io.to(data.to_send_socket_id).emit("updateFriendsWithoutChat", {
+              friends,
+              chats
+            });
+          });
+
+          GetChats(data.user2_id.toString(), (err, chats) => {
+            if (err) return err;
+
+            io.to(socket_id).emit("updateFriendsWithoutChat", {
+              friends,
+              chats
+            });
+          });
+
+          return;
+        }
+
+        // if second user is not online => send just initiator
+        GetChats(data.user1_id.toString(), (err, chats) => {
+          if (err) return err;
+
+          // push data to frontend
+          io.to(data.to_send_socket_id).emit("updateFriendsWithoutChat", {
+            friends,
+            chats
+          });
+        });
+      });
+    });
+  });
 });
 
 instrument(io, {
@@ -313,18 +377,26 @@ app.get("/members", (req: Request, res: Response) => {
 });
 
 // get friends of logged user
-// app.get("/get_friends", (req: Request, res: Response) => {
-//   const { user1_id } = req.query;
+app.get("/get_friends", (req: Request, res: Response) => {
+  const { user_id } = req.query;
 
-//   const query =
-//     "SELECT users.id, users.name, users.lastname, users.email, users.role, users.avatar, friendship.status FROM users JOIN friendship ON (users.id = friendship.user2_id AND friendship.user1_id = ?) WHERE users.id != ?";
+  GetFriends(user_id as string, (err, result) => {
+    if (err) return res.status(500).send(err);
 
-//   db.query(query, [user1_id, user1_id], (error: Error, result: any) => {
-//     if (error) return res.status(500).send(error);
+    return res.status(200).json(result);
+  });
+});
 
-//     return res.status(200).json(result);
-//   });
-// });
+// get logged user chats
+app.get("/chats", (req: Request, res: Response) => {
+  const { user_id } = req.query;
+
+  GetChats(user_id as string, (err, result) => {
+    if (err) return res.status(500).send(err);
+
+    return res.status(200).json(result);
+  });
+});
 
 // get notifications
 app.get("/notificaitons", (req: Request, res: Response) => {

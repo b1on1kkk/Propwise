@@ -1,7 +1,12 @@
+"use client";
+
 // components
 import FriendRequestNotificationCard from "../FriendRequestNotificationCard/FriendRequestNotificationCard";
 import SystemNotificationCard from "../SystemNotificationCard/SystemNotificationCard";
 import EmptyNotifications from "../EmptyNotifications/EmptyNotifications";
+
+// hooks
+import { useOutsideClick } from "@/hooks/useOutsideClick ";
 
 // context
 import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
@@ -17,12 +22,23 @@ import type { TNotificationsModal } from "@/interfaces/interfaces";
 
 export default function Notifications({
   notifications,
-  setNotifications
+  setNotifications,
+  notificationsModalStatus,
+  setNotificationsModalStatus
 }: TNotificationsModal) {
   const { user, socket, setMembers } = useGlobalModalStatus();
 
+  // if user click outside block - close modal window
+  const handleClickOutside = () => {
+    if (notificationsModalStatus)
+      setNotificationsModalStatus(!notificationsModalStatus);
+  };
+
   return (
-    <div className="w-[300px] border-1 shadow-md bg-white h-[400px] absolute right-0 top-11 rounded-lg z-30 p-4 overflow-auto">
+    <div
+      className="w-[300px] border-1 shadow-md bg-white h-[400px] absolute right-0 top-11 rounded-lg z-30 p-4 overflow-auto"
+      ref={useOutsideClick(handleClickOutside)}
+    >
       {notifications.length > 0 ? (
         <>
           {notifications.map((notification, idx) => {

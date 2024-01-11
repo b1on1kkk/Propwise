@@ -103,6 +103,8 @@ export default function Header() {
 
           {notificationsModalStatus && (
             <Notifications
+              notificationsModalStatus={notificationsModalStatus}
+              setNotificationsModalStatus={setNotificationsModalStatus}
               notifications={notifications}
               setNotifications={setNotifications}
             />
