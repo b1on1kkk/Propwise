@@ -1,7 +1,15 @@
 import { createContext, useContext } from "react";
 
-export interface TInboxContent {}
+import type { TChat } from "@/interfaces/interfaces";
 
-export const InboxContext = createContext<TInboxContent>({});
+export interface TInboxContent {
+  chosenUser: TChat | null;
+  setChosenUser: (c: TChat) => void;
+}
+
+export const InboxContext = createContext<TInboxContent>({
+  chosenUser: null,
+  setChosenUser: () => {}
+});
 
 export const useInboxContext = () => useContext(InboxContext);

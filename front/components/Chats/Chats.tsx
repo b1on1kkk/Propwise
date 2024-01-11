@@ -4,6 +4,9 @@ import Link from "next/link";
 import { ChevronDown, icons } from "lucide-react";
 import ChatCard from "./ChatCard/ChatCard";
 
+// context
+import { useInboxContext } from "@/context/InboxContext";
+
 // interfaces
 import type { TChats } from "@/interfaces/interfaces";
 
@@ -15,6 +18,8 @@ export default function Chats({
   chatArray,
   setOpenStatus
 }: TChats) {
+  const { setChosenUser } = useInboxContext();
+
   const Icon = icons[icon_name as keyof typeof icons];
 
   return (
@@ -59,7 +64,7 @@ export default function Chats({
               <Link
                 href={`/inbox/${chat.id}`}
                 key={idx}
-                onClick={() => console.log(chat)}
+                onClick={() => setChosenUser(chat)}
               >
                 <ChatCard user={chat} chatStatus={chatStatus} />
               </Link>
