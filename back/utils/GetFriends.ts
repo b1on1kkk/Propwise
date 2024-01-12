@@ -5,24 +5,14 @@ export function GetFriends(
   callback: (error: Error | null, data: any | null) => void
 ) {
   const query = `
-  SELECT
-    users.id, users.name, users.lastname, users.email, users.role, users.avatar,
-    friendship.status,
-    CASE 
-        WHEN chat.user1_id IS NOT NULL OR chat.user2_id IS NOT NULL THEN 'Yes'
-        ELSE 'No'
-    END AS isInChat
-  FROM
-    users
-  LEFT JOIN
-    friendship ON users.id = friendship.user1_id OR users.id = friendship.user2_id
-  LEFT JOIN
-    chat ON users.id = chat.user1_id OR users.id = chat.user2_id
-  WHERE
-    (users.id != ? AND friendship.status = 'accepted')
+    SELECT users.id, users.name, users.lastname, users.email, users.role, users.avatar,
+    friendship.status FROM users 
+    JOIN friendship ON users.id = friendship.user1_id OR users.id = friendship.user2_id 
+    WHERE (friendship.user1_id = ? OR friendship.user2_id = ?) 
+    AND status = 'accepted' AND users.id != ?;
     `;
 
-  db.query(query, [user_id], (err: Error, results: any) => {
+  db.query(query, [user_id, user_id, user_id], (err: Error, results: any) => {
     if (err) return callback(err, null);
 
     return callback(null, results);

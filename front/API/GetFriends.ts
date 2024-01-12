@@ -1,13 +1,13 @@
 import axios from "axios";
 
-import type { Members } from "@/interfaces/interfaces";
+import type { TFriendsWithoutChat } from "@/interfaces/interfaces";
 
-export async function GetFriends(user1_id: number) {
+export async function GetFriends(user_id: number) {
   try {
     const res = await axios.get(
-      `http://localhost:2000/get_friends?user1_id=${user1_id}`
+      `http://localhost:2000/get_friends?user_id=${user_id}`
     );
-    return res.data as Members[];
+    return res.data as TFriendsWithoutChat[];
   } catch (error) {
     console.log(error);
     return [];

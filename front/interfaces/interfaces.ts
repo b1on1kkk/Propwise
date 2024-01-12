@@ -198,6 +198,7 @@ export interface TNotificationsModal {
 
 export interface TAsideChatsHeader {
   searchValue: string;
+  showFriends: boolean;
   moreButtonOnClick: () => void;
   newChatButtonOnClick: () => void;
   searchOnChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -219,7 +220,6 @@ export interface TStartMessagingCard {
 
 export interface TFriendsWithoutChat extends User {
   status: "pending" | "accepted" | "declined";
-  isInChat: "Yes" | "No";
 }
 
 export interface TChat extends User {
@@ -227,4 +227,26 @@ export interface TChat extends User {
   user1_id: number;
   user2_id: number;
   chat_status: "pinned" | "all";
+}
+
+export interface TMessageInput {
+  value: string;
+  SubmitHandler: (e: React.FormEvent<HTMLFormElement>) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+export interface TChatHeader {
+  isOnlineStatus: boolean;
+  moreAboutUserStatus: boolean;
+  searchOnClick: () => void;
+  moreOnClick: () => void;
+  moreAboutUserOnClick: () => void;
+}
+
+export interface Messages {
+  name: string;
+  lastname: string;
+  sender_id: number;
+  value: string;
+  timestamp: string;
 }

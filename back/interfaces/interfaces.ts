@@ -17,3 +17,14 @@ export interface TCreateChat {
   to_send_socket_id: string;
   chat_status: "pinned" | "all";
 }
+
+export interface SendPrivateMessages {
+  name: string;
+  lastname: string;
+  chat_id: number;
+  sender_id: number;
+  sender_socket: string;
+  to_send_id: number;
+  value: string;
+  timestamp: string;
+}

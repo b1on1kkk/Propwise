@@ -19,7 +19,7 @@ export default function ChatCard({ user, chatStatus }: TChatCard) {
     <div className="hover:bg-gray-100 transition-all duration-200 ease-in">
       <div className="flex p-5 items-center gap-5">
         <div className="w-11 h-11 rounded-full bg-gray-400 relative">
-          {CheckUserOnline(onlineUsers, user.user2_id) && (
+          {CheckUserOnline(onlineUsers, user.id) && (
             <span className="flex absolute h-2 w-2 bottom-0 right-0 mr-0.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#009965] opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-[#009965]" />

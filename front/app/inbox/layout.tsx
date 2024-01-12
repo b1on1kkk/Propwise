@@ -30,7 +30,7 @@ export default function InboxLayout({
         {/*  */}
 
         {/* main chat menu */}
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 flex">{children}</main>
       </InboxContext.Provider>
     </main>
   );

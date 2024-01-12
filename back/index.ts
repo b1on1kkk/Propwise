@@ -25,12 +25,14 @@ import { UpdateNotificationStatus } from "./utils/UpdateNotificationStatus";
 import { GetNotifications } from "./utils/GetNotifications";
 import { GetFriends } from "./utils/GetFriends";
 import { GetChats } from "./utils/GetChats";
+import { SaveMessage } from "./utils/SaveMessage";
 
 // interfaces
 import type {
   TonlineUsers,
   TsendNotificationsTo,
-  TCreateChat
+  TCreateChat,
+  SendPrivateMessages
 } from "./interfaces/interfaces";
 
 ////////////////////////////////////////SOCKET IO////////////////////////////////////////
@@ -161,6 +163,7 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
     }
   );
 
+  // create chat functionality
   socket.on("createChat", (data: TCreateChat) => {
     // get value from frontend: user1_id - id user that initiate this chat creation
     // user2_id - user WITH whom initiator wanna create chat
@@ -220,6 +223,35 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
         });
       });
     });
+  });
+
+  // send private messages
+  socket.on("sendPrivateMessage", (message: SendPrivateMessages) => {
+    // find user socket_id to whom send message
+    const socket_id = FindUser(message.to_send_id, onlineUsers);
+
+    // if user is online - send new message to him directly
+    if (socket_id) {
+      io.to(socket_id).emit("getPrivateMessage", {
+        name: message.name,
+        lastname: message.lastname,
+        sender_id: message.sender_id,
+        value: message.value,
+        timestamp: message.timestamp
+      });
+    }
+
+    // in any case send message to sender
+    io.to(message.sender_socket).emit("getPrivateMessage", {
+      name: message.name,
+      lastname: message.lastname,
+      sender_id: message.sender_id,
+      value: message.value,
+      timestamp: message.timestamp
+    });
+
+    // in any case save message in database
+    SaveMessage(message);
   });
 });
 
@@ -444,6 +476,26 @@ app.delete("/delete_friendship", (req: Request, res: Response) => {
 
     return res.status(200).send("Friendship has been declined!");
   });
+});
+
+app.get("/messages", (req: Request, res: Response) => {
+  const { chat_id } = req.query;
+
+  db.query(
+    `
+    SELECT messages.timestamp, messages.value, messages.sender_id, users.name, users.lastname
+    FROM messages
+    INNER JOIN users
+    ON messages.sender_id = users.id 
+    WHERE messages.chat_id = ?;
+    `,
+    [chat_id],
+    (error: Error, result: any) => {
+      if (error) return res.status(500).send(error);
+
+      return res.status(200).json(result);
+    }
+  );
 });
 
 server.listen(2000, () => {

@@ -13,7 +13,7 @@ import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
 
 // API
 import { GetChats } from "@/API/GetChats";
-import { GetFriendsWithoutExistanceChat } from "@/API/GetFriendsWithoutExistanceChat";
+import { GetFriends } from "@/API/GetFriends";
 
 // interface
 import type { TChat, TFriendsWithoutChat } from "@/interfaces/interfaces";
@@ -50,14 +50,15 @@ export default function ChatAside() {
 
   return (
     <aside className="w-[350px] border-r-1 flex flex-col h-full">
-      <header className="text-[#56616b]">
+      <header>
         <AsideChatsHeader
           searchValue=""
+          showFriends={showFriends}
           moreButtonOnClick={() => {}}
           newChatButtonOnClick={() => {
             // send request to server only when block is closed
             if (!showFriends) {
-              GetFriendsWithoutExistanceChat(user[0].id).then((data) => {
+              GetFriends(user[0].id).then((data) => {
                 setFriendsWithoutChat(data);
               });
             }
@@ -71,22 +72,20 @@ export default function ChatAside() {
       {showFriends && (
         <div className="flex flex-col">
           {friendsWithoutChat.map((friend, idx) => {
-            if (friend.isInChat === "No") {
-              return (
-                <StartMessagingCard
-                  key={idx}
-                  friend={friend}
-                  createChatOnClick={() => {
-                    socket!.emit("createChat", {
-                      user1_id: user[0].id,
-                      user2_id: friend.id,
-                      to_send_socket_id: socket!.id!,
-                      chat_status: "all"
-                    });
-                  }}
-                />
-              );
-            }
+            return (
+              <StartMessagingCard
+                key={idx}
+                friend={friend}
+                createChatOnClick={() => {
+                  socket!.emit("createChat", {
+                    user1_id: user[0].id,
+                    user2_id: friend.id,
+                    to_send_socket_id: socket!.id!,
+                    chat_status: "all"
+                  });
+                }}
+              />
+            );
           })}
         </div>
       )}

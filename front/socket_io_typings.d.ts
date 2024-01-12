@@ -21,6 +21,13 @@ export interface ServerToClientEvents {
     friends: TFriendsWithoutChat[];
     chats: TChat[];
   }) => void;
+  getPrivateMessage: (data: {
+    name: string;
+    lastname: string;
+    sender_id: number;
+    value: string;
+    timestamp: string;
+  }) => void;
 }
 
 export interface ClientToServerEvents {
@@ -42,5 +49,15 @@ export interface ClientToServerEvents {
     user2_id: number;
     to_send_socket_id: string;
     chat_status: "pinned" | "all";
+  }) => void;
+  sendPrivateMessage: (data: {
+    name: string;
+    lastname: string;
+    chat_id: number;
+    sender_id: number;
+    sender_socket: string;
+    to_send_id: number;
+    value: string;
+    timestamp: string;
   }) => void;
 }
