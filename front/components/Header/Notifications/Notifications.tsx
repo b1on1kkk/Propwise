@@ -21,6 +21,7 @@ import { FriendshipSetUpMiddleware } from "@/utils/FriendshipSetUpMiddleware";
 import type { TNotificationsModal } from "@/interfaces/interfaces";
 
 export default function Notifications({
+  friends,
   notifications,
   setNotifications,
   notificationsModalStatus,
@@ -46,6 +47,7 @@ export default function Notifications({
               return (
                 <FriendRequestNotificationCard
                   key={idx}
+                  friends={friends}
                   notification={notification}
                   CreateFriendship={() => {
                     FriendshipSetUpMiddleware(

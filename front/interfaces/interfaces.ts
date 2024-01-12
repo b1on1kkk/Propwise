@@ -183,6 +183,7 @@ export interface TNotificationsFromDatabase {
 }
 
 export interface TFriendRequestNotificationCard {
+  friends: TFriends[];
   notification: TNotifications;
   CreateFriendship: () => void;
   DeclinedFriendship: () => void;
@@ -190,6 +191,7 @@ export interface TFriendRequestNotificationCard {
 }
 
 export interface TNotificationsModal {
+  friends: TFriends[];
   notifications: TNotifications[];
   notificationsModalStatus: boolean;
   setNotificationsModalStatus: (c: boolean) => void;
@@ -214,11 +216,11 @@ export interface TChats {
 }
 
 export interface TStartMessagingCard {
-  friend: TFriendsWithoutChat;
+  friend: TFriends;
   createChatOnClick: () => void;
 }
 
-export interface TFriendsWithoutChat extends User {
+export interface TFriends extends User {
   status: "pending" | "accepted" | "declined";
 }
 

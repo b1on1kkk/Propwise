@@ -17,7 +17,7 @@ export interface ServerToClientEvents {
   updatedNotifications: (data: {
     notifications: TNotificationsFromDatabase[];
   }) => void;
-  updateFriendsWithoutChat: (data: {
+  updateFriends: (data: {
     friends: TFriendsWithoutChat[];
     chats: TChat[];
   }) => void;

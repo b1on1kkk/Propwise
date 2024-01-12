@@ -16,14 +16,16 @@ import { CheckingIfNotReadNotifExist } from "@/utils/CheckingIfNotReadNotifExist
 
 // API
 import { GetNotifications } from "@/API/GetNotifications";
+import { GetFriends } from "@/API/GetFriends";
 
 // interfaces
-import type { TNotifications } from "@/interfaces/interfaces";
+import type { TNotifications, TFriends } from "@/interfaces/interfaces";
 
 export default function Header() {
-  const { socket, user } = useGlobalModalStatus();
+  const { socket, user, members } = useGlobalModalStatus();
 
   const [notifications, setNotifications] = useState<TNotifications[]>([]);
+  const [friends, setFriends] = useState<TFriends[]>([]);
 
   const [notificationsModalStatus, setNotificationsModalStatus] =
     useState<boolean>(false);
@@ -56,6 +58,15 @@ export default function Header() {
       });
     }
   }, [user]);
+
+  // get friends in header just for checking if friends exist and hide button in notification
+  useEffect(() => {
+    if (user.length > 0) {
+      GetFriends(user[0].id).then((friends) => {
+        setFriends(friends);
+      });
+    }
+  }, [notifications, user, members]);
 
   return (
     <header className="p-3 py-[9px] border-b-1 flex items-center border-l-1">
@@ -107,6 +118,7 @@ export default function Header() {
               setNotificationsModalStatus={setNotificationsModalStatus}
               notifications={notifications}
               setNotifications={setNotifications}
+              friends={friends}
             />
           )}
         </div>

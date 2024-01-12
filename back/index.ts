@@ -73,7 +73,7 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
 
   // listen for notifications
   socket.on("sendNotificationsTo", (data: TsendNotificationsTo) => {
-    // get next AUTO_INCREMENT index that well be inserted. (this needed to delete notifications correctly, if user want to)
+    // get next AUTO_INCREMENT index that will be inserted. (this needed to delete notifications correctly, if user want to)
     GetNotifNextAutoIncremetIdx((err, next_notification_id) => {
       if (err) return err;
 
@@ -193,7 +193,7 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
           GetChats(data.user1_id.toString(), (err, chats) => {
             if (err) return err;
 
-            io.to(data.to_send_socket_id).emit("updateFriendsWithoutChat", {
+            io.to(data.to_send_socket_id).emit("updateFriends", {
               friends,
               chats
             });
@@ -202,7 +202,7 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
           GetChats(data.user2_id.toString(), (err, chats) => {
             if (err) return err;
 
-            io.to(socket_id).emit("updateFriendsWithoutChat", {
+            io.to(socket_id).emit("updateFriends", {
               friends,
               chats
             });
@@ -216,7 +216,7 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
           if (err) return err;
 
           // push data to frontend
-          io.to(data.to_send_socket_id).emit("updateFriendsWithoutChat", {
+          io.to(data.to_send_socket_id).emit("updateFriends", {
             friends,
             chats
           });

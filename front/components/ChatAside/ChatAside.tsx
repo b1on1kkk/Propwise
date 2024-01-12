@@ -15,8 +15,11 @@ import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
 import { GetChats } from "@/API/GetChats";
 import { GetFriends } from "@/API/GetFriends";
 
+// utils
+import { CheckFriendsIfChatAlreadyExist } from "@/utils/CheckFriendsIfChatAlreadyExist";
+
 // interface
-import type { TChat, TFriendsWithoutChat } from "@/interfaces/interfaces";
+import type { TChat, TFriends } from "@/interfaces/interfaces";
 
 export default function ChatAside() {
   const { socket, user } = useGlobalModalStatus();
@@ -29,14 +32,17 @@ export default function ChatAside() {
 
   //  storages
   const [chats, setChats] = useState<TChat[]>([]);
-  const [friendsWithoutChat, setFriendsWithoutChat] = useState<
-    TFriendsWithoutChat[]
-  >([]);
+  const [friends, setFriends] = useState<TFriends[]>([]);
 
   if (socket) {
-    socket!.on("updateFriendsWithoutChat", (data) => {
-      setFriendsWithoutChat(data.friends);
-      setChats(data.chats);
+    socket!.on("updateFriends", (data) => {
+      const [newFriends, newChat] = CheckFriendsIfChatAlreadyExist(
+        data.friends,
+        data.chats
+      );
+
+      setFriends(newFriends);
+      setChats(newChat);
     });
   }
 
@@ -59,7 +65,7 @@ export default function ChatAside() {
             // send request to server only when block is closed
             if (!showFriends) {
               GetFriends(user[0].id).then((data) => {
-                setFriendsWithoutChat(data);
+                setFriends(CheckFriendsIfChatAlreadyExist(data, chats)[0]);
               });
             }
 
@@ -71,7 +77,7 @@ export default function ChatAside() {
 
       {showFriends && (
         <div className="flex flex-col">
-          {friendsWithoutChat.map((friend, idx) => {
+          {friends.map((friend, idx) => {
             return (
               <StartMessagingCard
                 key={idx}

@@ -1,9 +1,11 @@
+// socket
 import { Socket } from "socket.io-client";
 import type {
   ClientToServerEvents,
   ServerToClientEvents
 } from "@/socket_io_typings";
 
+// interfaces
 import type { Members } from "@/interfaces/interfaces";
 
 // API
