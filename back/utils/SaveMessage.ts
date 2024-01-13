@@ -1,8 +1,8 @@
 import { db } from "../global/db";
 
-import type { SendPrivateMessages } from "../interfaces/interfaces";
+import type { TSendPrivateMessages } from "../interfaces/interfaces";
 
-export function SaveMessage(message: SendPrivateMessages) {
+export function SaveMessage(message: TSendPrivateMessages) {
   const reconfiguration = {
     chat_id: message.chat_id,
     sender_id: message.sender_id,

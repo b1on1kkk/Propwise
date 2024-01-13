@@ -18,7 +18,7 @@ export interface TCreateChat {
   chat_status: "pinned" | "all";
 }
 
-export interface SendPrivateMessages {
+export interface TSendPrivateMessages {
   name: string;
   lastname: string;
   chat_id: number;
@@ -27,4 +27,11 @@ export interface SendPrivateMessages {
   to_send_id: number;
   value: string;
   timestamp: string;
+}
+
+export interface TPinMessage {
+  chat_id: number;
+  to_change_status: string;
+  socket_to_send: string;
+  user_id: number;
 }

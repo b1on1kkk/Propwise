@@ -17,6 +17,7 @@ import { GetFriends } from "@/API/GetFriends";
 
 // utils
 import { CheckFriendsIfChatAlreadyExist } from "@/utils/CheckFriendsIfChatAlreadyExist";
+import { PinMessages } from "@/utils/PinMessages";
 
 // interface
 import type { TChat, TFriends } from "@/interfaces/interfaces";
@@ -107,6 +108,15 @@ export default function ChatAside() {
               setOpenStatus={setOpenHidePinnedMessages}
               chatArray={chats}
               chatStatus="pinned"
+              // double click to pin message and redouble click to unpin message:
+              // get chat data TO pin from handler, then send this data to server using sockets, update data in database,
+              // parse new chats data again, push data from server to frontend again using sockets, push this data in useState
+              // and update chats
+              onDoubleClickToPinMessage={(_, chat) =>
+                PinMessages(chat, socket, user[0].id, (chats) =>
+                  setChats(chats)
+                )
+              }
             />
             {/*  */}
 
@@ -118,6 +128,12 @@ export default function ChatAside() {
               setOpenStatus={setOpenHideAllMessages}
               chatArray={chats}
               chatStatus="all"
+              // same as above
+              onDoubleClickToPinMessage={(_, chat) =>
+                PinMessages(chat, socket, user[0].id, (chats) =>
+                  setChats(chats)
+                )
+              }
             />
             {/*  */}
           </>

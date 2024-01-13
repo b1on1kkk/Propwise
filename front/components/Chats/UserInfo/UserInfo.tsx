@@ -5,13 +5,11 @@ import { X, CircleUserRound, UserRoundX } from "lucide-react";
 // context
 import { useInboxContext } from "@/context/InboxContext";
 
-export interface TUserInfo {
-  isOnlineStatus: boolean;
-  onClick: () => void;
-}
+// interfaces
+import type { TUserInfo } from "@/interfaces/interfaces";
 
 export default function UserInfo({ isOnlineStatus, onClick }: TUserInfo) {
-  const { chosenUser } = useInboxContext();
+  const { storedValue } = useInboxContext();
 
   return (
     <div className="border-l-1 w-[350px] p-5 flex flex-col">
@@ -30,8 +28,8 @@ export default function UserInfo({ isOnlineStatus, onClick }: TUserInfo) {
 
         <div className="mt-10">
           <HeaderUserInf
-            name={chosenUser!.name}
-            lastname={chosenUser!.lastname}
+            name={storedValue!.name}
+            lastname={storedValue!.lastname}
             online_status={isOnlineStatus ? "online" : "last seen recently"}
           >
             <div className="w-20 h-20 bg-gray-400 rounded-full" />
@@ -46,7 +44,7 @@ export default function UserInfo({ isOnlineStatus, onClick }: TUserInfo) {
 
         <div className="flex flex-col gap-3">
           <div>
-            <div>{chosenUser!.email}</div>
+            <div>{storedValue!.email}</div>
             <div className="text-sm text-[#56616b]">email</div>
           </div>
           <div>
@@ -54,7 +52,7 @@ export default function UserInfo({ isOnlineStatus, onClick }: TUserInfo) {
             <div className="text-sm text-[#56616b]">Bio</div>
           </div>
           <div>
-            <div className="text-indigo-500">@{chosenUser!.name}</div>
+            <div className="text-indigo-500">@{storedValue!.name}</div>
             <div className="text-sm text-[#56616b]">Username</div>
           </div>
         </div>

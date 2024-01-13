@@ -213,6 +213,10 @@ export interface TChats {
   chatStatus: "pinned" | "all";
   chatArray: TChat[];
   setOpenStatus: (c: boolean) => void;
+  onDoubleClickToPinMessage: (
+    e: React.MouseEvent<HTMLDivElement>,
+    chat: TChat
+  ) => void;
 }
 
 export interface TStartMessagingCard {
@@ -251,4 +255,9 @@ export interface Messages {
   sender_id: number;
   value: string;
   timestamp: string;
+}
+
+export interface TUserInfo {
+  isOnlineStatus: boolean;
+  onClick: () => void;
 }

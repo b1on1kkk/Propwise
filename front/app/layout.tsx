@@ -38,7 +38,7 @@ import { io, Socket } from "socket.io-client";
 import {
   ServerToClientEvents,
   ClientToServerEvents
-} from "@/socket_io_typings";
+} from "../socket_io_typings";
 
 export default function RootLayout({
   children

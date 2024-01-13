@@ -15,14 +15,14 @@ export default function ChatHeader({
   moreOnClick,
   moreAboutUserOnClick
 }: TChatHeader) {
-  const { chosenUser } = useInboxContext();
+  const { storedValue } = useInboxContext();
 
   return (
     <header className="p-5 border-b-1">
       <div className="flex items-center">
         <HeaderUserInf
-          name={chosenUser!.name}
-          lastname={chosenUser!.lastname}
+          name={storedValue!.name}
+          lastname={storedValue!.lastname}
           online_status={isOnlineStatus ? "online" : "last seen recently"}
         >
           <div className="h-11 w-11 bg-gray-400 rounded-full" />

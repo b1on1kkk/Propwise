@@ -22,7 +22,7 @@ import { GetMessages } from "@/API/GetMessages";
 import type { Messages } from "@/interfaces/interfaces";
 
 export default function Chat() {
-  const { chosenUser } = useInboxContext();
+  const { storedValue } = useInboxContext();
   const { onlineUsers, socket, user } = useGlobalModalStatus();
 
   const [moreAboutUser, setMoreAboutUser] = useState<boolean>(false);
@@ -38,10 +38,10 @@ export default function Chat() {
       const configureMessage = {
         name: user[0].name,
         lastname: user[0].lastname,
-        chat_id: chosenUser!.chat_id,
+        chat_id: storedValue!.chat_id,
         sender_id: user[0].id,
         sender_socket: socket!.id!,
-        to_send_id: chosenUser!.id,
+        to_send_id: storedValue!.id,
         value: messageInput,
         timestamp: format(new Date(), "HH:mm")
       };
@@ -53,17 +53,15 @@ export default function Chat() {
   }
 
   useEffect(() => {
-    GetMessages(chosenUser!.chat_id).then((messages) => {
-      setMessages(messages);
-    });
+    GetMessages(storedValue!.chat_id).then((messages) => setMessages(messages));
   }, []);
 
   const [isUserOnlineStatus, setIsUserOnlineStatus] = useState<boolean>(false);
 
   // set up users online status here only when component build in or dependency changes
   useEffect(() => {
-    if (chosenUser && onlineUsers)
-      setIsUserOnlineStatus(CheckUserOnline(onlineUsers, chosenUser.id));
+    if (storedValue && onlineUsers)
+      setIsUserOnlineStatus(CheckUserOnline(onlineUsers, storedValue.id));
   }, [onlineUsers]);
 
   if (socket) {
@@ -81,9 +79,6 @@ export default function Chat() {
     });
   }
 
-  // think about refresh and how to refresh user inf without error (two ways to fix it:
-  // using localstorage
-  // get data by page id)
   return (
     <>
       <div className="flex flex-col flex-1">
@@ -96,29 +91,33 @@ export default function Chat() {
         />
 
         <main className="flex flex-col bg-gray-50 overflow-auto flex-1 py-3 px-6 gap-3">
-          {messages.map((message, idx) => {
-            if (message.sender_id === user[0].id) {
-              return (
-                <LoggedInUserMessageCard
-                  key={idx}
-                  name={message.name}
-                  lastname={message.lastname}
-                  timestamp={message.timestamp}
-                  value={message.value}
-                />
-              );
-            }
+          {user.length > 0 && (
+            <>
+              {messages.map((message, idx) => {
+                if (message.sender_id === user[0].id) {
+                  return (
+                    <LoggedInUserMessageCard
+                      key={idx}
+                      name={message.name}
+                      lastname={message.lastname}
+                      timestamp={message.timestamp}
+                      value={message.value}
+                    />
+                  );
+                }
 
-            return (
-              <FriendMessageCard
-                key={idx}
-                name={message.name}
-                lastname={message.lastname}
-                timestamp={message.timestamp}
-                value={message.value}
-              />
-            );
-          })}
+                return (
+                  <FriendMessageCard
+                    key={idx}
+                    name={message.name}
+                    lastname={message.lastname}
+                    timestamp={message.timestamp}
+                    value={message.value}
+                  />
+                );
+              })}
+            </>
+          )}
         </main>
 
         {/* message input */}

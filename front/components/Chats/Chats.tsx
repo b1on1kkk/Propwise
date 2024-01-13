@@ -1,8 +1,8 @@
 import Link from "next/link";
 
 // components
-import { ChevronDown, icons } from "lucide-react";
 import ChatCard from "./ChatCard/ChatCard";
+import { ChevronDown, icons } from "lucide-react";
 
 // context
 import { useInboxContext } from "@/context/InboxContext";
@@ -16,11 +16,16 @@ export default function Chats({
   openStatus,
   chatStatus,
   chatArray,
-  setOpenStatus
+  setOpenStatus,
+  onDoubleClickToPinMessage
 }: TChats) {
-  const { setChosenUser } = useInboxContext();
-
   const Icon = icons[icon_name as keyof typeof icons];
+
+  const { setValue } = useInboxContext();
+
+  console.log(chatArray);
+
+  console.log(chatStatus);
 
   return (
     <div
@@ -64,9 +69,13 @@ export default function Chats({
               <Link
                 href={`/inbox/${chat.id}`}
                 key={idx}
-                onClick={() => setChosenUser(chat)}
+                onClick={() => setValue(chat)}
               >
-                <ChatCard user={chat} chatStatus={chatStatus} />
+                <ChatCard
+                  chat={chat}
+                  chatStatus={chatStatus}
+                  onDoubleClickToPinMessage={onDoubleClickToPinMessage}
+                />
               </Link>
             );
           }

@@ -1,8 +1,11 @@
 import express, { Express, Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
-import { Socket } from "socket.io";
-import { ClientToServerEvents } from "../front/socket_io_typings";
 
+// socket
+import { Socket } from "socket.io";
+import type { ClientToServerEvents } from "../front/socket_io_typings";
+
+// database connection
 import { db } from "./global/db";
 
 const bodyParser = require("body-parser");
@@ -32,7 +35,8 @@ import type {
   TonlineUsers,
   TsendNotificationsTo,
   TCreateChat,
-  SendPrivateMessages
+  TSendPrivateMessages,
+  TPinMessage
 } from "./interfaces/interfaces";
 
 ////////////////////////////////////////SOCKET IO////////////////////////////////////////
@@ -40,7 +44,7 @@ import type {
 const io = new Server(server, {
   cors: {
     origin: ["http://localhost:3000", "https://admin.socket.io"],
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "DELETE", "PUT"],
     credentials: true
   }
 });
@@ -226,7 +230,7 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
   });
 
   // send private messages
-  socket.on("sendPrivateMessage", (message: SendPrivateMessages) => {
+  socket.on("sendPrivateMessage", (message: TSendPrivateMessages) => {
     // find user socket_id to whom send message
     const socket_id = FindUser(message.to_send_id, onlineUsers);
 
@@ -252,6 +256,23 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
 
     // in any case save message in database
     SaveMessage(message);
+  });
+
+  // pin message functionality
+  socket.on("pinMessage", (data: TPinMessage) => {
+    const sql = `UPDATE chat SET chat_status = ? WHERE chat_id = ?`;
+
+    db.query(sql, [data.to_change_status, data.chat_id], (error: Error) => {
+      if (error) return error;
+
+      GetChats(data.user_id.toString(), (err, chats) => {
+        if (err) return err;
+
+        io.to(data.socket_to_send).emit("updateChatsAfterPinning", {
+          chats
+        });
+      });
+    });
   });
 });
 
@@ -441,6 +462,28 @@ app.get("/notificaitons", (req: Request, res: Response) => {
   });
 });
 
+app.get("/messages", (req: Request, res: Response) => {
+  const { chat_id } = req.query;
+
+  db.query(
+    `
+    SELECT messages.timestamp, messages.value, messages.sender_id, users.name, users.lastname
+    FROM messages
+    INNER JOIN users
+    ON messages.sender_id = users.id 
+    WHERE messages.chat_id = ?;
+    `,
+    [chat_id],
+    (error: Error, result: any) => {
+      if (error) return res.status(500).send(error);
+
+      return res.status(200).json(result);
+    }
+  );
+});
+
+////////////////////////////////////////PUT////////////////////////////////////////
+
 // update friendship status
 app.put("/update_friendship", (req: Request, res: Response) => {
   const { user1_id, user2_id, status } = req.body;
@@ -453,6 +496,8 @@ app.put("/update_friendship", (req: Request, res: Response) => {
     return res.status(200).send("Friendship status updated!");
   });
 });
+
+////////////////////////////////////////DELETE////////////////////////////////////////
 
 app.delete("/delete_notification", (req: Request, res: Response) => {
   const { notif_id } = req.body;
@@ -476,26 +521,6 @@ app.delete("/delete_friendship", (req: Request, res: Response) => {
 
     return res.status(200).send("Friendship has been declined!");
   });
-});
-
-app.get("/messages", (req: Request, res: Response) => {
-  const { chat_id } = req.query;
-
-  db.query(
-    `
-    SELECT messages.timestamp, messages.value, messages.sender_id, users.name, users.lastname
-    FROM messages
-    INNER JOIN users
-    ON messages.sender_id = users.id 
-    WHERE messages.chat_id = ?;
-    `,
-    [chat_id],
-    (error: Error, result: any) => {
-      if (error) return res.status(500).send(error);
-
-      return res.status(200).json(result);
-    }
-  );
 });
 
 server.listen(2000, () => {
