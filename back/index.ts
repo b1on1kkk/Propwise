@@ -22,7 +22,7 @@ const server = http.createServer(app);
 // utils
 import { FindUser } from "./utils/FindUser";
 import { SaveNotifications } from "./utils/SaveNotifications";
-import { GetNotifNextAutoIncremetIdx } from "./utils/GetNotifNextAutoIncremetIdx";
+import { GetNextAutoIncremetIdx } from "./utils/GetNextAutoIncremetIdx";
 import { UpdateNotificationStatus } from "./utils/UpdateNotificationStatus";
 import { GetFriends } from "./utils/GetFriends";
 import { SaveMessage } from "./utils/SaveMessage";
@@ -34,7 +34,10 @@ import { GETTER_TYPE } from "./utils/MAIN_DATA_GETTER";
 import {
   GET_USERS_QUERY,
   GET_CHATS_QUERY,
-  GET_NOTIFICATIONS_QUERY
+  GET_NOTIFICATIONS_QUERY,
+  GET_NEXT_NOTIFICATION_AUTOINCREMET,
+  GET_NEXT_MESSAGE_AUTOINCREMET,
+  GET_MESSAGES_QUERY
 } from "./constants/QUERIES";
 
 // interfaces
@@ -44,7 +47,9 @@ import type {
   TCreateChat,
   TSendPrivateMessages,
   TPinMessage,
-  TDeleteChat
+  TDeleteChat,
+  TUpdateStatusMessages,
+  TUpdateNotificationStatus
 } from "./interfaces/interfaces";
 
 ////////////////////////////////////////SOCKET IO////////////////////////////////////////
@@ -86,47 +91,50 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
   // listen for notifications
   socket.on("sendNotificationsTo", (data: TsendNotificationsTo) => {
     // get next AUTO_INCREMENT index that will be inserted. (this needed to delete notifications correctly, if user want to)
-    GetNotifNextAutoIncremetIdx((err, next_notification_id) => {
-      if (err) return err;
+    GetNextAutoIncremetIdx(
+      GET_NEXT_NOTIFICATION_AUTOINCREMET,
+      (err, next_notification_id) => {
+        if (err) return err;
 
-      // find user socket_id
-      const socket_id = FindUser(data.user_id, onlineUsers);
+        // find user socket_id
+        const socket_id = FindUser(data.user_id, onlineUsers);
 
-      // if socket_id not null => user is online and we can send him notification straightforward
-      if (socket_id) {
-        io.to(socket_id).emit("sendNotificationsFrom", {
-          notif_id: next_notification_id[0].AUTO_INCREMENT,
-          message: data.message,
+        // if socket_id not null => user is online and we can send him notification straightforward
+        if (socket_id) {
+          io.to(socket_id).emit("sendNotificationsFrom", {
+            notif_id: next_notification_id[0].AUTO_INCREMENT,
+            message: data.message,
+            notif_type: data.notif_type,
+            status: data.status,
+            timestamp: data.timestamp
+          });
+
+          // send updated members to client side if socket_id was found
+          MAIN_DATA_GETTER(
+            data.user_id.toString(),
+            GETTER_TYPE.GetUsers,
+            GET_USERS_QUERY,
+            (err, data) => {
+              if (err) return err;
+
+              // send new members data only when error prop is null
+              io.to(socket_id).emit("getMembersFromSocket", {
+                content: data
+              });
+            }
+          );
+        }
+
+        // save notification in database
+        SaveNotifications({
+          user_id: data.user_id,
           notif_type: data.notif_type,
-          status: data.status,
+          context: data.message,
+          status: false,
           timestamp: data.timestamp
         });
-
-        // send updated members to client side if socket_id was found
-        MAIN_DATA_GETTER(
-          data.user_id.toString(),
-          GETTER_TYPE.GetUsers,
-          GET_USERS_QUERY,
-          (err, data) => {
-            if (err) return err;
-
-            // send new members data only when error prop is null
-            io.to(socket_id).emit("getMembersFromSocket", {
-              content: data
-            });
-          }
-        );
       }
-
-      // save notification in database
-      SaveNotifications({
-        user_id: data.user_id,
-        notif_type: data.notif_type,
-        context: data.message,
-        status: false,
-        timestamp: data.timestamp
-      });
-    });
+    );
   });
 
   // socket to update members data if user send friend request
@@ -170,32 +178,29 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
   });
 
   // socket to update notifications status (read notifications or not)
-  socket.on(
-    "updateNotificationStatus",
-    (data: { user_id: number; socket_id: string }) => {
-      // first of all update status of each notifications
-      UpdateNotificationStatus(data.user_id.toString(), (update_err) => {
-        // return if error occur
-        if (update_err) return update_err;
+  socket.on("updateNotificationStatus", (data: TUpdateNotificationStatus) => {
+    // first of all update status of each notifications
+    UpdateNotificationStatus(data.user_id.toString(), (update_err) => {
+      // return if error occur
+      if (update_err) return update_err;
 
-        // then parse notifications again
-        MAIN_DATA_GETTER(
-          data.user_id.toString(),
-          GETTER_TYPE.GetNotifications,
-          GET_NOTIFICATIONS_QUERY,
-          (notif_err, notif_data) => {
-            // return if error occur
-            if (notif_err) return notif_err;
+      // then parse notifications again
+      MAIN_DATA_GETTER(
+        data.user_id.toString(),
+        GETTER_TYPE.GetNotifications,
+        GET_NOTIFICATIONS_QUERY,
+        (notif_err, notif_data) => {
+          // return if error occur
+          if (notif_err) return notif_err;
 
-            // push new notifications to frontend
-            io.to(data.socket_id).emit("updatedNotifications", {
-              notifications: notif_data
-            });
-          }
-        );
-      });
-    }
-  );
+          // push new notifications to frontend
+          io.to(data.socket_id).emit("updatedNotifications", {
+            notifications: notif_data
+          });
+        }
+      );
+    });
+  });
 
   // create chat functionality
   socket.on("createChat", (data: TCreateChat) => {
@@ -276,31 +281,43 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
 
   // send private messages
   socket.on("sendPrivateMessage", (message: TSendPrivateMessages) => {
-    // find user socket_id to whom send message
-    const socket_id = FindUser(message.to_send_id, onlineUsers);
+    // get next AUTO_INCREMENT index that will be inserted. (this needed to find message from frontend and set status as read)
+    GetNextAutoIncremetIdx(
+      GET_NEXT_MESSAGE_AUTOINCREMET,
+      (err, next_notification_id) => {
+        if (err) return err;
 
-    // if user is online - send new message to him directly
-    if (socket_id) {
-      io.to(socket_id).emit("getPrivateMessage", {
-        name: message.name,
-        lastname: message.lastname,
-        sender_id: message.sender_id,
-        value: message.value,
-        timestamp: message.timestamp
-      });
-    }
+        // find user socket_id to whom send message
+        const socket_id = FindUser(message.to_send_id, onlineUsers);
 
-    // in any case send message to sender
-    io.to(message.sender_socket).emit("getPrivateMessage", {
-      name: message.name,
-      lastname: message.lastname,
-      sender_id: message.sender_id,
-      value: message.value,
-      timestamp: message.timestamp
-    });
+        // if user is online - send new message to him directly
+        if (socket_id) {
+          io.to(socket_id).emit("getPrivateMessage", {
+            message_id: next_notification_id[0].AUTO_INCREMENT,
+            name: message.name,
+            lastname: message.lastname,
+            sender_id: message.sender_id,
+            value: message.value,
+            timestamp: message.timestamp,
+            status: message.status
+          });
+        }
 
-    // in any case save message in database
-    SaveMessage(message);
+        // in any case send message to sender
+        io.to(message.sender_socket).emit("getPrivateMessage", {
+          message_id: next_notification_id[0].AUTO_INCREMENT,
+          name: message.name,
+          lastname: message.lastname,
+          sender_id: message.sender_id,
+          value: message.value,
+          timestamp: message.timestamp,
+          status: message.status
+        });
+
+        // in any case save message in database
+        SaveMessage(message);
+      }
+    );
   });
 
   // pin message functionality
@@ -390,6 +407,34 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
         );
       });
     });
+  });
+
+  socket.on("updateStatusMessages", (data: TUpdateStatusMessages) => {
+    if (data.indexes_to_update.length > 0) {
+      const sql = `UPDATE messages SET status = 1 WHERE message_id IN (?)`;
+
+      db.query(sql, [data.indexes_to_update], (err: Error) => {
+        if (err) return err;
+
+        // get online users sockets
+        const socket1_id = FindUser(data.user1_id, onlineUsers);
+        const socket2_id = FindUser(data.user2_id, onlineUsers);
+
+        // get new messages
+        MAIN_DATA_GETTER(
+          data.chat_id.toString(),
+          GETTER_TYPE.GetMessages,
+          GET_MESSAGES_QUERY,
+          (message_err, messages) => {
+            if (message_err) return message_err;
+
+            io.to(socket1_id).to(socket2_id).emit("getUpdatedMessages", {
+              messages
+            });
+          }
+        );
+      });
+    }
   });
 });
 
@@ -596,19 +641,14 @@ app.get("/notificaitons", (req: Request, res: Response) => {
 app.get("/messages", (req: Request, res: Response) => {
   const { chat_id } = req.query;
 
-  db.query(
-    `
-    SELECT messages.timestamp, messages.value, messages.sender_id, users.name, users.lastname
-    FROM messages
-    INNER JOIN users
-    ON messages.sender_id = users.id 
-    WHERE messages.chat_id = ?;
-    `,
-    [chat_id],
-    (error: Error, result: any) => {
-      if (error) return res.status(500).send(error);
+  MAIN_DATA_GETTER(
+    chat_id as string,
+    GETTER_TYPE.GetMessages,
+    GET_MESSAGES_QUERY,
+    (message_err, messages) => {
+      if (message_err) return res.status(500).send(message_err);
 
-      return res.status(200).json(result);
+      return res.status(200).json(messages);
     }
   );
 });

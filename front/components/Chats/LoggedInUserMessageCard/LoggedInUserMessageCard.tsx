@@ -1,28 +1,31 @@
-interface TLoggedInUserMessageCard {
-  name: string;
-  lastname: string;
-  timestamp: string;
-  value: string;
-}
+// components
+import { Check, CheckCheck } from "lucide-react";
 
-export default function LoggedInUserMessageCard({
-  name,
-  lastname,
-  timestamp,
-  value
-}: TLoggedInUserMessageCard) {
+// interfaces
+import type { TMessageCard } from "@/interfaces/interfaces";
+
+export default function LoggedInUserMessageCard({ message }: TMessageCard) {
   return (
     <div className="flex gap-3 justify-end">
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2 justify-end">
-          <span className="text-xs text-[#56616b]">{timestamp}</span>
+          <span className="text-xs text-[#56616b]">{message.timestamp}</span>
           <span className="text-sm font-semibold">
-            {name} {lastname}
+            {message.name} {message.lastname}
           </span>
         </div>
 
-        <div className="px-3 py-2 bg-[#009965] rounded-lg text-white max-w-[400px]">
-          {value}
+        <div className="px-3 py-2 bg-[#009965] rounded-lg text-white max-w-[400px] flex items-end gap-3">
+          <div className="flex-1">{message.value}</div>
+          {message.status === 1 ? (
+            <span>
+              <CheckCheck width={13} height={13} color="white" />
+            </span>
+          ) : (
+            <span>
+              <Check width={13} height={13} color="white" />
+            </span>
+          )}
         </div>
       </div>
 

@@ -250,14 +250,20 @@ export interface TChatHeader {
 }
 
 export interface Messages {
+  message_id: number;
   name: string;
   lastname: string;
   sender_id: number;
   value: string;
   timestamp: string;
+  status: number;
 }
 
 export interface TUserInfo {
   isOnlineStatus: boolean;
   onClick: () => void;
+}
+
+export interface TMessageCard {
+  message: Messages;
 }

@@ -7,7 +7,8 @@ export function SaveMessage(message: TSendPrivateMessages) {
     chat_id: message.chat_id,
     sender_id: message.sender_id,
     value: message.value,
-    timestamp: message.timestamp
+    timestamp: message.timestamp,
+    status: message.status
   };
 
   db.query("INSERT INTO messages SET ?", [reconfiguration], (error: Error) => {

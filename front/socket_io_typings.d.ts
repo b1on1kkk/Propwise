@@ -1,27 +1,26 @@
 import type {
   TNotificationsFromDatabase,
   TFriendsWithoutChat,
-  TChat
+  TChat,
+  Messages
 } from "./interfaces/interfaces";
 
-import {
+import type {
   TsendNotificationsTo,
   TCreateChat,
   TSendPrivateMessages,
   TPinMessage,
-  TDeleteChat
+  TDeleteChat,
+  TUpdateStatusMessages,
+  TUpdateNotificationStatus,
+  TGetPrivateMessage,
+  TSendNotificationsFrom
 } from "../back/interfaces/interfaces";
 
 export interface ServerToClientEvents {
   getOnlineUsersId: (data: { user_id: number; socket_id: string }[]) => void;
 
-  sendNotificationsFrom: (data: {
-    notif_id: number;
-    message: string;
-    notif_type: "system" | "friend_request";
-    status: number;
-    timestamp: string;
-  }) => void;
+  sendNotificationsFrom: (data: TSendNotificationsFrom) => void;
 
   getMembersFromSocket: (data: { content: any }) => void;
 
@@ -34,15 +33,11 @@ export interface ServerToClientEvents {
     chats: TChat[];
   }) => void;
 
-  getPrivateMessage: (data: {
-    name: string;
-    lastname: string;
-    sender_id: number;
-    value: string;
-    timestamp: string;
-  }) => void;
+  getPrivateMessage: (data: TGetPrivateMessage) => void;
 
   updateChats: (data: { chats: TChat[] }) => void;
+
+  getUpdatedMessages: (data: { messages: Messages[] }) => void;
 }
 
 export interface ClientToServerEvents {
@@ -52,10 +47,7 @@ export interface ClientToServerEvents {
 
   updateMembers: (data: { user1_id: number; user2_id: number }) => void;
 
-  updateNotificationStatus: (data: {
-    user_id: number;
-    socket_id: string;
-  }) => void;
+  updateNotificationStatus: (data: TUpdateNotificationStatus) => void;
 
   createChat: (data: TCreateChat) => void;
 
@@ -64,4 +56,6 @@ export interface ClientToServerEvents {
   pinMessage: (data: TPinMessage) => void;
 
   deleteChat: (data: TDeleteChat) => void;
+
+  updateStatusMessages: (data: TUpdateStatusMessages) => void;
 }

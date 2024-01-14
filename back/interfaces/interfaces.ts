@@ -19,6 +19,7 @@ export interface TCreateChat {
 }
 
 export interface TSendPrivateMessages {
+  message_id: number;
   name: string;
   lastname: string;
   chat_id: number;
@@ -27,6 +28,7 @@ export interface TSendPrivateMessages {
   to_send_id: number;
   value: string;
   timestamp: string;
+  status: number;
 }
 
 export interface TPinMessage {
@@ -41,4 +43,34 @@ export interface TDeleteChat {
   chat_id: number;
   user1_id: number;
   user2_id: number;
+}
+
+export interface TUpdateStatusMessages {
+  indexes_to_update: number[];
+  chat_id: number;
+  user1_id: number;
+  user2_id: number;
+}
+
+export interface TUpdateNotificationStatus {
+  user_id: number;
+  socket_id: string;
+}
+
+export interface TGetPrivateMessage {
+  message_id: number;
+  name: string;
+  lastname: string;
+  sender_id: number;
+  value: string;
+  timestamp: string;
+  status: number;
+}
+
+export interface TSendNotificationsFrom {
+  notif_id: number;
+  message: string;
+  notif_type: "system" | "friend_request";
+  status: number;
+  timestamp: string;
 }

@@ -13,29 +13,46 @@ import ChatHeader from "@/components/Chats/ChatHeader/ChatHeader";
 import { useInboxContext } from "@/context/InboxContext";
 import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
 
+// hooks
+import { useScrollToBottom } from "@/hooks/useScrollToBottom";
+
 // utils
 import { format } from "date-fns";
 import { CheckUserOnline } from "@/utils/CheckUserOnline";
+import { DetectUserReadMessage } from "@/utils/DetectUserReadMessage";
+
+// API
 import { GetMessages } from "@/API/GetMessages";
 
 // interfaces
 import type { Messages } from "@/interfaces/interfaces";
 
 export default function Chat() {
+  // some data from contexts
   const { storedValue } = useInboxContext();
   const { onlineUsers, socket, user } = useGlobalModalStatus();
 
+  // variable to open right panel
   const [moreAboutUser, setMoreAboutUser] = useState<boolean>(false);
 
+  // text input handler
   const [messageInput, setMessageInput] = useState<string>("");
 
+  // messages store
   const [messages, setMessages] = useState<Messages[]>([]);
+
+  // custom hook that scroll message list to the button each time messages changes
+  const ref = useScrollToBottom(messages);
+
+  // variable to save data if user is online
+  const [isUserOnlineStatus, setIsUserOnlineStatus] = useState<boolean>(false);
 
   function SubmitHandler(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     if (messageInput) {
       const configureMessage = {
+        message_id: 0,
         name: user[0].name,
         lastname: user[0].lastname,
         chat_id: storedValue!.chat_id,
@@ -43,7 +60,8 @@ export default function Chat() {
         sender_socket: socket!.id!,
         to_send_id: storedValue!.id,
         value: messageInput,
-        timestamp: format(new Date(), "HH:mm")
+        timestamp: format(new Date(), "HH:mm"),
+        status: 0
       };
 
       socket!.emit("sendPrivateMessage", configureMessage);
@@ -56,28 +74,46 @@ export default function Chat() {
     GetMessages(storedValue!.chat_id).then((messages) => setMessages(messages));
   }, []);
 
-  const [isUserOnlineStatus, setIsUserOnlineStatus] = useState<boolean>(false);
-
   // set up users online status here only when component build in or dependency changes
   useEffect(() => {
     if (storedValue && onlineUsers)
       setIsUserOnlineStatus(CheckUserOnline(onlineUsers, storedValue.id));
   }, [onlineUsers]);
 
+  // new messages listener
   if (socket) {
     socket!.on("getPrivateMessage", (data) => {
       setMessages([
         ...messages,
         {
+          message_id: data.message_id,
           name: data.name,
           lastname: data.lastname,
           sender_id: data.sender_id,
           value: data.value,
-          timestamp: data.timestamp
+          timestamp: data.timestamp,
+          status: data.status
         }
       ]);
     });
   }
+
+  // this was done to track if user read message.
+  useEffect(() => {
+    // such long condition...
+    if (messages.length > 0 && user.length > 0 && storedValue && socket) {
+      DetectUserReadMessage(
+        user[0].id,
+        messages,
+        storedValue,
+        socket,
+        (newMessages) => {
+          setMessages(newMessages);
+        }
+      );
+    }
+    // and recall this hook when messages changes
+  }, [messages]);
 
   return (
     <>
@@ -90,31 +126,20 @@ export default function Chat() {
           moreAboutUserOnClick={() => setMoreAboutUser(!moreAboutUser)}
         />
 
-        <main className="flex flex-col bg-gray-50 overflow-auto flex-1 py-3 px-6 gap-3">
+        <main
+          ref={ref}
+          className="flex flex-col bg-gray-50 overflow-auto flex-1 py-3 px-6 gap-3"
+        >
           {user.length > 0 && (
             <>
               {messages.map((message, idx) => {
                 if (message.sender_id === user[0].id) {
                   return (
-                    <LoggedInUserMessageCard
-                      key={idx}
-                      name={message.name}
-                      lastname={message.lastname}
-                      timestamp={message.timestamp}
-                      value={message.value}
-                    />
+                    <LoggedInUserMessageCard key={idx} message={message} />
                   );
                 }
 
-                return (
-                  <FriendMessageCard
-                    key={idx}
-                    name={message.name}
-                    lastname={message.lastname}
-                    timestamp={message.timestamp}
-                    value={message.value}
-                  />
-                );
+                return <FriendMessageCard key={idx} message={message} />;
               })}
             </>
           )}
