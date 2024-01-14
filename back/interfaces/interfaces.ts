@@ -35,3 +35,10 @@ export interface TPinMessage {
   socket_to_send: string;
   user_id: number;
 }
+
+export interface TDeleteChat {
+  sender_socket: string;
+  chat_id: number;
+  user1_id: number;
+  user2_id: number;
+}

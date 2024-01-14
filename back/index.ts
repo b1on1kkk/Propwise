@@ -22,13 +22,20 @@ const server = http.createServer(app);
 // utils
 import { FindUser } from "./utils/FindUser";
 import { SaveNotifications } from "./utils/SaveNotifications";
-import { GetUsers } from "./utils/GetUsers";
 import { GetNotifNextAutoIncremetIdx } from "./utils/GetNotifNextAutoIncremetIdx";
 import { UpdateNotificationStatus } from "./utils/UpdateNotificationStatus";
-import { GetNotifications } from "./utils/GetNotifications";
 import { GetFriends } from "./utils/GetFriends";
-import { GetChats } from "./utils/GetChats";
 import { SaveMessage } from "./utils/SaveMessage";
+
+// MAIN DATA GETTER
+import { MAIN_DATA_GETTER } from "./utils/MAIN_DATA_GETTER";
+import { GETTER_TYPE } from "./utils/MAIN_DATA_GETTER";
+// QUERIES
+import {
+  GET_USERS_QUERY,
+  GET_CHATS_QUERY,
+  GET_NOTIFICATIONS_QUERY
+} from "./constants/QUERIES";
 
 // interfaces
 import type {
@@ -36,7 +43,8 @@ import type {
   TsendNotificationsTo,
   TCreateChat,
   TSendPrivateMessages,
-  TPinMessage
+  TPinMessage,
+  TDeleteChat
 } from "./interfaces/interfaces";
 
 ////////////////////////////////////////SOCKET IO////////////////////////////////////////
@@ -95,14 +103,19 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
         });
 
         // send updated members to client side if socket_id was found
-        GetUsers(data.user_id.toString(), (err, data) => {
-          // send new members data only when error prop is null
-          if (!err) {
+        MAIN_DATA_GETTER(
+          data.user_id.toString(),
+          GETTER_TYPE.GetUsers,
+          GET_USERS_QUERY,
+          (err, data) => {
+            if (err) return err;
+
+            // send new members data only when error prop is null
             io.to(socket_id).emit("getMembersFromSocket", {
               content: data
             });
           }
-        });
+        );
       }
 
       // save notification in database
@@ -124,23 +137,35 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
 
     // if one of the sockets are online - send changed members data
     if (socket1_id) {
-      GetUsers(data.user1_id.toString(), (err, data) => {
-        if (!err) {
+      MAIN_DATA_GETTER(
+        data.user1_id.toString(),
+        GETTER_TYPE.GetUsers,
+        GET_USERS_QUERY,
+        (err, users) => {
+          if (err) return err;
+
+          // send new members data only when error prop is null
           io.to(socket1_id).emit("getMembersFromSocket", {
-            content: data
+            content: users
           });
         }
-      });
+      );
     }
 
     if (socket2_id) {
-      GetUsers(data.user2_id.toString(), (err, data) => {
-        if (!err) {
+      MAIN_DATA_GETTER(
+        data.user2_id.toString(),
+        GETTER_TYPE.GetUsers,
+        GET_USERS_QUERY,
+        (err, users) => {
+          if (err) return err;
+
+          // send new members data only when error prop is null
           io.to(socket2_id).emit("getMembersFromSocket", {
-            content: data
+            content: users
           });
         }
-      });
+      );
     }
   });
 
@@ -154,15 +179,20 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
         if (update_err) return update_err;
 
         // then parse notifications again
-        GetNotifications(data.user_id.toString(), (notif_err, notif_data) => {
-          // return if error occur
-          if (notif_err) return notif_err;
+        MAIN_DATA_GETTER(
+          data.user_id.toString(),
+          GETTER_TYPE.GetNotifications,
+          GET_NOTIFICATIONS_QUERY,
+          (notif_err, notif_data) => {
+            // return if error occur
+            if (notif_err) return notif_err;
 
-          // push new notifications to frontend
-          io.to(data.socket_id).emit("updatedNotifications", {
-            notifications: notif_data
-          });
-        });
+            // push new notifications to frontend
+            io.to(data.socket_id).emit("updatedNotifications", {
+              notifications: notif_data
+            });
+          }
+        );
       });
     }
   );
@@ -194,37 +224,52 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
 
         // if socket is not null => user is online, so, send data to initiator (his data) of this chat and his new friend (him another data)
         if (socket_id) {
-          GetChats(data.user1_id.toString(), (err, chats) => {
-            if (err) return err;
+          MAIN_DATA_GETTER(
+            data.user1_id.toString(),
+            GETTER_TYPE.GetChats,
+            GET_CHATS_QUERY,
+            (err, chats) => {
+              if (err) return err;
 
-            io.to(data.to_send_socket_id).emit("updateFriends", {
-              friends,
-              chats
-            });
-          });
+              io.to(data.to_send_socket_id).emit("updateFriends", {
+                friends,
+                chats
+              });
+            }
+          );
 
-          GetChats(data.user2_id.toString(), (err, chats) => {
-            if (err) return err;
+          MAIN_DATA_GETTER(
+            data.user2_id.toString(),
+            GETTER_TYPE.GetChats,
+            GET_CHATS_QUERY,
+            (err, chats) => {
+              if (err) return err;
 
-            io.to(socket_id).emit("updateFriends", {
-              friends,
-              chats
-            });
-          });
+              io.to(socket_id).emit("updateFriends", {
+                friends,
+                chats
+              });
+            }
+          );
 
           return;
         }
 
         // if second user is not online => send just initiator
-        GetChats(data.user1_id.toString(), (err, chats) => {
-          if (err) return err;
+        MAIN_DATA_GETTER(
+          data.user1_id.toString(),
+          GETTER_TYPE.GetChats,
+          GET_CHATS_QUERY,
+          (err, chats) => {
+            if (err) return err;
 
-          // push data to frontend
-          io.to(data.to_send_socket_id).emit("updateFriends", {
-            friends,
-            chats
-          });
-        });
+            // push data to frontend
+            io.to(data.to_send_socket_id).emit("updateFriends", {
+              friends,
+              chats
+            });
+          }
+        );
       });
     });
   });
@@ -265,12 +310,84 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
     db.query(sql, [data.to_change_status, data.chat_id], (error: Error) => {
       if (error) return error;
 
-      GetChats(data.user_id.toString(), (err, chats) => {
-        if (err) return err;
+      MAIN_DATA_GETTER(
+        data.user_id.toString(),
+        GETTER_TYPE.GetChats,
+        GET_CHATS_QUERY,
+        (err, chats) => {
+          if (err) return err;
 
-        io.to(data.socket_to_send).emit("updateChatsAfterPinning", {
-          chats
-        });
+          io.to(data.socket_to_send).emit("updateChats", {
+            chats
+          });
+        }
+      );
+    });
+  });
+
+  socket.on("deleteChat", (data: TDeleteChat) => {
+    // create query to delete messages first
+    const delete_messages_sql_query = `DELETE FROM messages WHERE chat_id = ?`;
+
+    // request to delete messages
+    db.query(delete_messages_sql_query, [data.chat_id], (error: Error) => {
+      if (error) return error;
+
+      // create another query to delete chat
+      const delete_chat = `DELETE FROM chat WHERE chat_id = ?`;
+
+      // request
+      db.query(delete_chat, [data.chat_id], (error: Error) => {
+        if (error) return error;
+
+        // get socket of another user with whom we do this operation
+        const socket_id = FindUser(data.user1_id, onlineUsers);
+
+        // if socket is not null => user is online, so, send data to initiator (his data) of this chat and his new friend (him another data)
+        if (socket_id) {
+          MAIN_DATA_GETTER(
+            data.user1_id.toString(),
+            GETTER_TYPE.GetChats,
+            GET_CHATS_QUERY,
+            (err, chats) => {
+              if (err) return err;
+
+              io.to(data.sender_socket).emit("updateChats", {
+                chats
+              });
+            }
+          );
+
+          MAIN_DATA_GETTER(
+            data.user2_id.toString(),
+            GETTER_TYPE.GetChats,
+            GET_CHATS_QUERY,
+            (err, chats) => {
+              if (err) return err;
+
+              io.to(socket_id).emit("updateChats", {
+                chats
+              });
+            }
+          );
+
+          return;
+        }
+
+        // if second user is not online => send just initiator
+        MAIN_DATA_GETTER(
+          data.user1_id.toString(),
+          GETTER_TYPE.GetChats,
+          GET_CHATS_QUERY,
+          (err, chats) => {
+            if (err) return err;
+
+            // push data to frontend
+            io.to(data.sender_socket).emit("updateFriends", {
+              chats
+            });
+          }
+        );
       });
     });
   });
@@ -421,12 +538,16 @@ app.get("/events", (req: Request, res: Response) => {
 app.get("/members", (req: Request, res: Response) => {
   const { user_id } = req.query;
 
-  // get users inf using custom function
-  GetUsers(user_id as string, (err, data) => {
-    if (err) return res.status(500).json(err);
+  MAIN_DATA_GETTER(
+    user_id as string,
+    GETTER_TYPE.GetUsers,
+    GET_USERS_QUERY,
+    (err, data) => {
+      if (err) return res.status(500).json(err);
 
-    return res.status(200).json(data);
-  });
+      return res.status(200).json(data);
+    }
+  );
 });
 
 // get friends of logged user
@@ -444,22 +565,32 @@ app.get("/get_friends", (req: Request, res: Response) => {
 app.get("/chats", (req: Request, res: Response) => {
   const { user_id } = req.query;
 
-  GetChats(user_id as string, (err, result) => {
-    if (err) return res.status(500).send(err);
+  MAIN_DATA_GETTER(
+    user_id as string,
+    GETTER_TYPE.GetChats,
+    GET_CHATS_QUERY,
+    (err, chats) => {
+      if (err) return res.status(500).send(err);
 
-    return res.status(200).json(result);
-  });
+      return res.status(200).json(chats);
+    }
+  );
 });
 
 // get notifications
 app.get("/notificaitons", (req: Request, res: Response) => {
   const { user_id } = req.query;
 
-  GetNotifications(user_id as string, (err, data) => {
-    if (err) return res.status(500).json(err);
+  MAIN_DATA_GETTER(
+    user_id as string,
+    GETTER_TYPE.GetNotifications,
+    GET_NOTIFICATIONS_QUERY,
+    (err, data) => {
+      if (err) return res.status(500).json(err);
 
-    return res.status(200).json(data);
-  });
+      return res.status(200).json(data);
+    }
+  );
 });
 
 app.get("/messages", (req: Request, res: Response) => {

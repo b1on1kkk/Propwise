@@ -61,7 +61,7 @@ export default function Header() {
 
   // get friends in header just for checking if friends exist and hide button in notification
   useEffect(() => {
-    if (user.length > 0) {
+    if (user.length > 0 && notificationsModalStatus) {
       GetFriends(user[0].id).then((friends) => {
         setFriends(friends);
       });

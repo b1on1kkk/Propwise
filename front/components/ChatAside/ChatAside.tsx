@@ -45,6 +45,13 @@ export default function ChatAside() {
       setFriends(newFriends);
       setChats(newChat);
     });
+
+    // set up listener to update chat when one of the user delete it
+    socket!.on("updateChats", (data) => {
+      console.log(data.chats, "updateChats");
+
+      setChats(data.chats);
+    });
   }
 
   useEffect(() => {
@@ -90,6 +97,8 @@ export default function ChatAside() {
                     to_send_socket_id: socket!.id!,
                     chat_status: "all"
                   });
+
+                  setShowFriends(!showFriends);
                 }}
               />
             );
@@ -138,7 +147,7 @@ export default function ChatAside() {
             {/*  */}
           </>
         ) : (
-          <div className="h-full flex flex-col items-center justify-center w-full text-[#56616b]">
+          <div className="h-full flex flex-col items-center justify-center w-full text-[#56616b] gap-3">
             <div>
               <Frown width={60} height={60} />
             </div>

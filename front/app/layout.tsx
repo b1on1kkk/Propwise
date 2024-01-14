@@ -35,7 +35,7 @@ import { CALENDAR_SETTINGS } from "@/constants/CalendarSettings";
 // socket
 import { io, Socket } from "socket.io-client";
 
-import {
+import type {
   ServerToClientEvents,
   ClientToServerEvents
 } from "../socket_io_typings";

@@ -23,10 +23,6 @@ export default function Chats({
 
   const { setValue } = useInboxContext();
 
-  console.log(chatArray);
-
-  console.log(chatStatus);
-
   return (
     <div
       className={`${

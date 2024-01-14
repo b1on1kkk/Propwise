@@ -19,7 +19,7 @@ export function PinMessages(
     user_id: loggedin_user_id
   });
 
-  socket!.on("updateChatsAfterPinning", (data) => {
+  socket!.on("updateChats", (data) => {
     cb(data.chats);
   });
 }

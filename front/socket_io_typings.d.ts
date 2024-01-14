@@ -8,7 +8,8 @@ import {
   TsendNotificationsTo,
   TCreateChat,
   TSendPrivateMessages,
-  TPinMessage
+  TPinMessage,
+  TDeleteChat
 } from "../back/interfaces/interfaces";
 
 export interface ServerToClientEvents {
@@ -41,7 +42,7 @@ export interface ServerToClientEvents {
     timestamp: string;
   }) => void;
 
-  updateChatsAfterPinning: (data: { chats: TChat[] }) => void;
+  updateChats: (data: { chats: TChat[] }) => void;
 }
 
 export interface ClientToServerEvents {
@@ -61,4 +62,6 @@ export interface ClientToServerEvents {
   sendPrivateMessage: (data: TSendPrivateMessages) => void;
 
   pinMessage: (data: TPinMessage) => void;
+
+  deleteChat: (data: TDeleteChat) => void;
 }
