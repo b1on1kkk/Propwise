@@ -53,15 +53,15 @@ export const GET_NEXT_MESSAGE_AUTOINCREMET = `
 
 export const GET_MESSAGES_QUERY = `
     SELECT 
-    messages.timestamp, messages.value, messages.sender_id, users.name, users.lastname, messages.status, messages.message_id
+        messages.timestamp, messages.value, messages.sender_id, users.name, users.lastname, messages.status, messages.message_id
     FROM 
-    messages
+        messages
     INNER JOIN 
-    users
+        users
     ON 
-    messages.sender_id = users.id 
+        messages.sender_id = users.id 
     WHERE 
-    messages.chat_id = ?
+        messages.chat_id = ?
     ORDER BY 
-    message_id;
+        message_id;
 `;
