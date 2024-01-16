@@ -236,6 +236,7 @@ export interface TChat extends User {
   sender_id: number;
   value: string;
   timestamp: string;
+  status: number;
 }
 
 export interface TMessageInput {

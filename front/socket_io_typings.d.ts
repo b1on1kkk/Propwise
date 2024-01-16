@@ -14,7 +14,11 @@ import type {
   TUpdateStatusMessages,
   TUpdateNotificationStatus,
   TGetPrivateMessage,
-  TSendNotificationsFrom
+  TSendNotificationsFrom,
+  TGetUpdateReadMessageInChatSide,
+  TUpdateReadMessageInChatSide,
+  TUpdateChatsAfterSendingMessages,
+  TGetUpdatedDataAfterSendingMessage
 } from "../back/interfaces/interfaces";
 
 export interface ServerToClientEvents {
@@ -28,10 +32,7 @@ export interface ServerToClientEvents {
     notifications: TNotificationsFromDatabase[];
   }) => void;
 
-  updateFriends: (data: {
-    friends: TFriendsWithoutChat[];
-    chats: TChat[];
-  }) => void;
+  updateFriends: (data: { chats: TChat[] }) => void;
 
   getPrivateMessage: (data: TGetPrivateMessage) => void;
 
@@ -39,12 +40,13 @@ export interface ServerToClientEvents {
 
   getUpdatedMessages: (data: { messages: Messages[] }) => void;
 
-  getUpdatedDataAfterSendingMessage: (data: {
-    chat_id: number;
-    value: string;
-    timestamp: string;
-    sender_id: number;
-  }) => void;
+  getUpdatedDataAfterSendingMessage: (
+    data: TGetUpdatedDataAfterSendingMessage
+  ) => void;
+
+  getUpdateReadMessageInChatSide: (
+    data: TGetUpdateReadMessageInChatSide
+  ) => void;
 }
 
 export interface ClientToServerEvents {
@@ -66,11 +68,9 @@ export interface ClientToServerEvents {
 
   updateStatusMessages: (data: TUpdateStatusMessages) => void;
 
-  updateChatsAfterSendingMessages: (data: {
-    chat_id: number;
-    value: string;
-    timestamp: string;
-    user1_id: number;
-    user2_id: number;
-  }) => void;
+  updateChatsAfterSendingMessages: (
+    data: TUpdateChatsAfterSendingMessages
+  ) => void;
+
+  updateReadMessageInChatSide: (data: TUpdateReadMessageInChatSide) => void;
 }

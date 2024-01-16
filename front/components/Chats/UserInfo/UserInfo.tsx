@@ -21,7 +21,6 @@ export default function UserInfo({ isOnlineStatus, onClick }: TUserInfo) {
 
   function DeleteChat() {
     const configureDeleteChatData = {
-      sender_socket: socket!.id!,
       chat_id: storedValue!.chat_id,
       user1_id: storedValue!.user1_id,
       user2_id: storedValue!.user2_id

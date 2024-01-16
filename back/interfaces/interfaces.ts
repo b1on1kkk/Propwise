@@ -6,7 +6,7 @@ export interface TsendNotificationsTo {
   timestamp: string;
 }
 
-export interface TonlineUsers {
+export interface TOnlineUsers {
   user_id: number;
   socket_id: string;
 }
@@ -14,7 +14,6 @@ export interface TonlineUsers {
 export interface TCreateChat {
   user1_id: number;
   user2_id: number;
-  to_send_socket_id: string;
   chat_status: "pinned" | "all";
 }
 
@@ -39,7 +38,6 @@ export interface TPinMessage {
 }
 
 export interface TDeleteChat {
-  sender_socket: string;
   chat_id: number;
   user1_id: number;
   user2_id: number;
@@ -73,4 +71,41 @@ export interface TSendNotificationsFrom {
   notif_type: "system" | "friend_request";
   status: number;
   timestamp: string;
+}
+
+export interface TUpdateChatsAfterSendingMessages {
+  chat_id: number;
+  value: string;
+  timestamp: string;
+  user1_id: number;
+  user2_id: number;
+  status: number;
+}
+
+export interface TGetUpdateReadMessageInChatSide {
+  chat_id: number;
+  status: number;
+}
+
+export interface TUpdateReadMessageInChatSide
+  extends TGetUpdateReadMessageInChatSide {
+  user1_id: number;
+  user2_id: number;
+}
+
+export interface TUpdateChatsAfterSendingMessages {
+  chat_id: number;
+  value: string;
+  timestamp: string;
+  user1_id: number;
+  user2_id: number;
+  status: number;
+}
+
+export interface TGetUpdatedDataAfterSendingMessage {
+  chat_id: number;
+  value: string;
+  timestamp: string;
+  sender_id: number;
+  status: number;
 }

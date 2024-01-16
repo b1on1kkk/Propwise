@@ -1,5 +1,5 @@
 // components
-import { Pin } from "lucide-react";
+import { Pin, Check, CheckCheck } from "lucide-react";
 
 // context
 import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
@@ -14,6 +14,8 @@ export default function ChatCard({
   onDoubleClickToPinMessage
 }: TChatCard) {
   const { onlineUsers, user } = useGlobalModalStatus();
+
+  // console.log(chat);
 
   return (
     <div
@@ -37,38 +39,50 @@ export default function ChatCard({
             </div>
             <div className="text-[#56616b] text-xs">{chat.timestamp}</div>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center justify-end">
             <div className="flex-1 flex items-center">
-              {(chat.value === null || chat.value === undefined) &&
-              (chat.timestamp === null || chat.timestamp === undefined) ? (
-                <>
-                  <span className="text-[#56616b] text-sm mt-0.5 w-[190px] text-ellipsis whitespace-nowrap overflow-hidden">
-                    Be first! Write first message!
-                  </span>
-                </>
+              {chat.value === null ? (
+                <span className="text-[#56616b] text-sm mt-0.5 w-[200px] text-ellipsis whitespace-nowrap overflow-hidden">
+                  Will be the first! Start messanging!
+                </span>
               ) : (
-                <>
-                  {chat.sender_id === user[0].id ? (
-                    <>
-                      <span>You:</span>
-                      <span className="text-[#56616b] text-sm ml-1 mt-0.5 w-[150px] text-ellipsis whitespace-nowrap overflow-hidden">
-                        {chat.value}
-                      </span>
-                    </>
-                  ) : (
-                    <span className="text-[#56616b] text-sm mt-0.5 w-[150px] text-ellipsis whitespace-nowrap overflow-hidden">
-                      {chat.value}
-                    </span>
-                  )}
-                </>
+                <span className="text-[#56616b] text-sm mt-0.5 w-[150px] text-ellipsis whitespace-nowrap overflow-hidden">
+                  {chat.value}
+                </span>
               )}
             </div>
 
-            {chatStatus === "pinned" && (
-              <div className="rotate-45 text-[#56616b]">
-                <Pin width={12} height={12} fill="#56616b" />
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              {chat.sender_id === user[0].id && (
+                <>
+                  {chat.status === 1 ? (
+                    <div className="text-[#56616b]">
+                      <CheckCheck width={12} height={12} />
+                    </div>
+                  ) : (
+                    <div className="text-[#56616b]">
+                      <Check width={12} height={12} />
+                    </div>
+                  )}
+                </>
+              )}
+              {/* 
+              {chat.status === 1 ? (
+                <div className="text-[#56616b]">
+                  <CheckCheck width={12} height={12} />
+                </div>
+              ) : (
+                <div className="text-[#56616b]">
+                  <Check width={12} height={12} />
+                </div>
+              )} */}
+
+              {chatStatus === "pinned" && (
+                <div className="rotate-45 text-[#56616b]">
+                  <Pin width={12} height={12} fill="#56616b" />
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

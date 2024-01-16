@@ -13,6 +13,7 @@ export function DetectUserReadMessage(
   messages: Messages[],
   storedValue: TChat,
   socket: Socket<ServerToClientEvents, ClientToServerEvents>,
+  chat_id: number,
   cb: (messages: Messages[]) => void
 ) {
   const indexesToChangeStatus: number[] = [];
@@ -31,6 +32,15 @@ export function DetectUserReadMessage(
     user1_id: storedValue.user1_id,
     user2_id: storedValue.user2_id
   });
+
+  if (indexesToChangeStatus.length > 0) {
+    socket.emit("updateReadMessageInChatSide", {
+      chat_id: chat_id,
+      status: 1,
+      user1_id: storedValue.user1_id,
+      user2_id: storedValue.user2_id
+    });
+  }
 
   // get answer and rewrite messanges
   socket.on("getUpdatedMessages", (data) => {

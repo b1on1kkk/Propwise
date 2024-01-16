@@ -17,8 +17,8 @@ import { GetChats } from "@/API/GetChats";
 import { GetFriends } from "@/API/GetFriends";
 
 // utils
-import { CheckFriendsIfChatAlreadyExist } from "@/utils/CheckFriendsIfChatAlreadyExist";
 import { PinMessages } from "@/utils/PinMessages";
+import { CheckFriendsIfChatAlreadyExist } from "@/utils/CheckFriendsIfChatAlreadyExist";
 
 // interface
 import type { TFriends } from "@/interfaces/interfaces";
@@ -37,18 +37,13 @@ export default function ChatAside() {
   const [friends, setFriends] = useState<TFriends[]>([]);
 
   if (socket) {
-    socket!.on("updateFriends", (data) => {
-      const [newFriends, newChat] = CheckFriendsIfChatAlreadyExist(
-        data.friends,
-        data.chats
-      );
-
-      setFriends(newFriends);
-      setChats(newChat);
+    socket.on("updateFriends", (data) => {
+      setChats(data.chats);
+      setFriends([]);
     });
 
     // set up listener to update chat when one of the user delete it
-    socket!.on("updateChats", (data) => {
+    socket.on("updateChats", (data) => {
       setChats(data.chats);
     });
   }
@@ -93,7 +88,6 @@ export default function ChatAside() {
                   socket!.emit("createChat", {
                     user1_id: user[0].id,
                     user2_id: friend.id,
-                    to_send_socket_id: socket!.id!,
                     chat_status: "all"
                   });
 

@@ -20,12 +20,14 @@ const http = require("http");
 const server = http.createServer(app);
 
 // utils
-import { FindUser } from "./utils/FindUser";
 import { SaveNotifications } from "./utils/SaveNotifications";
 import { GetNextAutoIncremetIdx } from "./utils/GetNextAutoIncremetIdx";
 import { UpdateNotificationStatus } from "./utils/UpdateNotificationStatus";
 import { GetFriends } from "./utils/GetFriends";
 import { SaveMessage } from "./utils/SaveMessage";
+// algorithms
+import { quickSort } from "./utils/QuickSort";
+import { binarySearch } from "./utils/BinarySearch";
 
 // MAIN DATA GETTER
 import { MAIN_DATA_GETTER } from "./utils/MAIN_DATA_GETTER";
@@ -42,14 +44,15 @@ import {
 
 // interfaces
 import type {
-  TonlineUsers,
+  TOnlineUsers,
   TsendNotificationsTo,
   TCreateChat,
   TSendPrivateMessages,
   TPinMessage,
   TDeleteChat,
   TUpdateStatusMessages,
-  TUpdateNotificationStatus
+  TUpdateNotificationStatus,
+  TUpdateChatsAfterSendingMessages
 } from "./interfaces/interfaces";
 
 ////////////////////////////////////////SOCKET IO////////////////////////////////////////
@@ -62,18 +65,18 @@ const io = new Server(server, {
   }
 });
 
-let onlineUsers: TonlineUsers[] = [];
+let onlineUsers: TOnlineUsers[] = [];
 
 io.on("connection", (socket: Socket<ClientToServerEvents>) => {
   // check if user is online
   socket.on("userConnected", (data: { new_connected_user_id: number }) => {
-    if (
-      !onlineUsers.some((user) => user.user_id === data.new_connected_user_id)
-    ) {
+    if (binarySearch(onlineUsers, data.new_connected_user_id) === -1) {
       onlineUsers.push({
         user_id: data.new_connected_user_id,
         socket_id: socket.id
       });
+
+      onlineUsers = quickSort(onlineUsers);
     }
 
     io.emit("getOnlineUsersId", onlineUsers);
@@ -96,7 +99,7 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
         if (err) return err;
 
         // find user socket_id
-        const socket_id = FindUser(data.user_id, onlineUsers);
+        const socket_id = binarySearch(onlineUsers, data.user_id);
 
         // if socket_id not null => user is online and we can send him notification straightforward
         if (socket_id) {
@@ -139,8 +142,8 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
   // socket to update members data if user send friend request
   socket.on("updateMembers", (data: { user1_id: number; user2_id: number }) => {
     // find users if they are online
-    const socket1_id = FindUser(data.user1_id, onlineUsers);
-    const socket2_id = FindUser(data.user2_id, onlineUsers);
+    const socket1_id = binarySearch(onlineUsers, data.user1_id);
+    const socket2_id = binarySearch(onlineUsers, data.user2_id);
 
     // if one of the sockets are online - send changed members data
     if (socket1_id) {
@@ -214,52 +217,16 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
       chat_status: data.chat_status
     };
 
-    // get socket of second user with whom we wanna start chat (socket will not be null only when user is online)
-    // in other case user will get data by fetching if directly from database
-    const socket_id = FindUser(data.user2_id, onlineUsers);
-
     // create chat by creating data to database
     db.query("INSERT INTO chat SET ?", [value], (error: Error) => {
       if (error) return error;
 
-      // reget data about "free" friends or friends that are not have chat with initiator
-      GetFriends(data.user1_id.toString(), (err, friends) => {
-        if (err) return err;
+      // get sockets
+      const socket1_id = binarySearch(onlineUsers, data.user1_id);
+      const socket2_id = binarySearch(onlineUsers, data.user2_id);
 
-        // if socket is not null => user is online, so, send data to initiator (his data) of this chat and his new friend (him another data)
-        if (socket_id) {
-          MAIN_DATA_GETTER(
-            data.user1_id.toString(),
-            GETTER_TYPE.GetChats,
-            GET_CHATS_QUERY,
-            (err, chats) => {
-              if (err) return err;
-
-              io.to(data.to_send_socket_id).emit("updateFriends", {
-                friends,
-                chats
-              });
-            }
-          );
-
-          MAIN_DATA_GETTER(
-            data.user2_id.toString(),
-            GETTER_TYPE.GetChats,
-            GET_CHATS_QUERY,
-            (err, chats) => {
-              if (err) return err;
-
-              io.to(socket_id).emit("updateFriends", {
-                friends,
-                chats
-              });
-            }
-          );
-
-          return;
-        }
-
-        // if second user is not online => send just initiator
+      // check which user is online
+      if (socket1_id) {
         MAIN_DATA_GETTER(
           data.user1_id.toString(),
           GETTER_TYPE.GetChats,
@@ -267,14 +234,27 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
           (err, chats) => {
             if (err) return err;
 
-            // push data to frontend
-            io.to(data.to_send_socket_id).emit("updateFriends", {
-              friends,
+            io.to(socket1_id).emit("updateFriends", {
               chats
             });
           }
         );
-      });
+      }
+
+      if (socket2_id) {
+        MAIN_DATA_GETTER(
+          data.user2_id.toString(),
+          GETTER_TYPE.GetChats,
+          GET_CHATS_QUERY,
+          (err, chats) => {
+            if (err) return err;
+
+            io.to(socket2_id).emit("updateFriends", {
+              chats
+            });
+          }
+        );
+      }
     });
   });
 
@@ -287,7 +267,7 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
         if (err) return err;
 
         // find user socket_id to whom send message
-        const socket_id = FindUser(message.to_send_id, onlineUsers);
+        const socket_id = binarySearch(onlineUsers, message.to_send_id);
 
         // if user is online - send new message to him directly
         if (socket_id) {
@@ -356,11 +336,12 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
       db.query(delete_chat, [data.chat_id], (error: Error) => {
         if (error) return error;
 
-        // get socket of another user with whom we do this operation
-        const socket_id = FindUser(data.user1_id, onlineUsers);
+        // get sockets of users
+        const socket1_id = binarySearch(onlineUsers, data.user1_id);
+        const socket2_id = binarySearch(onlineUsers, data.user2_id);
 
-        // if socket is not null => user is online, so, send data to initiator (his data) of this chat and his new friend (him another data)
-        if (socket_id) {
+        // check if one of the socket is null
+        if (socket1_id) {
           MAIN_DATA_GETTER(
             data.user1_id.toString(),
             GETTER_TYPE.GetChats,
@@ -368,12 +349,14 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
             (err, chats) => {
               if (err) return err;
 
-              io.to(data.sender_socket).emit("updateChats", {
+              io.to(socket1_id).emit("updateChats", {
                 chats
               });
             }
           );
+        }
 
+        if (socket2_id) {
           MAIN_DATA_GETTER(
             data.user2_id.toString(),
             GETTER_TYPE.GetChats,
@@ -381,28 +364,12 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
             (err, chats) => {
               if (err) return err;
 
-              io.to(socket_id).emit("updateChats", {
+              io.to(socket2_id).emit("updateChats", {
                 chats
               });
             }
           );
-
-          return;
         }
-
-        // if second user is not online => send just initiator
-        MAIN_DATA_GETTER(
-          data.user1_id.toString(),
-          GETTER_TYPE.GetChats,
-          GET_CHATS_QUERY,
-          (err, chats) => {
-            if (err) return err;
-
-            io.to(data.sender_socket).emit("updateChats", {
-              chats
-            });
-          }
-        );
       });
     });
   });
@@ -415,8 +382,8 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
         if (err) return err;
 
         // get online users sockets
-        const socket1_id = FindUser(data.user1_id, onlineUsers);
-        const socket2_id = FindUser(data.user2_id, onlineUsers);
+        const socket1_id = binarySearch(onlineUsers, data.user1_id);
+        const socket2_id = binarySearch(onlineUsers, data.user2_id);
 
         // get new messages
         MAIN_DATA_GETTER(
@@ -435,17 +402,12 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
     }
   });
 
+  // send updated chat to each user
   socket.on(
     "updateChatsAfterSendingMessages",
-    (data: {
-      chat_id: number;
-      value: string;
-      timestamp: string;
-      user1_id: number;
-      user2_id: number;
-    }) => {
-      const socket1_id = FindUser(data.user1_id, onlineUsers);
-      const socket2_id = FindUser(data.user2_id, onlineUsers);
+    (data: TUpdateChatsAfterSendingMessages) => {
+      const socket1_id = binarySearch(onlineUsers, data.user1_id);
+      const socket2_id = binarySearch(onlineUsers, data.user2_id);
 
       io.to(socket1_id)
         .to(socket2_id)
@@ -453,8 +415,28 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
           chat_id: data.chat_id,
           value: data.value,
           timestamp: data.timestamp,
-          sender_id: data.user1_id
+          sender_id: data.user1_id,
+          status: data.status
         });
+    }
+  );
+
+  // send status of message (read or not) to each users if one of them is online
+  socket.on(
+    "updateReadMessageInChatSide",
+    (data: {
+      chat_id: number;
+      status: number;
+      user1_id: number;
+      user2_id: number;
+    }) => {
+      const socket1_id = binarySearch(onlineUsers, data.user1_id);
+      const socket2_id = binarySearch(onlineUsers, data.user2_id);
+
+      io.to(socket1_id).to(socket2_id).emit("getUpdateReadMessageInChatSide", {
+        chat_id: data.chat_id,
+        status: data.status
+      });
     }
   );
 });
@@ -478,7 +460,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 ////////////////////////////////////////POST////////////////////////////////////////
 
-// logg in user
+// log in user
 app.post("/login", (req: Request, res: Response) => {
   const { email, password } = req.body;
 
