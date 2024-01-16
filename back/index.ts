@@ -86,7 +86,6 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
 
     io.emit("getOnlineUsersId", onlineUsers);
   });
-  //
 
   // listen for notifications
   socket.on("sendNotificationsTo", (data: TsendNotificationsTo) => {
@@ -399,8 +398,7 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
           (err, chats) => {
             if (err) return err;
 
-            // push data to frontend
-            io.to(data.sender_socket).emit("updateFriends", {
+            io.to(data.sender_socket).emit("updateChats", {
               chats
             });
           }
@@ -436,6 +434,29 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
       });
     }
   });
+
+  socket.on(
+    "updateChatsAfterSendingMessages",
+    (data: {
+      chat_id: number;
+      value: string;
+      timestamp: string;
+      user1_id: number;
+      user2_id: number;
+    }) => {
+      const socket1_id = FindUser(data.user1_id, onlineUsers);
+      const socket2_id = FindUser(data.user2_id, onlineUsers);
+
+      io.to(socket1_id)
+        .to(socket2_id)
+        .emit("getUpdatedDataAfterSendingMessage", {
+          chat_id: data.chat_id,
+          value: data.value,
+          timestamp: data.timestamp,
+          sender_id: data.user1_id
+        });
+    }
+  );
 });
 
 instrument(io, {

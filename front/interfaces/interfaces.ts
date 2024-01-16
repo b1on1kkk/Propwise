@@ -233,6 +233,9 @@ export interface TChat extends User {
   user1_id: number;
   user2_id: number;
   chat_status: "pinned" | "all";
+  sender_id: number;
+  value: string;
+  timestamp: string;
 }
 
 export interface TMessageInput {
@@ -266,4 +269,13 @@ export interface TUserInfo {
 
 export interface TMessageCard {
   message: Messages;
+}
+
+export interface TChatCard {
+  chat: TChat;
+  chatStatus: "pinned" | "all";
+  onDoubleClickToPinMessage: (
+    e: React.MouseEvent<HTMLDivElement>,
+    chat: TChat
+  ) => void;
 }

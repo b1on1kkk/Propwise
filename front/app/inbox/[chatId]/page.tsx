@@ -29,7 +29,7 @@ import type { Messages } from "@/interfaces/interfaces";
 
 export default function Chat() {
   // some data from contexts
-  const { storedValue } = useInboxContext();
+  const { storedValue, setChats, chats } = useInboxContext();
   const { onlineUsers, socket, user } = useGlobalModalStatus();
 
   // variable to open right panel
@@ -66,8 +66,36 @@ export default function Chat() {
 
       socket!.emit("sendPrivateMessage", configureMessage);
 
+      socket!.emit("updateChatsAfterSendingMessages", {
+        chat_id: storedValue!.chat_id,
+        value: messageInput,
+        timestamp: format(new Date(), "HH:mm"),
+        user1_id: user[0].id,
+        user2_id: storedValue!.id
+      });
+
       setMessageInput("");
     }
+  }
+
+  // set listener that listen if user send message => change message on chat card for one user and for another if another is online
+  if (socket) {
+    socket!.on("getUpdatedDataAfterSendingMessage", (message) => {
+      setChats([
+        ...chats.map((chat) => {
+          if (chat.chat_id === message.chat_id) {
+            return {
+              ...chat,
+              value: message.value,
+              timestamp: message.timestamp,
+              sender_id: message.sender_id
+            };
+          }
+
+          return chat;
+        })
+      ]);
+    });
   }
 
   useEffect(() => {

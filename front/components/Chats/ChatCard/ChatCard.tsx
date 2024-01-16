@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-
+// components
 import { Pin } from "lucide-react";
 
 // context
@@ -7,23 +6,14 @@ import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
 import { CheckUserOnline } from "@/utils/CheckUserOnline";
 
 // interfaces
-import type { TChat } from "@/interfaces/interfaces";
-
-export interface TChatCard {
-  chat: TChat;
-  chatStatus: "pinned" | "all";
-  onDoubleClickToPinMessage: (
-    e: React.MouseEvent<HTMLDivElement>,
-    chat: TChat
-  ) => void;
-}
+import type { TChatCard } from "@/interfaces/interfaces";
 
 export default function ChatCard({
   chat,
   chatStatus,
   onDoubleClickToPinMessage
 }: TChatCard) {
-  const { onlineUsers } = useGlobalModalStatus();
+  const { onlineUsers, user } = useGlobalModalStatus();
 
   return (
     <div
@@ -45,14 +35,33 @@ export default function ChatCard({
             <div className="flex-1 font-bold">
               {chat.name} {chat.lastname}
             </div>
-            <div className="text-[#56616b] text-xs">1h ago</div>
+            <div className="text-[#56616b] text-xs">{chat.timestamp}</div>
           </div>
           <div className="flex items-center">
             <div className="flex-1 flex items-center">
-              <span>You:</span>
-              <span className="text-[#56616b] text-sm ml-1 mt-0.5 w-[150px] text-ellipsis whitespace-nowrap overflow-hidden">
-                It's magicssssssssssssssssssssssssssssssss
-              </span>
+              {(chat.value === null || chat.value === undefined) &&
+              (chat.timestamp === null || chat.timestamp === undefined) ? (
+                <>
+                  <span className="text-[#56616b] text-sm mt-0.5 w-[190px] text-ellipsis whitespace-nowrap overflow-hidden">
+                    Be first! Write first message!
+                  </span>
+                </>
+              ) : (
+                <>
+                  {chat.sender_id === user[0].id ? (
+                    <>
+                      <span>You:</span>
+                      <span className="text-[#56616b] text-sm ml-1 mt-0.5 w-[150px] text-ellipsis whitespace-nowrap overflow-hidden">
+                        {chat.value}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-[#56616b] text-sm mt-0.5 w-[150px] text-ellipsis whitespace-nowrap overflow-hidden">
+                      {chat.value}
+                    </span>
+                  )}
+                </>
+              )}
             </div>
 
             {chatStatus === "pinned" && (

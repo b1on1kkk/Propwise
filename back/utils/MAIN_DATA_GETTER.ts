@@ -13,26 +13,49 @@ export function MAIN_DATA_GETTER(
   MYSQL_QUERY: string,
   callback: (error: Error | null, data: any | null) => void
 ) {
-  if (
-    TYPE !== GETTER_TYPE.GetNotifications &&
-    TYPE !== GETTER_TYPE.GetMessages
-  ) {
-    db.query(
-      MYSQL_QUERY,
-      [user_id, user_id, user_id],
-      (err: Error, results: any) => {
+  switch (TYPE) {
+    case GETTER_TYPE.GetUsers: {
+      db.query(
+        MYSQL_QUERY,
+        [user_id, user_id, user_id],
+        (err: Error, results: any) => {
+          if (err) return callback(err, null);
+
+          return callback(null, results);
+        }
+      );
+      break;
+    }
+
+    case GETTER_TYPE.GetChats: {
+      db.query(
+        MYSQL_QUERY,
+        [user_id, user_id, user_id],
+        (err: Error, results: any) => {
+          if (err) return callback(err, null);
+
+          return callback(null, results);
+        }
+      );
+      break;
+    }
+
+    case GETTER_TYPE.GetNotifications: {
+      db.query(MYSQL_QUERY, [user_id], (err: Error, results: any) => {
         if (err) return callback(err, null);
 
         return callback(null, results);
-      }
-    );
+      });
+      break;
+    }
 
-    return;
+    case GETTER_TYPE.GetMessages: {
+      db.query(MYSQL_QUERY, [user_id], (err: Error, results: any) => {
+        if (err) return callback(err, null);
+
+        return callback(null, results);
+      });
+      break;
+    }
   }
-
-  db.query(MYSQL_QUERY, [user_id], (err: Error, results: any) => {
-    if (err) return callback(err, null);
-
-    return callback(null, results);
-  });
 }

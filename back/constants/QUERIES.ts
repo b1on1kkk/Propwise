@@ -13,16 +13,30 @@ export const GET_USERS_QUERY = `
   `;
 
 export const GET_CHATS_QUERY = `
-    SELECT 
-        chat.*, users.id, users.name, users.lastname, users.email, users.role, users.avatar
-    FROM 
-        chat
-    INNER JOIN 
-        users
-    ON 
-        chat.user1_id = users.id OR chat.user2_id = users.id
-    WHERE 
-        (chat.user1_id = ? OR chat.user2_id = ?) AND users.id != ?;
+  SELECT 
+      chat.*, 
+      users.id, users.name, users.lastname, users.email, users.role, users.avatar,
+      messages.*
+  FROM 
+      chat
+  INNER JOIN 
+      users
+  ON 
+      chat.user1_id = users.id OR chat.user2_id = users.id
+  LEFT JOIN 
+      (
+        SELECT 
+            sender_id, value, timestamp 
+        FROM 
+            messages 
+        ORDER BY 
+            message_id 
+        DESC LIMIT 1
+      ) AS messages
+  ON 
+      chat.chat_id = chat.chat_id
+  WHERE 
+      (chat.user1_id = ? OR chat.user2_id = ?) AND users.id != ?
   `;
 
 export const GET_NOTIFICATIONS_QUERY = `

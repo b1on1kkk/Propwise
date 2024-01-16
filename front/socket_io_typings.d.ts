@@ -38,6 +38,13 @@ export interface ServerToClientEvents {
   updateChats: (data: { chats: TChat[] }) => void;
 
   getUpdatedMessages: (data: { messages: Messages[] }) => void;
+
+  getUpdatedDataAfterSendingMessage: (data: {
+    chat_id: number;
+    value: string;
+    timestamp: string;
+    sender_id: number;
+  }) => void;
 }
 
 export interface ClientToServerEvents {
@@ -58,4 +65,12 @@ export interface ClientToServerEvents {
   deleteChat: (data: TDeleteChat) => void;
 
   updateStatusMessages: (data: TUpdateStatusMessages) => void;
+
+  updateChatsAfterSendingMessages: (data: {
+    chat_id: number;
+    value: string;
+    timestamp: string;
+    user1_id: number;
+    user2_id: number;
+  }) => void;
 }

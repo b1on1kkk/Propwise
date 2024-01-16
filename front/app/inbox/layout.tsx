@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 // components
 import ChatAside from "@/components/ChatAside/ChatAside";
 
@@ -8,6 +10,9 @@ import { InboxContext } from "@/context/InboxContext";
 
 // hooks
 import { useLocalStorageLastChosenChat } from "@/hooks/useLocalStorageLastChosenChat";
+
+// interfaces
+import type { TChat } from "@/interfaces/interfaces";
 
 export default function InboxLayout({
   children
@@ -19,12 +24,17 @@ export default function InboxLayout({
     null
   );
 
+  // chats storage
+  const [chats, setChats] = useState<TChat[]>([]);
+
   return (
     <main className="h-screen border-l-1 flex overflow-hidden">
       <InboxContext.Provider
         value={{
           storedValue,
-          setValue
+          setValue,
+          chats,
+          setChats
         }}
       >
         {/* left aside menu */}
