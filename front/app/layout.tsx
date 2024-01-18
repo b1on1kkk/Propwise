@@ -113,6 +113,8 @@ export default function RootLayout({
     { ...CALENDAR_SETTINGS[1], status: false }
   );
 
+  console.log("test text");
+
   return (
     <html lang="en">
       <body
