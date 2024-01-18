@@ -29,9 +29,6 @@ export default function ChatAside() {
 
   //  variables used for show/hide blocks
   const [showFriends, setShowFriends] = useState<boolean>(false);
-  const [openHidePinnedMessages, setOpenHidePinnedMessages] =
-    useState<boolean>(true);
-  const [openHideAllMessages, setOpenHideAllMessages] = useState<boolean>(true);
 
   //  storages
   const [friends, setFriends] = useState<TFriends[]>([]);
@@ -61,7 +58,6 @@ export default function ChatAside() {
       <header>
         <AsideChatsHeader
           searchValue=""
-          showFriends={showFriends}
           moreButtonOnClick={() => {}}
           newChatButtonOnClick={() => {
             // send request to server only when block is closed
@@ -106,8 +102,6 @@ export default function ChatAside() {
             <Chats
               icon_name="Pin"
               title_text="Pinned"
-              openStatus={openHidePinnedMessages}
-              setOpenStatus={setOpenHidePinnedMessages}
               chatArray={chats}
               chatStatus="pinned"
               // double click to pin message and redouble click to unpin message:
@@ -125,9 +119,7 @@ export default function ChatAside() {
             {/* all chats */}
             <Chats
               icon_name="Mail"
-              title_text={"All messages"}
-              openStatus={openHideAllMessages}
-              setOpenStatus={setOpenHideAllMessages}
+              title_text="All messages"
               chatArray={chats}
               chatStatus="all"
               // same as above

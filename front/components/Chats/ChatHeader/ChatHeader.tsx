@@ -12,7 +12,6 @@ export default function ChatHeader({
   isOnlineStatus,
   moreAboutUserStatus,
   searchOnClick,
-  moreOnClick,
   moreAboutUserOnClick
 }: TChatHeader) {
   const { storedValue } = useInboxContext();
@@ -32,22 +31,21 @@ export default function ChatHeader({
           <div>
             <ChatHeaderButton
               icon_name="Search"
+              width={17}
+              height={17}
+              tooltip_title="Find message"
+              placement="top"
               onClick={searchOnClick}
-              chosen={false}
-            />
-          </div>
-          <div>
-            <ChatHeaderButton
-              icon_name="MoreVertical"
-              onClick={moreOnClick}
-              chosen={false}
             />
           </div>
           <div>
             <ChatHeaderButton
               icon_name="PanelRight"
+              width={17}
+              height={17}
+              tooltip_title="More about user"
+              placement="top"
               onClick={moreAboutUserOnClick}
-              chosen={moreAboutUserStatus}
             />
           </div>
         </div>

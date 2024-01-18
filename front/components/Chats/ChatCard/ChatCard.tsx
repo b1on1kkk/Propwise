@@ -15,11 +15,9 @@ export default function ChatCard({
 }: TChatCard) {
   const { onlineUsers, user } = useGlobalModalStatus();
 
-  // console.log(chat);
-
   return (
     <div
-      className="hover:bg-gray-100 transition-all duration-200 ease-in"
+      className="hover:bg-gray-100 transition-all duration-200 ease-in rounded-xl"
       onDoubleClick={(e) => onDoubleClickToPinMessage(e, chat)}
     >
       <div className="flex p-5 items-center gap-5">
@@ -66,16 +64,6 @@ export default function ChatCard({
                   )}
                 </>
               )}
-              {/* 
-              {chat.status === 1 ? (
-                <div className="text-[#56616b]">
-                  <CheckCheck width={12} height={12} />
-                </div>
-              ) : (
-                <div className="text-[#56616b]">
-                  <Check width={12} height={12} />
-                </div>
-              )} */}
 
               {chatStatus === "pinned" && (
                 <div className="rotate-45 text-[#56616b]">

@@ -7,13 +7,13 @@ import ChatAside from "@/components/ChatAside/ChatAside";
 
 // context
 import { InboxContext } from "@/context/InboxContext";
+import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
 
 // hooks
 import { useLocalStorageLastChosenChat } from "@/hooks/useLocalStorageLastChosenChat";
 
 // interfaces
 import type { TChat } from "@/interfaces/interfaces";
-import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
 
 export default function InboxLayout({
   children

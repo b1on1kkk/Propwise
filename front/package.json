@@ -9,8 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@nextui-org/react": "^2.2.9",
     "axios": "^1.6.3",
     "date-fns": "^3.0.6",
+    "framer-motion": "^10.18.0",
     "lucide-react": "^0.303.0",
     "next": "14.0.4",
     "react": "^18",

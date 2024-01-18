@@ -8,6 +8,7 @@ import FriendMessageCard from "@/components/Chats/FriendMessageCard/FriendMessag
 import MessageInput from "@/components/Chats/MessageInput/MessageInput";
 import UserInfo from "@/components/Chats/UserInfo/UserInfo";
 import ChatHeader from "@/components/Chats/ChatHeader/ChatHeader";
+import EmptyChatWarning from "@/components/Chats/EmptyChatWarning/EmptyChatWarning";
 
 // context
 import { useInboxContext } from "@/context/InboxContext";
@@ -17,9 +18,9 @@ import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
 import { useScrollToBottom } from "@/hooks/useScrollToBottom";
 
 // utils
-import { format } from "date-fns";
 import { CheckUserOnline } from "@/utils/CheckUserOnline";
 import { DetectUserReadMessage } from "@/utils/DetectUserReadMessage";
+import { SendPrivateMessage } from "@/utils/SendPrivateMessage";
 
 // API
 import { GetMessages } from "@/API/GetMessages";
@@ -47,33 +48,12 @@ export default function Chat() {
   // variable to save data if user is online
   const [isUserOnlineStatus, setIsUserOnlineStatus] = useState<boolean>(false);
 
+  // Submit new message
   function SubmitHandler(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     if (messageInput) {
-      const configureMessage = {
-        message_id: 0,
-        name: user[0].name,
-        lastname: user[0].lastname,
-        chat_id: storedValue!.chat_id,
-        sender_id: user[0].id,
-        sender_socket: socket!.id!,
-        to_send_id: storedValue!.id,
-        value: messageInput,
-        timestamp: format(new Date(), "HH:mm"),
-        status: 0
-      };
-
-      socket!.emit("sendPrivateMessage", configureMessage);
-
-      socket!.emit("updateChatsAfterSendingMessages", {
-        chat_id: storedValue!.chat_id,
-        value: messageInput,
-        timestamp: format(new Date(), "HH:mm"),
-        user1_id: user[0].id,
-        user2_id: storedValue!.id,
-        status: 0
-      });
+      SendPrivateMessage(socket, messageInput, user, storedValue);
 
       setMessageInput("");
     }
@@ -132,25 +112,35 @@ export default function Chat() {
           isOnlineStatus={isUserOnlineStatus}
           moreAboutUserStatus={moreAboutUser}
           searchOnClick={() => {}}
-          moreOnClick={() => {}}
           moreAboutUserOnClick={() => setMoreAboutUser(!moreAboutUser)}
         />
 
         <main
           ref={ref}
-          className="flex flex-col bg-gray-50 overflow-auto flex-1 py-3 px-6 gap-3"
+          className={`flex flex-col bg-gray-50 overflow-auto flex-1 py-3 px-6 gap-3 ${
+            messages.length === 0 && "justify-center items-center"
+          }`}
         >
           {user.length > 0 && (
             <>
-              {messages.map((message, idx) => {
-                if (message.sender_id === user[0].id) {
-                  return (
-                    <LoggedInUserMessageCard key={idx} message={message} />
-                  );
-                }
-
-                return <FriendMessageCard key={idx} message={message} />;
-              })}
+              {messages.length > 0 ? (
+                <>
+                  {messages.map((message, idx) => {
+                    if (message.sender_id === user[0].id) {
+                      return (
+                        <LoggedInUserMessageCard key={idx} message={message} />
+                      );
+                    }
+                    return <FriendMessageCard key={idx} message={message} />;
+                  })}
+                </>
+              ) : (
+                <EmptyChatWarning
+                  sendFirstMessageGreeting={() =>
+                    SendPrivateMessage(socket, "HEY!", user, storedValue)
+                  }
+                />
+              )}
             </>
           )}
         </main>

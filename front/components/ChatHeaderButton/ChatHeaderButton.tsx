@@ -1,26 +1,51 @@
 "use client";
 
-import { icons } from "lucide-react";
+import { Button, Tooltip } from "@nextui-org/react";
+import Icon from "../Icon/Icon";
+
+interface TChatHeaderButton {
+  icon_name: string;
+  width: number;
+  height: number;
+  tooltip_title: string;
+  placement:
+    | "top-start"
+    | "top"
+    | "top-end"
+    | "bottom-start"
+    | "bottom"
+    | "bottom-end"
+    | "left-start"
+    | "left"
+    | "left-end"
+    | "right-start"
+    | "right"
+    | "right-end";
+  onClick: () => void;
+}
 
 export default function ChatHeaderButton({
   icon_name,
-  chosen,
+  width,
+  height,
+  tooltip_title,
+  placement,
   onClick
-}: {
-  icon_name: string;
-  chosen: boolean;
-  onClick: () => void;
-}) {
-  const Icon = icons[icon_name as keyof typeof icons];
-
+}: TChatHeaderButton) {
   return (
-    <button
-      className={`p-2 border-1 rounded-lg cursor-pointer ${
-        chosen ? "hover:bg-green-200" : "hover:bg-gray-200"
-      } active:translate-y-0.5 shadow ${chosen && "border-green-200"}`}
-      onClick={onClick}
-    >
-      <Icon width={17} height={17} color={`${chosen ? "green" : "#56616b"}`} />
-    </button>
+    <Tooltip content={tooltip_title} color="default" placement={placement}>
+      <Button
+        onClick={onClick}
+        size="sm"
+        className="p-2 min-w-0 bg-gray-200 shadow border-1"
+      >
+        <Icon
+          icon_name={icon_name}
+          className="text-[#56616b]"
+          width={width}
+          height={height}
+        />
+      </Button>
+    </Tooltip>
   );
 }

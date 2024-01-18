@@ -7,7 +7,6 @@ import type { TAsideChatsHeader } from "@/interfaces/interfaces";
 
 export default function AsideChatsHeader({
   searchValue,
-  showFriends,
   moreButtonOnClick,
   newChatButtonOnClick,
   searchOnChange
@@ -21,14 +20,20 @@ export default function AsideChatsHeader({
         <div className="flex gap-2">
           <ChatHeaderButton
             icon_name="MoreVertical"
+            width={17}
+            height={17}
+            tooltip_title="Learn more"
+            placement="left"
             onClick={moreButtonOnClick}
-            chosen={false}
           />
 
           <ChatHeaderButton
             icon_name="MessageSquarePlus"
+            width={17}
+            height={17}
+            tooltip_title="Add new chat"
+            placement="right"
             onClick={newChatButtonOnClick}
-            chosen={showFriends}
           />
         </div>
       </div>

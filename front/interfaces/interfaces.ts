@@ -1,4 +1,4 @@
-import { AddingNewEventTypes } from "@/components/AddingEventModal/NewEventReducer/NewEventReducer";
+import { AddingNewEventTypes } from "@/components/NewEventModal/NewEventReducer/NewEventReducer";
 
 export interface Events {
   event_id: number;
@@ -102,7 +102,6 @@ export interface TAvatarAndRole {
 export interface TCalendarSettings {
   id: number;
   text: string;
-  move_to: string;
 }
 
 export interface TEventCard {
@@ -200,7 +199,6 @@ export interface TNotificationsModal {
 
 export interface TAsideChatsHeader {
   searchValue: string;
-  showFriends: boolean;
   moreButtonOnClick: () => void;
   newChatButtonOnClick: () => void;
   searchOnChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -209,10 +207,8 @@ export interface TAsideChatsHeader {
 export interface TChats {
   icon_name: string;
   title_text: string;
-  openStatus: boolean;
   chatStatus: "pinned" | "all";
   chatArray: TChat[];
-  setOpenStatus: (c: boolean) => void;
   onDoubleClickToPinMessage: (
     e: React.MouseEvent<HTMLDivElement>,
     chat: TChat
@@ -249,7 +245,6 @@ export interface TChatHeader {
   isOnlineStatus: boolean;
   moreAboutUserStatus: boolean;
   searchOnClick: () => void;
-  moreOnClick: () => void;
   moreAboutUserOnClick: () => void;
 }
 

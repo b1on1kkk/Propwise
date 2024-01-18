@@ -1,17 +1,19 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+
 // components
 import HeaderUserInf from "../HeaderUserInf/HeaderUserInf";
-import { X, CircleUserRound, UserRoundX } from "lucide-react";
+import { CircleUserRound, UserRoundX } from "lucide-react";
+import ChatHeaderButton from "@/components/ChatHeaderButton/ChatHeaderButton";
+import { Tooltip, Button } from "@nextui-org/react";
 
 // context
 import { useInboxContext } from "@/context/InboxContext";
+import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
 
 // interfaces
 import type { TUserInfo } from "@/interfaces/interfaces";
-
-import { SendingNotificationSocket } from "@/utils/SendingNotificationSocket";
-import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
-
-import { useRouter } from "next/navigation";
 
 export default function UserInfo({ isOnlineStatus, onClick }: TUserInfo) {
   const { storedValue } = useInboxContext();
@@ -39,12 +41,14 @@ export default function UserInfo({ isOnlineStatus, onClick }: TUserInfo) {
           <span className="flex-1 text-xl font-semibold text-[#56616b]">
             User Info
           </span>
-          <button
-            className="p-1 hover:bg-gray-200 rounded-lg transition-all duration-200"
+          <ChatHeaderButton
+            icon_name="X"
+            width={17}
+            height={17}
+            tooltip_title="Close"
+            placement="top"
             onClick={onClick}
-          >
-            <X width={20} height={20} />
-          </button>
+          />
         </div>
 
         <div className="mt-10">
@@ -80,13 +84,22 @@ export default function UserInfo({ isOnlineStatus, onClick }: TUserInfo) {
       </main>
 
       <footer className="flex justify-center">
-        <button
-          className="flex items-center gap-2 bg-red-500 rounded-lg px-4 py-2 text-white cursor-pointer hover:bg-red-600 transition-all duration-200 shadow"
-          onClick={() => DeleteChat()}
+        <Tooltip
+          content={
+            <div className="px-1 py-2 text-center">
+              <div className="text-small font-bold">WARNING!!!</div>
+              <div className="text-tiny">
+                All messages will be deleted forever! Are you sure?
+              </div>
+            </div>
+          }
+          color="danger"
         >
-          <UserRoundX width={19} height={19} />
-          <span className="text-sm">Delete chat</span>
-        </button>
+          <Button onClick={() => DeleteChat()} color="danger">
+            <UserRoundX width={19} height={19} />
+            <span className="text-sm">Delete chat</span>
+          </Button>
+        </Tooltip>
       </footer>
     </div>
   );

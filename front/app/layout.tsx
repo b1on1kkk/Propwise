@@ -10,8 +10,10 @@ axios.defaults.withCredentials = true;
 // components
 import LeftAsideMenu from "@/components/LeftAsideMenu/LeftAsideMenu";
 import Header from "@/components/Header/Header";
-import AddingEventModal from "@/components/AddingEventModal/AddingEventModal";
 import ShowMoreEventsRightModal from "@/components/ShowMoreEventsRightModal/ShowMoreEventsRightModal";
+
+// providers
+import Providers from "./providers";
 
 // context
 import { MyGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
@@ -46,9 +48,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const path = usePathname();
-
-  // modal, creating new event
-  const [createModalStatus, setCreateModalStatus] = useState<boolean>(false);
 
   // right modal, showing more data about events
   const [detailedModalStatus, setDetailedModalStatus] =
@@ -118,13 +117,12 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${
-          createModalStatus || detailedModalStatus ? "overflow-hidden" : ""
+          detailedModalStatus ? "overflow-hidden" : ""
         } flex max-h-screen max-w-screen`}
       >
         <MyGlobalModalStatus.Provider
           value={{
             chosenDay,
-            createModalStatus,
             detailedModalStatus,
             events,
             user,
@@ -133,7 +131,6 @@ export default function RootLayout({
             socket,
             members,
             // setters
-            setCreateModalStatus,
             setDetailedModalStatus,
             setChosenDay,
             setEvents,
@@ -146,10 +143,9 @@ export default function RootLayout({
 
           <div className="flex flex-col flex-1">
             {path !== "/login" && path !== "/registration" && <Header />}
-            {children}
+            <Providers>{children}</Providers>
           </div>
 
-          <AddingEventModal />
           <ShowMoreEventsRightModal day={chosenToSeeDetailedInfDay} />
         </MyGlobalModalStatus.Provider>
       </body>

@@ -12,6 +12,8 @@ import {
   Plus,
   ArrowDownCircle
 } from "lucide-react";
+import NewEventModal from "@/components/NewEventModal/NewEventModal";
+import { Tabs, Tab, useDisclosure } from "@nextui-org/react";
 
 // constants
 import { CALENDAR_SETTINGS } from "@/constants/CalendarSettings";
@@ -31,15 +33,8 @@ export default function CalendarHeader({
 }) {
   const { setCurrentMonth, currentMonth, extendedDays } =
     useGlobalCalendatContext();
-  const {
-    setCreateModalStatus,
-    createModalStatus,
-    storedLocalStorageValue,
-    setLocalStorageValue
-  } = useGlobalModalStatus();
-
-  // use default calendar status
-  const [moveTo, setMoveTo] = useState<string>(storedLocalStorageValue.move_to);
+  const { storedLocalStorageValue, setLocalStorageValue } =
+    useGlobalModalStatus();
 
   const [isAnyDayChosenStatus, setIsAnyDayChosenStatus] = useState<boolean>(
     IsAnyDayChosen(extendedDays)
@@ -48,6 +43,8 @@ export default function CalendarHeader({
   useEffect(() => {
     setIsAnyDayChosenStatus(IsAnyDayChosen(extendedDays));
   }, [extendedDays]);
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <div className="flex border-l-1 border-b-1 px-5 py-4">
@@ -72,36 +69,26 @@ export default function CalendarHeader({
         <div className="h-7 border-1"></div>
         {/*  */}
 
-        <div className="flex py-2 bg-gray-100 rounded-lg relative select-none">
-          {CALENDAR_SETTINGS.map((item, idx) => {
+        <Tabs
+          defaultSelectedKey={"1"}
+          onSelectionChange={(key) => {
+            setLocalStorageValue({
+              ...CALENDAR_SETTINGS[key as number],
+              status: storedLocalStorageValue.status
+            });
+          }}
+          items={CALENDAR_SETTINGS}
+        >
+          {(item) => {
             return (
-              <button
-                className={`font-semibold px-[14px] z-10 cursor-pointer text-[#56616b]`}
-                key={idx}
-                onClick={() => {
-                  setLocalStorageValue({
-                    ...item,
-                    status: storedLocalStorageValue.status
-                  });
-                  setMoveTo(item.move_to);
-                }}
-              >
-                {item.text}
-              </button>
+              <Tab
+                key={`${item.id}`}
+                className="text-base font-semibold"
+                title={item.text}
+              />
             );
-          })}
-          <div
-            className={`w-10 h-10 bg-white top-0 absolute border-1 rounded-lg ${
-              moveTo === "0px"
-                ? "right-0"
-                : moveTo === "41px"
-                ? "right-41px"
-                : moveTo === "80px"
-                ? "right-80px"
-                : "right-0"
-            } shadow-sm transition-all duration-300 ease-[cubic-bezier(0.68,-0.55,0.27,1.55)]`}
-          />
-        </div>
+          }}
+        </Tabs>
       </div>
 
       <div className="flex items-center gap-1">
@@ -131,11 +118,15 @@ export default function CalendarHeader({
           left_icon={<Plus width={17} height={17} />}
           title="Create"
           onClick={() => {
-            if (isAnyDayChosenStatus) setCreateModalStatus(!createModalStatus);
+            if (isAnyDayChosenStatus) onOpen();
           }}
           bg_color={`${isAnyDayChosenStatus ? "bg-[#009965]" : "bg-gray-400"}`}
           text_color="text-white"
         />
+
+        {/* add new event modal */}
+        <NewEventModal isOpen={isOpen} onClose={onClose} />
+        {/*  */}
 
         <CalendarHeaderButton
           right_icon={<ArrowDownCircle width={17} height={17} />}

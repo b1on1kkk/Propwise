@@ -1,18 +1,18 @@
 export const HOMEPAGE_HEADER = [
   {
-    text: "Overview",
-    move_to: "248px"
+    id: "overview",
+    label: "Overview"
   },
   {
-    text: "Markets",
-    move_to: "165px"
+    id: "markets",
+    label: "Markets"
   },
   {
-    text: "Investors",
-    move_to: "84px"
+    id: "investors",
+    label: "Investors"
   },
   {
-    text: "Calendar",
-    move_to: "-2px"
+    id: "calendar",
+    label: "Calendar"
   }
 ];

@@ -1,5 +1,5 @@
 // components
-import Icon from "./Icon/Icon";
+import Icon from "../Icon/Icon";
 
 // interfaces
 import type { TRegistrationInput } from "@/interfaces/interfaces";
@@ -25,7 +25,12 @@ export default function RegistrationInput({
           validity_status ? "border-red-500" : ""
         } transition-all duration-200 ease-in`}
       >
-        <Icon icon_name={icon_name} />
+        <Icon
+          icon_name={icon_name}
+          width={20}
+          height={20}
+          className="text-[#56616b] hover:text-[#009965] transition-all duration-200 ease-in flex items-center"
+        />
         <input
           type={type}
           className="flex-1 focus:outline-none "
@@ -40,6 +45,9 @@ export default function RegistrationInput({
           <>
             {showPassword ? (
               <Icon
+                className="text-[#56616b] hover:text-[#009965] transition-all duration-200 ease-in flex items-center"
+                width={20}
+                height={20}
                 icon_name="EyeOff"
                 onClick={() => {
                   if (setShowPassword) setShowPassword(!showPassword);
@@ -47,6 +55,9 @@ export default function RegistrationInput({
               />
             ) : (
               <Icon
+                className="text-[#56616b] hover:text-[#009965] transition-all duration-200 ease-in flex items-center"
+                width={20}
+                height={20}
                 icon_name="Eye"
                 onClick={() => {
                   if (setShowPassword) setShowPassword(!showPassword);
