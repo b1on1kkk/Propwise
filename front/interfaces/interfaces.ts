@@ -95,7 +95,9 @@ export interface OnlineSocketUsers {
 
 export interface TAvatarAndRole {
   hideAsideMenuStatus: boolean;
-  user: User[];
+  user_data: User[] | undefined;
+  user_isloading: boolean;
+  user_iserror: boolean;
   onlineUsers: OnlineSocketUsers[];
 }
 

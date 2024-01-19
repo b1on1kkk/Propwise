@@ -7,7 +7,7 @@ interface TChatHeaderButton {
   icon_name: string;
   width: number;
   height: number;
-  tooltip_title: string;
+  tooltip_title?: string;
   placement:
     | "top-start"
     | "top"
@@ -21,6 +21,8 @@ interface TChatHeaderButton {
     | "right-start"
     | "right"
     | "right-end";
+  className: string;
+  delay?: number;
   onClick: () => void;
 }
 
@@ -30,15 +32,19 @@ export default function ChatHeaderButton({
   height,
   tooltip_title,
   placement,
+  className,
+  delay,
   onClick
 }: TChatHeaderButton) {
   return (
-    <Tooltip content={tooltip_title} color="default" placement={placement}>
-      <Button
-        onClick={onClick}
-        size="sm"
-        className="p-2 min-w-0 bg-gray-200 shadow border-1"
-      >
+    <Tooltip
+      content={tooltip_title}
+      color="default"
+      placement={placement}
+      delay={delay}
+      closeDelay={delay}
+    >
+      <Button onClick={onClick} size="sm" className={className}>
         <Icon
           icon_name={icon_name}
           className="text-[#56616b]"

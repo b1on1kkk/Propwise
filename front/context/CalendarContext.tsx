@@ -1,9 +1,19 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import type { NewDays } from "@/interfaces/interfaces";
+import type { NewDays, Events } from "@/interfaces/interfaces";
+import type {
+  QueryObserverResult,
+  RefetchOptions
+} from "@tanstack/react-query";
 
 export interface TCalendarContent {
+  events: Events[] | undefined;
+  isLoading: boolean;
+  isError: boolean;
+  refetch: (
+    options?: RefetchOptions | undefined
+  ) => Promise<QueryObserverResult<Events[] | undefined, Error>> | undefined;
   extendedDays: NewDays[];
   currentMonth: string;
   setCurrentMonth: (c: string) => void;
@@ -11,6 +21,14 @@ export interface TCalendarContent {
 }
 
 export const CalendarContext = createContext<TCalendarContent>({
+  events: undefined,
+  isLoading: false,
+  isError: false,
+  refetch: () => {
+    return new Promise<QueryObserverResult<Events[] | undefined, Error>>(
+      (resolve, reject) => {}
+    );
+  },
   extendedDays: [],
   currentMonth: "",
   setCurrentMonth: () => {},

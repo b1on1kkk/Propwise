@@ -19,10 +19,10 @@ import CreateEventInputLink from "../CreateEvent/CreateEventInputLink/CreateEven
 
 // API
 import { InsertEvent } from "@/API/InsertEvent";
-import { GetEvents } from "@/API/GetUsersEvents";
 
 // context
 import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
+import { useGlobalCalendatContext } from "@/context/CalendarContext";
 
 // utils
 import { format } from "date-fns";
@@ -33,9 +33,6 @@ import {
 } from "./NewEventReducer/NewEventReducer";
 import { CheckForEmptyFields } from "@/utils/CheckForEmptyFields";
 
-// interfaces
-import type { Events } from "@/interfaces/interfaces";
-
 export default function NewEventModal({
   isOpen,
   onClose
@@ -43,7 +40,8 @@ export default function NewEventModal({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  const { chosenDay, user, setEvents } = useGlobalModalStatus();
+  const { chosenDay, user } = useGlobalModalStatus();
+  const { refetch } = useGlobalCalendatContext();
 
   const [state, dispatch] = useReducer(AddingEventReducer, {
     ...NewEventInitialState
@@ -55,11 +53,7 @@ export default function NewEventModal({
     if (emptyFields) {
       const user_id = user[0].id;
 
-      InsertEvent(user_id, state, chosenDay).then(() => {
-        GetEvents(user_id, chosenDay!.month).then((events: Events[]) =>
-          setEvents(events)
-        );
-      });
+      InsertEvent(user_id, state, chosenDay).then(() => refetch());
 
       onClose();
       dispatch({ type: AddingNewEventTypes.CLEAR, payload: "" });

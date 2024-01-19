@@ -24,6 +24,7 @@ export default function AsideChatsHeader({
             height={17}
             tooltip_title="Learn more"
             placement="left"
+            className="p-2 min-w-0 bg-gray-200 shadow border-1"
             onClick={moreButtonOnClick}
           />
 
@@ -33,6 +34,7 @@ export default function AsideChatsHeader({
             height={17}
             tooltip_title="Add new chat"
             placement="right"
+            className="p-2 min-w-0 bg-gray-200 shadow border-1"
             onClick={newChatButtonOnClick}
           />
         </div>

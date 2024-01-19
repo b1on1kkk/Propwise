@@ -10,7 +10,6 @@ axios.defaults.withCredentials = true;
 // components
 import LeftAsideMenu from "@/components/LeftAsideMenu/LeftAsideMenu";
 import Header from "@/components/Header/Header";
-import ShowMoreEventsRightModal from "@/components/ShowMoreEventsRightModal/ShowMoreEventsRightModal";
 
 // providers
 import Providers from "./providers";
@@ -21,12 +20,10 @@ import { MyGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
 // interfaces
 import type {
   NewDays,
-  Events,
   User,
   OnlineSocketUsers,
   Members
 } from "@/interfaces/interfaces";
-import { GetLoggedInUserInf } from "@/API/GetLoggedInUserInf";
 
 // hooks
 import { useLocalStorage } from "@/hooks/useLocalStorage";
@@ -36,11 +33,15 @@ import { CALENDAR_SETTINGS } from "@/constants/CalendarSettings";
 
 // socket
 import { io, Socket } from "socket.io-client";
-
 import type {
   ServerToClientEvents,
   ClientToServerEvents
 } from "../socket_io_typings";
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+// Create a client
+const queryClient = new QueryClient();
 
 export default function RootLayout({
   children
@@ -60,9 +61,6 @@ export default function RootLayout({
   const [chosenToSeeDetailedInfDay, setChosenToSeeDetailedInfDay] =
     useState<NewDays | null>(null);
 
-  // event storage
-  const [events, setEvents] = useState<Events[]>([]);
-
   // logged in user storage
   const [user, setUser] = useState<User[]>([]);
   // online users storage
@@ -76,14 +74,6 @@ export default function RootLayout({
 
   // members storage
   const [members, setMembers] = useState<Members[]>([]);
-
-  // get users inf if path name changes
-  useEffect(() => {
-    GetLoggedInUserInf().then((data: User[]) => {
-      // set user only when data returned and user array empty
-      if (data.length > 0 && user.length === 0) setUser(data);
-    });
-  }, [path]);
 
   useEffect(() => {
     if (user.length > 0 && !socket) {
@@ -113,8 +103,6 @@ export default function RootLayout({
     { ...CALENDAR_SETTINGS[1], status: false }
   );
 
-  console.log("test text");
-
   return (
     <html lang="en">
       <body
@@ -122,34 +110,34 @@ export default function RootLayout({
           detailedModalStatus ? "overflow-hidden" : ""
         } flex max-h-screen max-w-screen`}
       >
-        <MyGlobalModalStatus.Provider
-          value={{
-            chosenDay,
-            detailedModalStatus,
-            events,
-            user,
-            onlineUsers,
-            storedLocalStorageValue,
-            socket,
-            members,
-            // setters
-            setDetailedModalStatus,
-            setChosenDay,
-            setEvents,
-            setChosenToSeeDetailedInfDay,
-            setLocalStorageValue,
-            setMembers
-          }}
-        >
-          {path !== "/login" && path !== "/registration" && <LeftAsideMenu />}
+        <QueryClientProvider client={queryClient}>
+          <MyGlobalModalStatus.Provider
+            value={{
+              chosenDay,
+              detailedModalStatus,
+              user,
+              onlineUsers,
+              storedLocalStorageValue,
+              socket,
+              members,
+              chosenToSeeDetailedInfDay,
+              // setters
+              setDetailedModalStatus,
+              setChosenDay,
+              setUser,
+              setChosenToSeeDetailedInfDay,
+              setLocalStorageValue,
+              setMembers
+            }}
+          >
+            {path !== "/login" && path !== "/registration" && <LeftAsideMenu />}
 
-          <div className="flex flex-col flex-1">
-            {path !== "/login" && path !== "/registration" && <Header />}
-            <Providers>{children}</Providers>
-          </div>
-
-          <ShowMoreEventsRightModal day={chosenToSeeDetailedInfDay} />
-        </MyGlobalModalStatus.Provider>
+            <div className="flex flex-col flex-1">
+              {path !== "/login" && path !== "/registration" && <Header />}
+              <Providers>{children}</Providers>
+            </div>
+          </MyGlobalModalStatus.Provider>
+        </QueryClientProvider>
       </body>
     </html>
   );

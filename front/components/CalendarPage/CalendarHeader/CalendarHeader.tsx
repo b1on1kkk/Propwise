@@ -3,17 +3,13 @@
 import { useEffect, useState } from "react";
 
 // components
-import CalendarHeaderButton from "@/components/CalendarHeaderButton/CalendarHeaderButton";
-import {
-  Calendar,
-  SlidersHorizontalIcon,
-  ChevronRight,
-  ChevronLeft,
-  Plus,
-  ArrowDownCircle
-} from "lucide-react";
+import { ChevronRight, ChevronLeft } from "lucide-react";
 import NewEventModal from "@/components/NewEventModal/NewEventModal";
 import { Tabs, Tab, useDisclosure } from "@nextui-org/react";
+import MonthsButton from "./MonthsButton/MonthsButton";
+import FilterButton from "./FilterButton/FilterButton";
+import MonthHandlerButton from "./MonthHandlerButton/MonthHandlerButton";
+import ControllerButton from "./ControllerButton/ControllerButton";
 
 // constants
 import { CALENDAR_SETTINGS } from "@/constants/CalendarSettings";
@@ -31,8 +27,7 @@ export default function CalendarHeader({
 }: {
   firstDayCurrentMonth: Date;
 }) {
-  const { setCurrentMonth, currentMonth, extendedDays } =
-    useGlobalCalendatContext();
+  const { setCurrentMonth, extendedDays } = useGlobalCalendatContext();
   const { storedLocalStorageValue, setLocalStorageValue } =
     useGlobalModalStatus();
 
@@ -49,21 +44,9 @@ export default function CalendarHeader({
   return (
     <div className="flex border-l-1 border-b-1 px-5 py-4">
       <div className="flex gap-1 items-center flex-1">
-        <CalendarHeaderButton
-          left_icon={<Calendar width={17} height={17} />}
-          title={currentMonth}
-          onClick={() => {}}
-          bg_color="bg-white"
-          text_color="text-[#56616b]"
-        />
+        <MonthsButton />
 
-        <CalendarHeaderButton
-          left_icon={<SlidersHorizontalIcon width={17} height={17} />}
-          title="Filter"
-          onClick={() => {}}
-          bg_color="bg-white"
-          text_color="text-[#56616b]"
-        />
+        <FilterButton />
 
         {/* delimiter */}
         <div className="h-7 border-1"></div>
@@ -92,49 +75,47 @@ export default function CalendarHeader({
       </div>
 
       <div className="flex items-center gap-1">
-        <div>
-          <button
-            className="p-2 border-1 rounded-lg text-[#56616b] shadow active:translate-y-0.5 transition-all duration-75 cursor-pointer"
-            onClick={() => PrevMonth(setCurrentMonth, firstDayCurrentMonth)}
-          >
-            <ChevronLeft width={15} height={15} />
-          </button>
-        </div>
+        <MonthHandlerButton
+          onClick={() => PrevMonth(setCurrentMonth, firstDayCurrentMonth)}
+        >
+          <ChevronLeft width={15} height={15} />
+        </MonthHandlerButton>
 
-        <div>
-          <button
-            className="p-2 border-1 rounded-lg text-[#56616b] shadow active:translate-y-0.5 transition-all duration-75 cursor-pointer"
-            onClick={() => NextMonth(setCurrentMonth, firstDayCurrentMonth)}
-          >
-            <ChevronRight width={15} height={15} />
-          </button>
-        </div>
+        <MonthHandlerButton
+          onClick={() => NextMonth(setCurrentMonth, firstDayCurrentMonth)}
+        >
+          <ChevronRight width={15} height={15} />
+        </MonthHandlerButton>
 
         {/* delimiter */}
         <div className="h-7 border-1"></div>
         {/*  */}
 
-        <CalendarHeaderButton
-          left_icon={<Plus width={17} height={17} />}
-          title="Create"
+        <ControllerButton
+          className={`flex gap-1.5 rounded-lg ${
+            isAnyDayChosenStatus
+              ? "bg-[#009965] text-white"
+              : "bg-gray-400 text-white"
+          } border-1 shadow min-w-0 px-3 py-2 h-[38px]`}
           onClick={() => {
             if (isAnyDayChosenStatus) onOpen();
           }}
-          bg_color={`${isAnyDayChosenStatus ? "bg-[#009965]" : "bg-gray-400"}`}
-          text_color="text-white"
+          icon_side="left"
+          icon_name="Plus"
+          button_text="Create"
+        />
+
+        <ControllerButton
+          className={`flex gap-1.5 rounded-lg bg-white border-1 shadow text-[#56616b] min-w-0 px-3 py-2 h-[38px]`}
+          onClick={() => {}}
+          icon_side="right"
+          icon_name="ArrowDownCircle"
+          button_text="Export"
         />
 
         {/* add new event modal */}
         <NewEventModal isOpen={isOpen} onClose={onClose} />
         {/*  */}
-
-        <CalendarHeaderButton
-          right_icon={<ArrowDownCircle width={17} height={17} />}
-          title="Export"
-          onClick={() => {}}
-          bg_color="bg-white"
-          text_color="text-[#56616b]"
-        />
       </div>
     </div>
   );

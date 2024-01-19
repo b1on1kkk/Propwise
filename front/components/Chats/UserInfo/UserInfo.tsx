@@ -43,6 +43,7 @@ export default function UserInfo({ isOnlineStatus, onClick }: TUserInfo) {
           </span>
           <ChatHeaderButton
             icon_name="X"
+            className="p-2 min-w-0 bg-gray-200 shadow border-1"
             width={17}
             height={17}
             tooltip_title="Close"

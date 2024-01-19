@@ -30,6 +30,7 @@ export default function ChatHeader({
         <div className="flex gap-2">
           <div>
             <ChatHeaderButton
+              className="p-2 min-w-0 bg-gray-200 shadow border-1"
               icon_name="Search"
               width={17}
               height={17}
@@ -40,6 +41,7 @@ export default function ChatHeader({
           </div>
           <div>
             <ChatHeaderButton
+              className="p-2 min-w-0 bg-gray-200 shadow border-1"
               icon_name="PanelRight"
               width={17}
               height={17}

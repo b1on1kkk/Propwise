@@ -3,6 +3,7 @@
 // components
 import { MoreHorizontal } from "lucide-react";
 import SmallEventCard from "./SmallEventCard/SmallEventCard";
+import { Spinner } from "@nextui-org/react";
 
 // context
 import { useGlobalCalendatContext } from "@/context/CalendarContext";
@@ -16,31 +17,41 @@ import { ChangeStatusChosenDate } from "@/utils/ChangeStatusChosenDate";
 import { ShowMoreDateInf } from "@/utils/ShowMoreDateInf";
 
 export default function CalendarMain() {
-  const { extendedDays, currentMonth, setExtendedDays } =
-    useGlobalCalendatContext();
+  const {
+    extendedDays,
+    currentMonth,
+    setExtendedDays,
+    isLoading,
+    isError,
+    events
+  } = useGlobalCalendatContext();
   const {
     setChosenDay,
-    events,
     detailedModalStatus,
     setChosenToSeeDetailedInfDay,
     setDetailedModalStatus
   } = useGlobalModalStatus();
 
   return (
-    <main className="flex-1 overflow-auto">
-      <div>
-        <div className="flex">
-          {months.map((month) => {
-            return (
-              <div
-                key={month}
-                className="flex-1 py-3 text-[#56616b] text-center font-semibold border-1"
-              >
-                {month}
-              </div>
-            );
-          })}
+    <main className="flex-1 overflow-auto border-l-1">
+      <div className="flex">
+        {months.map((month) => {
+          return (
+            <div
+              key={month}
+              className="flex-1 py-3 text-[#56616b] text-center font-semibold border-1"
+            >
+              {month}
+            </div>
+          );
+        })}
+      </div>
+
+      {isLoading || isError || !events ? (
+        <div className="flex h-full items-center justify-center">
+          <Spinner color="primary" />
         </div>
+      ) : (
         <div className="grid grid-cols-7 grid-rows-5">
           {extendedDays.map((day, idx) => {
             let counter = 0;
@@ -136,7 +147,7 @@ export default function CalendarMain() {
             );
           })}
         </div>
-      </div>
+      )}
     </main>
   );
 }

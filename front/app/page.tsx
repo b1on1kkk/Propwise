@@ -22,10 +22,11 @@ import {
   parse
 } from "date-fns";
 import { CreateExtendDays } from "@/utils/CreateExtendDays";
-import { GetEvents } from "@/API/GetUsersEvents";
+import { GetEvents } from "@/API/GetEvents";
 
 // interfaces
 import type { NewDays } from "@/interfaces/interfaces";
+import ShowMoreEventsRightModal from "@/components/ShowMoreEventsRightModal/ShowMoreEventsRightModal";
 
 function ShowTypeOfCalendar(type: string): React.ReactNode {
   switch (type) {
@@ -39,6 +40,7 @@ function ShowTypeOfCalendar(type: string): React.ReactNode {
 }
 
 export default function Home() {
+  // create calendar layout
   const today = startOfToday();
   let [currentMonth, setCurrentMonth] = useState(format(today, "MMMM-yyyy"));
   const firstDayCurrentMonth = parse(currentMonth, "MMMM-yyyy", new Date());
@@ -51,19 +53,25 @@ export default function Home() {
   const [extendedDays, setExtendedDays] = useState<NewDays[]>(
     CreateExtendDays(days)
   );
+  //
 
-  const { setEvents, user, storedLocalStorageValue } = useGlobalModalStatus();
+  const { user, storedLocalStorageValue, chosenToSeeDetailedInfDay } =
+    useGlobalModalStatus();
+
+  const { data, refetch, isLoading, isError } = GetEvents(user, currentMonth);
 
   useEffect(() => {
     setExtendedDays(CreateExtendDays(days));
-    if (user.length > 0) {
-      GetEvents(user[0].id, currentMonth).then((events) => setEvents(events));
-    }
+    refetch();
   }, [currentMonth, user]);
 
   return (
     <CalendarContext.Provider
       value={{
+        events: data,
+        isLoading,
+        isError,
+        refetch,
         extendedDays,
         currentMonth,
         setCurrentMonth,
@@ -72,6 +80,8 @@ export default function Home() {
     >
       <CalendarHeader firstDayCurrentMonth={firstDayCurrentMonth} />
       {ShowTypeOfCalendar(storedLocalStorageValue.text)}
+
+      <ShowMoreEventsRightModal day={chosenToSeeDetailedInfDay} />
     </CalendarContext.Provider>
   );
 }

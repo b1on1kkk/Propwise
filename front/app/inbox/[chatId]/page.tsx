@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useEffect, useState } from "react";
 
 // components
@@ -9,6 +10,8 @@ import MessageInput from "@/components/Chats/MessageInput/MessageInput";
 import UserInfo from "@/components/Chats/UserInfo/UserInfo";
 import ChatHeader from "@/components/Chats/ChatHeader/ChatHeader";
 import EmptyChatWarning from "@/components/Chats/EmptyChatWarning/EmptyChatWarning";
+import LogMessagesSkeleton from "@/components/Chats/LogMessagesSkeleton/LogMessagesSkeleton";
+import FriendMessageSkeleton from "@/components/Chats/FriendMessageSkeleton/FriendMessageSkeleton";
 
 // context
 import { useInboxContext } from "@/context/InboxContext";
@@ -29,6 +32,9 @@ import { GetMessages } from "@/API/GetMessages";
 import type { Messages } from "@/interfaces/interfaces";
 
 export default function Chat() {
+  // fake array for skeleton messages loader
+  const fakeArray = new Array(3).fill(0);
+
   // some data from contexts
   const { storedValue } = useInboxContext();
   const { onlineUsers, socket, user } = useGlobalModalStatus();
@@ -41,6 +47,13 @@ export default function Chat() {
 
   // messages store
   const [messages, setMessages] = useState<Messages[]>([]);
+
+  const { isLoading, isError } = GetMessages(
+    storedValue!.chat_id,
+    (messages) => {
+      setMessages(messages);
+    }
+  );
 
   // custom hook that scroll message list to the button each time messages changes
   const ref = useScrollToBottom(messages);
@@ -58,10 +71,6 @@ export default function Chat() {
       setMessageInput("");
     }
   }
-
-  useEffect(() => {
-    GetMessages(storedValue!.chat_id).then((messages) => setMessages(messages));
-  }, []);
 
   // set up users online status here only when component build in or dependency changes
   useEffect(() => {
@@ -117,13 +126,24 @@ export default function Chat() {
 
         <main
           ref={ref}
-          className={`flex flex-col bg-gray-50 overflow-auto flex-1 py-3 px-6 gap-3 ${
-            messages.length === 0 && "justify-center items-center"
-          }`}
+          className="flex flex-col bg-gray-50 overflow-auto flex-1 py-3 px-6 gap-3"
         >
+          {(isLoading || isError) && (
+            <>
+              {fakeArray.map((_, idx) => {
+                return (
+                  <React.Fragment key={idx}>
+                    <LogMessagesSkeleton />
+                    <FriendMessageSkeleton />
+                  </React.Fragment>
+                );
+              })}
+            </>
+          )}
+
           {user.length > 0 && (
             <>
-              {messages.length > 0 ? (
+              {messages.length > 0 && !isLoading && !isError ? (
                 <>
                   {messages.map((message, idx) => {
                     if (message.sender_id === user[0].id) {
@@ -135,11 +155,13 @@ export default function Chat() {
                   })}
                 </>
               ) : (
-                <EmptyChatWarning
-                  sendFirstMessageGreeting={() =>
-                    SendPrivateMessage(socket, "HEY!", user, storedValue)
-                  }
-                />
+                <div className="h-full flex items-center justify-center">
+                  <EmptyChatWarning
+                    sendFirstMessageGreeting={() =>
+                      SendPrivateMessage(socket, "HEY!", user, storedValue)
+                    }
+                  />
+                </div>
               )}
             </>
           )}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import styles from "./MemberCard.module.scss";
 
 // components
@@ -17,9 +17,11 @@ import { SendingNotificationSocket } from "@/utils/SendingNotificationSocket";
 
 // API
 import { InsertDataToCreateFriendship } from "@/API/InsertDataToCreateFriendship";
+import { GetFriends } from "@/API/GetFriends";
 
 export default function MemberCard({ member }: TMemberCard) {
   const { socket, setMembers, user } = useGlobalModalStatus();
+  const [friendsCounter, setFriendsCounter] = useState<number>(0);
 
   const loggedin_user = user[0];
 
@@ -51,7 +53,13 @@ export default function MemberCard({ member }: TMemberCard) {
   useEffect(() => {
     socket!.on("getMembersFromSocket", (data) => {
       setMembers(data.content);
+      // update friends counter when user add another to friend
+      GetFriends(member.id).then((friends) =>
+        setFriendsCounter(friends.length)
+      );
     });
+
+    GetFriends(member.id).then((friends) => setFriendsCounter(friends.length));
   }, []);
 
   return (
@@ -71,7 +79,7 @@ export default function MemberCard({ member }: TMemberCard) {
 
           <div className="mt-5 border-t-2 flex">
             <div className="flex-1 text-center border-r-1 flex flex-col mt-1">
-              <span className="font-bold">0</span>
+              <span className="font-bold">{friendsCounter}</span>
               <span className="text-sm text-[#56616b]">friends</span>
             </div>
 

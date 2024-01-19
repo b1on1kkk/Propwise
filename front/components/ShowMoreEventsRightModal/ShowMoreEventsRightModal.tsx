@@ -18,21 +18,24 @@ import { useOutsideClick } from "@/hooks/useOutsideClick ";
 
 // utils
 import { FindChosenDayEvents } from "@/utils/FindChosenDayEvents";
+import { useGlobalCalendatContext } from "@/context/CalendarContext";
 
 export default function ShowMoreEventsRightModal({
   day
 }: TShowMoreEventsModal) {
   const [dayEvents, setDayEvents] = useState<Events[]>([]);
 
-  const { events, detailedModalStatus, setDetailedModalStatus } =
+  const { detailedModalStatus, setDetailedModalStatus } =
     useGlobalModalStatus();
+
+  const { events } = useGlobalCalendatContext();
 
   const handleClickOutside = () => {
     if (detailedModalStatus) setDetailedModalStatus(!detailedModalStatus);
   };
 
   useEffect(() => {
-    if (day) {
+    if (day && events) {
       setDayEvents(FindChosenDayEvents(events, day));
     }
   }, [day]);

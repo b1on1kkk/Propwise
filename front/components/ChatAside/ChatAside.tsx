@@ -7,6 +7,7 @@ import Chats from "../Chats/Chats";
 import AsideChatsHeader from "../AsideChatsHeader/AsideChatsHeader";
 import StartMessagingCard from "../Chats/StartMessagingCard/StartMessagingCard";
 import EmptyChatListWarning from "../Chats/EmptyChatListWarning/EmptyChatListWarning";
+import { Spinner } from "@nextui-org/react";
 
 // context
 import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
@@ -45,12 +46,10 @@ export default function ChatAside() {
     });
   }
 
+  const { refetch, data, isLoading, isError } = GetChats(user);
+
   useEffect(() => {
-    if (user.length > 0) {
-      GetChats(user[0].id).then((chats) => {
-        setChats(chats);
-      });
-    }
+    if (data && user.length > 0) refetch();
   }, [user]);
 
   return (
@@ -96,7 +95,13 @@ export default function ChatAside() {
       )}
 
       <main className={`overflow-auto flex-1`}>
-        {chats.length > 0 ? (
+        {isLoading || isError || !data ? (
+          <div className="flex h-full items-center justify-center">
+            <Spinner color="primary" />
+          </div>
+        ) : isLoading || isError || data.length === 0 ? (
+          <EmptyChatListWarning />
+        ) : (
           <>
             {/* pinned chats */}
             <Chats
@@ -131,8 +136,6 @@ export default function ChatAside() {
             />
             {/*  */}
           </>
-        ) : (
-          <EmptyChatListWarning />
         )}
       </main>
     </aside>

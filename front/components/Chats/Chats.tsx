@@ -26,12 +26,8 @@ export default function Chats({
   // storage of chats
   const [Pinned, Messages] = DevideByStatus(chatArray);
 
-  const ItemClasses = {
-    title: "text-sm text-[#56616b]"
-  };
-
   return (
-    <Accordion itemClasses={ItemClasses}>
+    <Accordion itemClasses={{ title: "text-sm text-[#56616b]" }}>
       <AccordionItem
         aria-label={icon_name}
         title={title_text}
