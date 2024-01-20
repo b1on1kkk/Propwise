@@ -10,12 +10,12 @@ export default function LoggedInUserMessageCard({ message }: TMessageCard) {
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2 justify-end">
           <span className="text-xs text-[#56616b]">{message.timestamp}</span>
-          <span className="text-sm font-semibold">
+          <span className="text-sm font-semibold dark:text-dark_text">
             {message.name} {message.lastname}
           </span>
         </div>
 
-        <div className="px-3 py-2 bg-[#009965] rounded-lg text-white max-w-[400px] flex items-end gap-3">
+        <div className="px-3 py-2 bg-[#009965] rounded-lg text-white max-w-[400px] flex items-end gap-3 dark:bg-dark_text">
           <div className="flex-1">{message.value}</div>
           {message.status === 1 ? (
             <span>

@@ -60,10 +60,12 @@ export default function AvatarAndRole({
 
             {!hideAsideMenuStatus && (
               <div className="flex flex-col">
-                <span className="font-semibold">
+                <span className="font-semibold dark:text-dark_text">
                   {user_data[0].name} {user_data[0].lastname}
                 </span>
-                <span className="text-xs">{user_data[0].role}</span>
+                <span className="text-xs dark:text-dark_text">
+                  {user_data[0].role}
+                </span>
               </div>
             )}
           </>

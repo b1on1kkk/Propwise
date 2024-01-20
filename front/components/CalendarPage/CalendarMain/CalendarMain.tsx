@@ -33,13 +33,13 @@ export default function CalendarMain() {
   } = useGlobalModalStatus();
 
   return (
-    <main className="flex-1 overflow-auto border-l-1">
+    <main className="flex-1 overflow-auto border-l-1 dark:border-dark_border">
       <div className="flex">
         {months.map((month) => {
           return (
             <div
               key={month}
-              className="flex-1 py-3 text-[#56616b] text-center font-semibold border-1"
+              className="flex-1 py-3 text-[#56616b] text-center font-semibold border-1 dark:border-dark_border dark:text-dark_text"
             >
               {month}
             </div>
@@ -59,10 +59,13 @@ export default function CalendarMain() {
             return (
               <div
                 key={idx}
-                className={`border-1 h-60 text-[#56616b] font-semibold flex flex-col justify-between p-3 transition-all duration-200${
+                className={`border-1 dark:border-dark_border h-60 text-[#56616b] font-semibold flex flex-col justify-between p-3 transition-all duration-200${
                   idx === 0 && ColStartClasses[getDay(day.day)]
-                } ${!isSameMonth(day.day, currentMonth) && "bg-gray-50"} ${
-                  day.create_event && "border-green-500"
+                } ${
+                  !isSameMonth(day.day, currentMonth) &&
+                  "bg-gray-50 dark:bg-black dark:opacity-40"
+                } ${
+                  day.create_event && "border-green-500 dark:border-dark_text"
                 } ${
                   day.mouse_over && !day.create_event && "shadow-inner"
                 } transition-all duration-200 ease-in`}
@@ -98,13 +101,16 @@ export default function CalendarMain() {
                 }}
               >
                 <div className="flex justify-between items-center min-h-7">
-                  <time dateTime={format(day.day, "yyyy-mm-dd")}>
+                  <time
+                    dateTime={format(day.day, "yyyy-mm-dd")}
+                    className="dark:text-dark_text"
+                  >
                     {format(day.day, "d")}
                   </time>
 
                   {day.mouse_over && (
                     <button
-                      className={`p-1 border-1 rounded-lg text-[#b5b5b5] hover:text-[#696969] active:translate-y-0.5 shadow cursor-pointer`}
+                      className={`p-1 border-1 rounded-lg text-[#b5b5b5] hover:text-[#696969] active:translate-y-0.5 shadow cursor-pointer dark:border-dark_border dark:text-dark_text`}
                       onClick={() => {
                         setChosenToSeeDetailedInfDay(day);
                         setDetailedModalStatus(!detailedModalStatus);
@@ -138,7 +144,7 @@ export default function CalendarMain() {
                   })}
 
                   {counter >= 1 && counter - 1 !== 0 && (
-                    <div className="p-1 border-2 border-dashed rounded-lg text-center border-white bg-[#009965] text-white hover:bg-green-600 transition-all duration-200 ease-in">
+                    <div className="p-1 border-2 border-dashed rounded-lg text-center border-white bg-[#009965] text-white hover:bg-green-600 transition-all duration-200 ease-in dark:bg-dark_bg dark:border-dark_border hover:dark:bg-dark_text">
                       +{counter - 1}
                     </div>
                   )}

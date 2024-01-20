@@ -22,7 +22,7 @@ export default function LinksBlock({
     <div className={till_end_status ? "flex-1" : ""}>
       {title && (
         <div
-          className={`text-sm font-semibold pt-4 pb-1 ${
+          className={`text-sm font-semibold pt-4 pb-1 dark:text-dark_text ${
             storedLocalStorageValue.status ? "text-center" : "pl-3"
           }`}
         >
@@ -42,20 +42,22 @@ export default function LinksBlock({
             }
           >
             <div
-              className="text-[#56616b] transition-all duration-200 select-none"
+              className="text-[#56616b] transition-all duration-200 select-none dark:text-dark_text"
               onMouseEnter={() => onMouseFunction(data, item, setter)}
               onMouseLeave={() => onMouseFunction(data, item, setter)}
             >
               <div
                 className={`p-3 flex items-center gap-3 ${
-                  item.status ? "bg-[#e7f5ee]" : ""
+                  item.status ? "bg-[#e7f5ee] dark:bg-dark_text" : ""
                 } transition-all duration-200 ${
                   storedLocalStorageValue.status ? "justify-center" : ""
                 }`}
               >
                 <div
-                  className={`p-2 border-1 rounded-lg transition-all duration-200${
-                    item.status ? "border-green-400 shadow drop-shadow-lg" : ""
+                  className={`p-2 border-1 dark:border-dark_border rounded-lg transition-all duration-200${
+                    item.status
+                      ? "border-green-400 shadow drop-shadow-lg dark:border-white"
+                      : ""
                   }`}
                 >
                   <Icon icon_name={item.icon_name} hover_status={item.status} />
@@ -63,7 +65,7 @@ export default function LinksBlock({
                 {!storedLocalStorageValue.status && (
                   <div
                     className={`font-semibold transition-all duration-200 ${
-                      item.status ? "text-black" : ""
+                      item.status ? "text-black dark:text-white" : ""
                     }`}
                   >
                     {item.text}

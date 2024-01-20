@@ -65,7 +65,7 @@ export default function NewEventModal({
       <ModalContent>
         {(onClose) => (
           <>
-            <ModalHeader className="font-semibold flex-1 text-lg">
+            <ModalHeader className="font-semibold flex-1 text-lg dark:text-dark_text">
               Create event
             </ModalHeader>
             <ModalBody>
@@ -73,7 +73,7 @@ export default function NewEventModal({
                 <input
                   type="text"
                   placeholder="Enter title*"
-                  className="w-full focus:outline-none"
+                  className="w-full focus:outline-none dark:bg-inherit dark:text-dark_text placeholder:dark:text-dark_text"
                   onChange={(e) =>
                     dispatch({
                       type: AddingNewEventTypes.EVENT_NAME,
@@ -85,10 +85,10 @@ export default function NewEventModal({
               </CreateEventInputWrapper>
 
               <CreateEventInputWrapper>
-                <div>
+                <div className="dark:text-dark_text">
                   <Calendar width={20} height={20} />
                 </div>
-                <div>
+                <div className="dark:text-dark_text">
                   {chosenDay && (
                     <span>
                       {chosenDay?.week_day}, {chosenDay?.month},{" "}
@@ -139,7 +139,7 @@ export default function NewEventModal({
                 <CreateEventInputWrapper>
                   <div className="h-[90px] w-full">
                     <textarea
-                      className="resize-none w-full h-full focus:outline-none"
+                      className="resize-none w-full h-full focus:outline-none dark:bg-inherit dark:text-dark_text placeholder:dark:text-dark_text"
                       placeholder="Add a descriptions*"
                       onChange={(e) =>
                         dispatch({

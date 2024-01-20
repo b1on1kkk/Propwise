@@ -15,7 +15,7 @@ export default function LeftAsideMenu() {
     <aside
       className={`${
         storedLocalStorageValue.status ? "w-24" : "w-48"
-      } h-screen transition-all duration-200 bg-white flex flex-col`}
+      } h-screen transition-all duration-200 flex flex-col`}
     >
       {/* header */}
       <Header />

@@ -17,7 +17,7 @@ export default function ChatCard({
 
   return (
     <div
-      className="hover:bg-gray-100 transition-all duration-200 ease-in rounded-xl"
+      className="hover:bg-gray-100 transition-all duration-200 ease-in rounded-lg hover:dark:bg-slate-700"
       onDoubleClick={(e) => onDoubleClickToPinMessage(e, chat)}
     >
       <div className="flex p-5 items-center gap-5">

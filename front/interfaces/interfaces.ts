@@ -194,9 +194,9 @@ export interface TFriendRequestNotificationCard {
 export interface TNotificationsModal {
   friends: TFriends[];
   notifications: TNotifications[];
-  notificationsModalStatus: boolean;
-  setNotificationsModalStatus: (c: boolean) => void;
+  NotReadedStatus: boolean;
   setNotifications: (c: TNotifications[]) => void;
+  onClick: () => void;
 }
 
 export interface TAsideChatsHeader {

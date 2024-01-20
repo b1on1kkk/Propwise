@@ -22,6 +22,8 @@ import { useGlobalCalendatContext } from "@/context/CalendarContext";
 import { NextMonth, PrevMonth } from "./utils/NextAndPrevMonthControlles";
 import { IsAnyDayChosen } from "./utils/IsAnyDayChosen";
 
+import { useTheme } from "next-themes";
+
 export default function CalendarHeader({
   firstDayCurrentMonth
 }: {
@@ -41,15 +43,17 @@ export default function CalendarHeader({
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  const { theme } = useTheme();
+
   return (
-    <div className="flex border-l-1 border-b-1 px-5 py-4">
+    <div className="flex border-l-1 border-b-1 px-5 py-4 dark:border-dark_border">
       <div className="flex gap-1 items-center flex-1">
         <MonthsButton />
 
         <FilterButton />
 
         {/* delimiter */}
-        <div className="h-7 border-1"></div>
+        <div className="h-7 border-1 dark:border-dark_border"></div>
         {/*  */}
 
         <Tabs
@@ -61,6 +65,8 @@ export default function CalendarHeader({
             });
           }}
           items={CALENDAR_SETTINGS}
+          variant={theme === "dark" ? "underlined" : "solid"}
+          color="primary"
         >
           {(item) => {
             return (
@@ -88,15 +94,15 @@ export default function CalendarHeader({
         </MonthHandlerButton>
 
         {/* delimiter */}
-        <div className="h-7 border-1"></div>
+        <div className="h-7 border-1 dark:border-dark_border"></div>
         {/*  */}
 
         <ControllerButton
           className={`flex gap-1.5 rounded-lg ${
             isAnyDayChosenStatus
-              ? "bg-[#009965] text-white"
-              : "bg-gray-400 text-white"
-          } border-1 shadow min-w-0 px-3 py-2 h-[38px]`}
+              ? "bg-[#009965] text-white dark:bg-dark_text"
+              : "bg-gray-400 text-white dark:bg-dark_bg dark:border-dark_text"
+          } border-1 shadow min-w-0 px-3 py-2 h-[38px] dark:border-dark_border`}
           onClick={() => {
             if (isAnyDayChosenStatus) onOpen();
           }}
@@ -106,7 +112,7 @@ export default function CalendarHeader({
         />
 
         <ControllerButton
-          className={`flex gap-1.5 rounded-lg bg-white border-1 shadow text-[#56616b] min-w-0 px-3 py-2 h-[38px]`}
+          className="flex gap-1.5 rounded-lg bg-white border-1 shadow text-[#56616b] dark:text-white min-w-0 px-3 py-2 h-[38px] dark:bg-dark_bg dark:border-dark_border hover:dark:bg-dark_text"
           onClick={() => {}}
           icon_side="right"
           icon_name="ArrowDownCircle"

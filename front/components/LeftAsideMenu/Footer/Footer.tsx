@@ -30,7 +30,7 @@ export default function Footer() {
   }, [userQuery]);
 
   return (
-    <footer className="border-t-1 items-center">
+    <footer className="border-t-1 items-center dark:border-dark_border">
       <div className="px-3 py-2">
         <AvatarAndRole
           hideAsideMenuStatus={storedLocalStorageValue.status}

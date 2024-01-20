@@ -15,13 +15,13 @@ export default function CreateEventInputLink({
 }: TCreateEventInputLink) {
   return (
     <CreateEventInputWrapper>
-      <div>
+      <div className="dark:text-dark_text">
         <Link width={20} height={20} />
       </div>
       <input
         type="text"
         placeholder={text}
-        className="w-full focus:outline-none text-indigo-500 font-semibold placeholder:font-normal"
+        className="w-full focus:outline-none text-indigo-500 font-semibold placeholder:font-normal dark:bg-inherit"
         onChange={onChange}
         value={value}
       />

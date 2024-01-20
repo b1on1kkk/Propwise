@@ -18,7 +18,7 @@ export default function HeaderUserInf({
       {/*  */}
 
       <div className="flex flex-col">
-        <div className="font-bold">
+        <div className="font-bold dark:text-dark_text">
           {name} {lastname}
         </div>
         <div className="text-[#56616b] text-sm">{online_status}</div>

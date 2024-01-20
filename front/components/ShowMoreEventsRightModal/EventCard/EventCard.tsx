@@ -16,14 +16,14 @@ export default function EventCard({
   link
 }: TEventCard) {
   return (
-    <div className="border-1 rounded-lg shadow flex p-3 text-[#56616b] flex-col gap-1">
+    <div className="border-1 rounded-lg shadow flex p-3 text-[#56616b] flex-col gap-1 dark:border-dark_border">
       <div className="text-xl font-semibold text-center">
         {link ? (
           <a href={link} target="_blank" rel="noreferrer">
             <span className="text-indigo-500">{name}</span>
           </a>
         ) : (
-          <>{name}</>
+          <span className="text-dark_text">{name}</span>
         )}
       </div>
       <BlockInf

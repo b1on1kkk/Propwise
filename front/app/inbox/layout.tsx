@@ -66,7 +66,7 @@ export default function InboxLayout({
   }
 
   return (
-    <main className="h-screen border-l-1 flex overflow-hidden">
+    <main className="h-screen border-l-1 flex overflow-hidden dark:border-dark_border">
       <InboxContext.Provider
         value={{
           storedValue,

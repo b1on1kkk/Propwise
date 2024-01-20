@@ -3,10 +3,17 @@
 // components
 import FriendRequestNotificationCard from "../FriendRequestNotificationCard/FriendRequestNotificationCard";
 import SystemNotificationCard from "../SystemNotificationCard/SystemNotificationCard";
-import EmptyNotifications from "../EmptyNotifications/EmptyNotifications";
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  Button
+} from "@nextui-org/react";
+import { Bell } from "lucide-react";
 
 // hooks
-import { useOutsideClick } from "@/hooks/useOutsideClick ";
+import { useTheme } from "next-themes";
 
 // context
 import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
@@ -23,30 +30,52 @@ import type { TNotificationsModal } from "@/interfaces/interfaces";
 export default function Notifications({
   friends,
   notifications,
+  NotReadedStatus,
   setNotifications,
-  notificationsModalStatus,
-  setNotificationsModalStatus
+  onClick
 }: TNotificationsModal) {
   const { user, socket, setMembers } = useGlobalModalStatus();
-
-  // if user click outside block - close modal window
-  const handleClickOutside = () => {
-    if (notificationsModalStatus)
-      setNotificationsModalStatus(!notificationsModalStatus);
-  };
+  const { theme } = useTheme();
 
   return (
-    <div
-      className="w-[300px] border-1 shadow-md bg-white h-[400px] absolute right-0 top-11 rounded-lg z-30 p-4 overflow-auto"
-      ref={useOutsideClick(handleClickOutside)}
-    >
-      {notifications.length > 0 ? (
-        <>
-          {notifications.map((notification, idx) => {
-            if (notification.notif_type === "friend_request") {
-              return (
+    <Dropdown className="gap-3">
+      <DropdownTrigger onClick={onClick}>
+        <Button className="min-w-0 h-[42px] px-3 dark:bg-dark_bg bg-white border-1 dark:border-dark_border hover:dark:bg-dark_text">
+          <Bell
+            width={16}
+            height={16}
+            fill={theme === "dark" ? "white" : "#56616b"}
+            color={theme === "dark" ? "white" : "#56616b"}
+          />
+          {NotReadedStatus && (
+            <span className="flex absolute h-3 w-3 top-0 right-0 -mt-1 -mr-1">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#009965] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-[#009965]"></span>
+            </span>
+          )}
+        </Button>
+      </DropdownTrigger>
+      <DropdownMenu
+        aria-label="notifications"
+        closeOnSelect={false}
+        className="w-[300px] h-[400px] overflow-auto"
+      >
+        {notifications.map((notification, idx) => {
+          if (notification.notif_type === "friend_request") {
+            return (
+              <DropdownItem
+                textValue={notification.context.content}
+                key={idx}
+                onDoubleClick={() =>
+                  DeleteNotificationFromDatabase(
+                    notification.notif_id,
+                    notifications
+                  ).then((newNotifications) =>
+                    setNotifications(newNotifications)
+                  )
+                }
+              >
                 <FriendRequestNotificationCard
-                  key={idx}
                   friends={friends}
                   notification={notification}
                   CreateFriendship={() => {
@@ -82,30 +111,38 @@ export default function Notifications({
                     )
                   }
                 />
-              );
-            } else {
-              return (
+              </DropdownItem>
+            );
+          } else {
+            return (
+              <DropdownItem
+                textValue={notification.context.content}
+                key={idx}
+                onDoubleClick={() =>
+                  DeleteNotificationFromDatabase(
+                    notification.notif_id,
+                    notifications
+                  ).then((newNotifications) =>
+                    setNotifications(newNotifications)
+                  )
+                }
+              >
                 <SystemNotificationCard
-                  key={idx}
                   notificaton={notification}
                   DeleteNotification={() =>
-                    // call function and pass props in it
                     DeleteNotificationFromDatabase(
                       notification.notif_id,
                       notifications
                     ).then((newNotifications) =>
-                      // set changed data
                       setNotifications(newNotifications)
                     )
                   }
                 />
-              );
-            }
-          })}
-        </>
-      ) : (
-        <EmptyNotifications />
-      )}
-    </div>
+              </DropdownItem>
+            );
+          }
+        })}
+      </DropdownMenu>
+    </Dropdown>
   );
 }

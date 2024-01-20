@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import Chats from "../Chats/Chats";
 import AsideChatsHeader from "../AsideChatsHeader/AsideChatsHeader";
 import StartMessagingCard from "../Chats/StartMessagingCard/StartMessagingCard";
-import EmptyChatListWarning from "../Chats/EmptyChatListWarning/EmptyChatListWarning";
 import { Spinner } from "@nextui-org/react";
 
 // context
@@ -52,8 +51,12 @@ export default function ChatAside() {
     if (data && user.length > 0) refetch();
   }, [user]);
 
+  useEffect(() => {
+    if (data) setChats(data);
+  }, [data]);
+
   return (
-    <aside className="w-[350px] border-r-1 flex flex-col h-full">
+    <aside className="w-[350px] border-r-1 flex flex-col h-full dark:border-dark_border">
       <header>
         <AsideChatsHeader
           searchValue=""
@@ -94,13 +97,11 @@ export default function ChatAside() {
         </div>
       )}
 
-      <main className={`overflow-auto flex-1`}>
+      <main className="overflow-auto flex-1 p-4">
         {isLoading || isError || !data ? (
           <div className="flex h-full items-center justify-center">
             <Spinner color="primary" />
           </div>
-        ) : isLoading || isError || data.length === 0 ? (
-          <EmptyChatListWarning />
         ) : (
           <>
             {/* pinned chats */}

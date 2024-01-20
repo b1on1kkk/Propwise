@@ -38,12 +38,12 @@ export default function UserInfo({ isOnlineStatus, onClick }: TUserInfo) {
     <div className="border-l-1 w-[350px] p-5 flex flex-col">
       <header>
         <div className="flex items-center">
-          <span className="flex-1 text-xl font-semibold text-[#56616b]">
+          <span className="flex-1 text-xl font-semibold text-[#56616b] dark:text-dark_text">
             User Info
           </span>
           <ChatHeaderButton
             icon_name="X"
-            className="p-2 min-w-0 bg-gray-200 shadow border-1"
+            className="p-2 min-w-0 bg-gray-200 shadow border-1 dark:bg-dark_bg dark:border-dark_border dark:text-dark_text hover:dark:bg-dark_text"
             width={17}
             height={17}
             tooltip_title="Close"
@@ -68,7 +68,7 @@ export default function UserInfo({ isOnlineStatus, onClick }: TUserInfo) {
           <CircleUserRound width={20} height={20} />
         </div>
 
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3 dark:text-dark_text">
           <div>
             <div>{storedValue!.email}</div>
             <div className="text-sm text-[#56616b]">email</div>

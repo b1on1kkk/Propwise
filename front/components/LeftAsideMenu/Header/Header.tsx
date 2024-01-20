@@ -10,15 +10,17 @@ export default function Header() {
     useGlobalModalStatus();
 
   return (
-    <header className="flex border-b-1 p-3 items-center">
+    <header className="flex border-b-1 p-3 items-center dark:border-dark_border">
       <div className={`${storedLocalStorageValue.status && "flex-1 flex"}`}>
-        <div className="p-2 bg-[#009965] rounded-lg">
+        <div className="p-2 bg-[#009965] rounded-lg dark:bg-dark_text">
           <Gem width={20} height={20} color="white" />
         </div>
       </div>
 
       {!storedLocalStorageValue.status && (
-        <h1 className="ml-3 text-lg font-semibold flex-1">Propwise</h1>
+        <h1 className="ml-3 text-lg font-semibold flex-1 dark:text-dark_text">
+          Propwise
+        </h1>
       )}
       <div>
         <ChatHeaderButton
@@ -27,7 +29,7 @@ export default function Header() {
               ? "ArrowRightCircle"
               : "ArrowLeftCircle"
           }
-          className="px-1.5 py-1 min-w-0 bg-white border-1 rounded-lg shadow"
+          className="px-1.5 py-1 min-w-0 bg-white border-1 rounded-lg shadow dark:bg-dark_bg dark:border-dark_border hover:dark:bg-dark_text hover:dark:border-white"
           width={18}
           height={18}
           tooltip_title={storedLocalStorageValue.status ? "expand" : "hide"}

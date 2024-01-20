@@ -63,7 +63,7 @@ export default function MemberCard({ member }: TMemberCard) {
   }, []);
 
   return (
-    <div className="w-64 h-[400px] border-1 shadow rounded-lg m-3 flex flex-col relative bg-white">
+    <div className="w-64 h-[400px] border-1 shadow rounded-lg m-3 flex flex-col relative bg-white dark:bg-dark_bg dark:border-dark_border">
       <div className="flex-1">
         <div className="h-full bg-gray-400 rounded-t-lg" />
       </div>
@@ -71,37 +71,43 @@ export default function MemberCard({ member }: TMemberCard) {
       <div className="flex-1">
         <div className="pt-16 px-8">
           <div className="text-center text-[#56616b]">
-            <div className="text-xl font-semibold">
+            <div className="text-xl font-semibold dark:text-dark_text">
               {member.name} {member.lastname}
             </div>
-            <div className="font-semibold text-sm">{member.role}</div>
+            <div className="font-semibold text-sm dark:text-dark_text">
+              {member.role}
+            </div>
           </div>
 
-          <div className="mt-5 border-t-2 flex">
-            <div className="flex-1 text-center border-r-1 flex flex-col mt-1">
-              <span className="font-bold">{friendsCounter}</span>
-              <span className="text-sm text-[#56616b]">friends</span>
+          <div className="mt-5 border-t-1 flex dark:border-dark_border">
+            <div className="flex-1 text-center border-r-1 flex flex-col mt-1 dark:border-dark_border">
+              <span className="font-bold dark:text-dark_text">
+                {friendsCounter}
+              </span>
+              <span className="text-sm text-[#56616b] dark:text-dark_text">
+                friends
+              </span>
             </div>
 
             <div className="flex-1 flex items-center justify-center mt-1">
               {member.status === "pending" ? (
                 <StatusButton
                   icon_name="CircleDotDashed"
-                  className="py-2 px-3 border-1 rounded-lg shadow active:translate-y-0.5 cursor-pointer flex items-center justify-center"
+                  className="py-2 px-3 border-1 rounded-lg shadow active:translate-y-0.5 cursor-pointer flex items-center justify-center dark:border-dark_border"
                   onClick={() => {}}
                   picture_size={19}
                 />
               ) : member.status === "accepted" ? (
                 <StatusButton
                   icon_name="Contact2"
-                  className="py-2 px-3 border-1 rounded-lg shadow active:translate-y-0.5 cursor-pointer flex items-center justify-center"
+                  className="py-2 px-3 border-1 rounded-lg shadow active:translate-y-0.5 cursor-pointer flex items-center justify-center dark:border-dark_border"
                   onClick={() => {}}
                   picture_size={19}
                 />
               ) : (
                 <StatusButton
                   icon_name="UserRoundPlus"
-                  className="py-2 px-3 border-1 rounded-lg shadow bg-[#009965] text-white active:translate-y-0.5 cursor-pointer flex items-center justify-center"
+                  className="py-2 px-3 border-1 rounded-lg shadow bg-[#009965] text-white active:translate-y-0.5 cursor-pointer flex items-center justify-center dark:border-dark_border"
                   onClick={CreateFriendship}
                   picture_size={19}
                 />

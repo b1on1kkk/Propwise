@@ -28,7 +28,7 @@ export default function MonthsButton() {
   return (
     <Dropdown placement="bottom-start">
       <DropdownTrigger>
-        <Button className="bg-white border-1 shadow rounded-lg min-w-0 px-3 py-2 text-[#56616b]">
+        <Button className="bg-white border-1 shadow rounded-lg min-w-0 px-3 py-2 text-[#56616b] dark:bg-dark_bg dark:border-dark_border dark:text-dark_text hover:dark:bg-dark_text hover:dark:text-white">
           <Calendar width={17} height={17} />
           <span className="font-semibold">{currentMonth}</span>
         </Button>
@@ -41,7 +41,7 @@ export default function MonthsButton() {
               onClick={() => setCurrentMonth(month)}
               textValue={month}
             >
-              <span className="text-[#56616b] font-semibold text-base">
+              <span className="text-[#56616b] font-semibold text-base dark:text-dark_text">
                 {month}
               </span>
             </DropdownItem>

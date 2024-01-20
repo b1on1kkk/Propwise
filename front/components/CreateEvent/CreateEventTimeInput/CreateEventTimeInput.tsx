@@ -13,13 +13,13 @@ export default function CreateEventTimeInput({
   return (
     <div className="flex-1">
       <CreateEventInputWrapper>
-        <div>
+        <div className="dark:text-dark_text">
           <Clock width={20} height={20} />
         </div>
         <input
           type="time"
           placeholder={text}
-          className="w-full focus:outline-none "
+          className="w-full focus:outline-none dark:bg-inherit dark:text-dark_text placeholder:dark:text-dark_text"
           onChange={onChange}
           value={value}
         />

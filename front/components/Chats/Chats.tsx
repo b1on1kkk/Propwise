@@ -27,11 +27,15 @@ export default function Chats({
   const [Pinned, Messages] = DevideByStatus(chatArray);
 
   return (
-    <Accordion itemClasses={{ title: "text-sm text-[#56616b]" }}>
+    <Accordion
+      itemClasses={{ title: "text-sm text-[#56616b]" }}
+      className="overflow-auto"
+    >
       <AccordionItem
         aria-label={icon_name}
         title={title_text}
         startContent={<Icon icon_name={icon_name} width={15} height={15} />}
+        className="dark:text-dark_text"
       >
         {chatStatus === "pinned" ? (
           <>

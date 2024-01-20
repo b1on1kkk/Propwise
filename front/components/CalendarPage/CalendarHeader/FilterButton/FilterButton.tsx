@@ -35,7 +35,7 @@ export default function FilterButton() {
   return (
     <Dropdown className="w-[230px]" placement="bottom-start">
       <DropdownTrigger>
-        <Button className="bg-white border-1 shadow rounded-lg min-w-0 px-3 py-2 text-[#56616b]">
+        <Button className="bg-white border-1 shadow rounded-lg min-w-0 px-3 py-2 text-[#56616b] dark:bg-dark_bg dark:border-dark_border dark:text-dark_text hover:dark:bg-dark_text hover:dark:text-white">
           <SlidersHorizontalIcon width={17} height={17} />
           <span className="font-semibold">Filter</span>
         </Button>
@@ -49,7 +49,7 @@ export default function FilterButton() {
           return (
             <DropdownItem key={item.text} textValue={item.text}>
               <Checkbox color="primary" isSelected={item.checked_status}>
-                <span className="text-[#56616b] font-semibold">
+                <span className="text-[#56616b] font-semibold dark:text-dark_text">
                   {item.text}
                 </span>
               </Checkbox>

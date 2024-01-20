@@ -46,11 +46,11 @@ export default function ShowMoreEventsRightModal({
       className="items-center justify-end"
     >
       <div
-        className="h-screen w-[400px] bg-white shadow-rme_shadow flex flex-col animate-overlay_motion_anim"
+        className="h-screen w-[400px] bg-white shadow-rme_shadow flex flex-col animate-overlay_motion_anim dark:bg-gray-900"
         ref={useOutsideClick(handleClickOutside)}
       >
-        <header className="px-5 py-3 border-b-2 flex">
-          <span className="font-semibold flex-1 text-lg">
+        <header className="px-5 py-3 border-b-2 flex dark:border-dark_border">
+          <span className="font-semibold flex-1 text-lg dark:text-dark_text">
             Detailed Event Information
           </span>
           <button

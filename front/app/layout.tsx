@@ -13,6 +13,7 @@ import Header from "@/components/Header/Header";
 
 // providers
 import Providers from "./providers";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // context
 import { MyGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
@@ -37,8 +38,6 @@ import type {
   ServerToClientEvents,
   ClientToServerEvents
 } from "../socket_io_typings";
-
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -108,7 +107,7 @@ export default function RootLayout({
       <body
         className={`${
           detailedModalStatus ? "overflow-hidden" : ""
-        } flex max-h-screen max-w-screen`}
+        } flex max-h-screen max-w-screen dark:bg-dark_bg`}
       >
         <QueryClientProvider client={queryClient}>
           <MyGlobalModalStatus.Provider
@@ -130,12 +129,16 @@ export default function RootLayout({
               setMembers
             }}
           >
-            {path !== "/login" && path !== "/registration" && <LeftAsideMenu />}
+            <Providers>
+              {path !== "/login" && path !== "/registration" && (
+                <LeftAsideMenu />
+              )}
 
-            <div className="flex flex-col flex-1">
-              {path !== "/login" && path !== "/registration" && <Header />}
-              <Providers>{children}</Providers>
-            </div>
+              <div className="flex flex-col flex-1">
+                {path !== "/login" && path !== "/registration" && <Header />}
+                {children}
+              </div>
+            </Providers>
           </MyGlobalModalStatus.Provider>
         </QueryClientProvider>
       </body>

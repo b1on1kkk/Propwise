@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 
 // components
-import { Search, Bell } from "lucide-react";
 import Notifications from "./Notifications/Notifications";
 import HeaderController from "./HeaderController/HeaderController";
+import ThemeSwitcher from "./ThemeSwitcher/ThemeSwitcher";
+import HeaderSearch from "./HeaderSearch/HeaderSearch";
 
 // context
 import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
@@ -13,6 +14,7 @@ import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
 // utils
 import { NotificationsSerializer } from "@/utils/NotificationsSerializer";
 import { CheckingIfNotReadNotifExist } from "@/utils/CheckingIfNotReadNotifExist";
+import { CheckNotifications } from "@/utils/CheckNotifications";
 
 // API
 import { GetNotifications } from "@/API/GetNotifications";
@@ -26,9 +28,6 @@ export default function Header() {
 
   const [notifications, setNotifications] = useState<TNotifications[]>([]);
   const [friends, setFriends] = useState<TFriends[]>([]);
-
-  const [notificationsModalStatus, setNotificationsModalStatus] =
-    useState<boolean>(false);
 
   const NotReadedStatus = CheckingIfNotReadNotifExist(notifications);
 
@@ -61,7 +60,7 @@ export default function Header() {
 
   // get friends in header just for checking if friends exist and hide button in notification
   useEffect(() => {
-    if (user.length > 0 && notificationsModalStatus) {
+    if (user.length > 0) {
       GetFriends(user[0].id).then((friends) => {
         setFriends(friends);
       });
@@ -69,58 +68,33 @@ export default function Header() {
   }, [notifications, user, members]);
 
   return (
-    <header className="p-3 py-[9px] border-b-1 flex items-center border-l-1">
+    <header className="p-3 py-[9px] border-b-1 flex items-center border-l-1 dark:border-dark_border">
       <div className="flex flex-1">
         <HeaderController />
       </div>
+
+      <ThemeSwitcher />
+
       <div className="flex gap-2">
-        <div className="flex items-center bg-gray-100 border-1 px-3 rounded-lg gap-2">
-          <Search width={18} height={18} className="opacity-70" />
-          <form>
-            <input
-              type="text"
-              placeholder="Search"
-              className="focus:outline-none bg-inherit w-60 placeholder:font-semibold"
-            />
-          </form>
-        </div>
-        <div className="relative">
-          <button
-            className="flex items-center justify-center p-3 border-1 rounded-lg cursor-pointer hover:bg-gray-200 transition-all duration-200 ease-in"
-            onClick={() => {
-              setNotificationsModalStatus(!notificationsModalStatus);
+        <HeaderSearch value="" onChange={() => {}} />
 
-              if (NotReadedStatus) {
-                socket!.emit("updateNotificationStatus", {
-                  user_id: user[0].id,
-                  socket_id: socket!.id!
-                });
-
-                socket!.on("updatedNotifications", (data) => {
-                  setNotifications(NotificationsSerializer(data.notifications));
-                });
-              }
-            }}
-          >
-            <Bell width={16} height={16} fill="black" />
-          </button>
-
-          {NotReadedStatus && (
-            <span className="flex absolute h-3 w-3 top-0 right-0 -mt-1 -mr-1">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#009965] opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-[#009965]"></span>
-            </span>
-          )}
-
-          {notificationsModalStatus && (
-            <Notifications
-              notificationsModalStatus={notificationsModalStatus}
-              setNotificationsModalStatus={setNotificationsModalStatus}
-              notifications={notifications}
-              setNotifications={setNotifications}
-              friends={friends}
-            />
-          )}
+        <div>
+          <Notifications
+            friends={friends}
+            notifications={notifications}
+            NotReadedStatus={NotReadedStatus}
+            setNotifications={setNotifications}
+            onClick={() =>
+              CheckNotifications(
+                NotReadedStatus,
+                socket,
+                user[0].id,
+                (notifications) => {
+                  setNotifications(NotificationsSerializer(notifications));
+                }
+              )
+            }
+          />
         </div>
       </div>
     </header>

@@ -126,7 +126,7 @@ export default function Chat() {
 
         <main
           ref={ref}
-          className="flex flex-col bg-gray-50 overflow-auto flex-1 py-3 px-6 gap-3"
+          className="flex flex-col bg-gray-50 overflow-auto flex-1 py-3 px-6 gap-3 dark:bg-slate-800"
         >
           {(isLoading || isError) && (
             <>
@@ -141,9 +141,19 @@ export default function Chat() {
             </>
           )}
 
+          {messages.length === 0 && !isLoading && !isError && (
+            <div className="h-full flex items-center justify-center">
+              <EmptyChatWarning
+                sendFirstMessageGreeting={() =>
+                  SendPrivateMessage(socket, "HEY!", user, storedValue)
+                }
+              />
+            </div>
+          )}
+
           {user.length > 0 && (
             <>
-              {messages.length > 0 && !isLoading && !isError ? (
+              {messages.length > 0 && !isLoading && !isError && (
                 <>
                   {messages.map((message, idx) => {
                     if (message.sender_id === user[0].id) {
@@ -154,14 +164,6 @@ export default function Chat() {
                     return <FriendMessageCard key={idx} message={message} />;
                   })}
                 </>
-              ) : (
-                <div className="h-full flex items-center justify-center">
-                  <EmptyChatWarning
-                    sendFirstMessageGreeting={() =>
-                      SendPrivateMessage(socket, "HEY!", user, storedValue)
-                    }
-                  />
-                </div>
               )}
             </>
           )}

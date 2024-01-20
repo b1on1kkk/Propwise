@@ -47,6 +47,11 @@ const config: Config = {
       },
       translate: {
         center_card_avatar: "translate(-50%, -50%);"
+      },
+      colors: {
+        dark_bg: "#092635",
+        dark_text: "#9EC8B9",
+        dark_border: "#56616b"
       }
     }
   },
@@ -61,7 +66,13 @@ const config: Config = {
             }
           }
         },
-        dark: {}
+        dark: {
+          colors: {
+            primary: {
+              DEFAULT: "#9EC8B9"
+            }
+          }
+        }
       }
     })
   ]

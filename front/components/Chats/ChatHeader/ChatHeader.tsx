@@ -17,7 +17,7 @@ export default function ChatHeader({
   const { storedValue } = useInboxContext();
 
   return (
-    <header className="p-5 border-b-1">
+    <header className="p-5 border-b-1 dark:border-dark_border">
       <div className="flex items-center">
         <HeaderUserInf
           name={storedValue!.name}
@@ -30,7 +30,7 @@ export default function ChatHeader({
         <div className="flex gap-2">
           <div>
             <ChatHeaderButton
-              className="p-2 min-w-0 bg-gray-200 shadow border-1"
+              className="p-2 min-w-0 bg-gray-200 shadow border-1 dark:bg-dark_bg dark:border-dark_border dark:text-dark_text hover:dark:bg-dark_text"
               icon_name="Search"
               width={17}
               height={17}
@@ -41,7 +41,7 @@ export default function ChatHeader({
           </div>
           <div>
             <ChatHeaderButton
-              className="p-2 min-w-0 bg-gray-200 shadow border-1"
+              className="p-2 min-w-0 bg-gray-200 shadow border-1 dark:bg-dark_bg dark:border-dark_border dark:text-dark_text hover:dark:bg-dark_text"
               icon_name="PanelRight"
               width={17}
               height={17}

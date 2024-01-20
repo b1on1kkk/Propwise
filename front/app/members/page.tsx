@@ -4,7 +4,6 @@ import { useEffect } from "react";
 
 // components
 import MemberCard from "@/components/MemberCard/MemberCard";
-import Loading from "@/components/Loading/Loading";
 
 // API
 import { GetAllMembers } from "@/API/GetAllMembers";
@@ -21,7 +20,7 @@ export default function page() {
   }, [user]);
 
   return (
-    <main className="flex-1 border-l-1 overflow-auto">
+    <main className="flex-1 border-l-1 overflow-auto dark:border-dark_border">
       {members ? (
         <>
           <div className="grid grid-cols-6">
@@ -31,7 +30,7 @@ export default function page() {
           </div>
         </>
       ) : (
-        <Loading />
+        <></>
       )}
     </main>
   );
