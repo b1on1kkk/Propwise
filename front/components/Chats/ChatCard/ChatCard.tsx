@@ -8,6 +8,8 @@ import { CheckUserOnline } from "@/utils/CheckUserOnline";
 // interfaces
 import type { TChatCard } from "@/interfaces/interfaces";
 
+import { isJsonString } from "@/utils/isJsonString";
+
 export default function ChatCard({
   chat,
   chatStatus,
@@ -45,7 +47,9 @@ export default function ChatCard({
                 </span>
               ) : (
                 <span className="text-[#56616b] text-sm mt-0.5 w-[150px] text-ellipsis whitespace-nowrap overflow-hidden">
-                  {chat.value}
+                  {isJsonString(chat.value)
+                    ? `${JSON.parse(chat.value).event_name} - shared evet`
+                    : chat.value}
                 </span>
               )}
             </div>

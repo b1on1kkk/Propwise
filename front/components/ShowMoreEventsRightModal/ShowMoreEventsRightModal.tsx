@@ -6,19 +6,21 @@ import { useEffect, useState } from "react";
 import { X, Calendar } from "lucide-react";
 import EventCard from "./EventCard/EventCard";
 import ModalWrapper from "../ModalWrapper/ModalWrapper";
-
-// interfaces
-import type { Events, TShowMoreEventsModal } from "@/interfaces/interfaces";
-
-// context
-import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
+import SharingEventModal from "../SharingEventModal/SharingEventModal";
 
 // hooks
 import { useOutsideClick } from "@/hooks/useOutsideClick ";
 
+// context
+import { useGlobalModalStatus } from "@/context/CreateNewTaskModalContext";
+
 // utils
 import { FindChosenDayEvents } from "@/utils/FindChosenDayEvents";
 import { useGlobalCalendatContext } from "@/context/CalendarContext";
+import { useDisclosure } from "@nextui-org/react";
+
+// interfaces
+import type { Events, TShowMoreEventsModal } from "@/interfaces/interfaces";
 
 export default function ShowMoreEventsRightModal({
   day
@@ -35,10 +37,14 @@ export default function ShowMoreEventsRightModal({
   };
 
   useEffect(() => {
-    if (day && events) {
-      setDayEvents(FindChosenDayEvents(events, day));
-    }
+    if (day && events) setDayEvents(FindChosenDayEvents(events, day));
   }, [day]);
+
+  // open/close modal
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  // save chosen event to share it
+  const [chosenEvent, setChosenEvent] = useState<Events | null>(null);
 
   return (
     <ModalWrapper
@@ -46,7 +52,7 @@ export default function ShowMoreEventsRightModal({
       className="items-center justify-end"
     >
       <div
-        className="h-screen w-[400px] bg-white shadow-rme_shadow flex flex-col animate-overlay_motion_anim dark:bg-gray-900"
+        className="h-screen w-[400px] bg-white shadow-rme_shadow flex flex-col animate-overlay_motion_anim dark:bg-slate-900"
         ref={useOutsideClick(handleClickOutside)}
       >
         <header className="px-5 py-3 border-b-2 flex dark:border-dark_border">
@@ -77,6 +83,11 @@ export default function ShowMoreEventsRightModal({
                     time_to={event.time_to}
                     description={event.description}
                     link={event.link}
+                    onShareClick={() => {
+                      setDetailedModalStatus(!detailedModalStatus);
+                      onOpen();
+                      setChosenEvent(event);
+                    }}
                   />
                 );
               })}
@@ -91,6 +102,16 @@ export default function ShowMoreEventsRightModal({
           )}
         </main>
       </div>
+
+      {/* sharing modal */}
+      <SharingEventModal
+        isOpen={isOpen}
+        onClose={onClose}
+        chosenEvent={chosenEvent}
+        detailedModalStatus={detailedModalStatus}
+        setDetailedModalStatus={setDetailedModalStatus}
+      />
+      {/*  */}
     </ModalWrapper>
   );
 }

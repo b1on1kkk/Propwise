@@ -12,6 +12,8 @@ import ChatHeader from "@/components/Chats/ChatHeader/ChatHeader";
 import EmptyChatWarning from "@/components/Chats/EmptyChatWarning/EmptyChatWarning";
 import LogMessagesSkeleton from "@/components/Chats/LogMessagesSkeleton/LogMessagesSkeleton";
 import FriendMessageSkeleton from "@/components/Chats/FriendMessageSkeleton/FriendMessageSkeleton";
+import LoggedInUserSharedMessageEventCard from "@/components/Chats/LoggedInUserSharedMessageEventCard/LoggedInUserSharedMessageEventCard";
+import FriendSharedMessageEventCard from "@/components/Chats/FriendSharedMessageEventCard/FriendSharedMessageEventCard";
 
 // context
 import { useInboxContext } from "@/context/InboxContext";
@@ -24,6 +26,9 @@ import { useScrollToBottom } from "@/hooks/useScrollToBottom";
 import { CheckUserOnline } from "@/utils/CheckUserOnline";
 import { DetectUserReadMessage } from "@/utils/DetectUserReadMessage";
 import { SendPrivateMessage } from "@/utils/SendPrivateMessage";
+import { isJsonString } from "@/utils/isJsonString";
+import { ExtendMessagesAddingType } from "@/utils/ExtendMessagesAddingType";
+import { InsertSharedEvent } from "@/utils/InsertSharedEvent";
 
 // API
 import { GetMessages } from "@/API/GetMessages";
@@ -51,7 +56,7 @@ export default function Chat() {
   const { isLoading, isError } = GetMessages(
     storedValue!.chat_id,
     (messages) => {
-      setMessages(messages);
+      setMessages(ExtendMessagesAddingType(messages));
     }
   );
 
@@ -90,7 +95,8 @@ export default function Chat() {
           sender_id: data.sender_id,
           value: data.value,
           timestamp: data.timestamp,
-          status: data.status
+          status: data.status,
+          type: isJsonString(data.value) ? "shared_event" : "message"
         }
       ]);
     });
@@ -157,10 +163,32 @@ export default function Chat() {
                 <>
                   {messages.map((message, idx) => {
                     if (message.sender_id === user[0].id) {
+                      if (message.type === "shared_event") {
+                        return (
+                          <LoggedInUserSharedMessageEventCard
+                            key={idx}
+                            message={message}
+                          />
+                        );
+                      }
+
                       return (
                         <LoggedInUserMessageCard key={idx} message={message} />
                       );
                     }
+
+                    if (message.type === "shared_event") {
+                      return (
+                        <FriendSharedMessageEventCard
+                          key={idx}
+                          message={message}
+                          onAddFriendsEvent={(event) =>
+                            InsertSharedEvent(event, user[0].id)
+                          }
+                        />
+                      );
+                    }
+
                     return <FriendMessageCard key={idx} message={message} />;
                   })}
                 </>

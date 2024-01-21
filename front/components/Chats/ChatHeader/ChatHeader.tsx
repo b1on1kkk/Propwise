@@ -41,7 +41,7 @@ export default function ChatHeader({
           </div>
           <div>
             <ChatHeaderButton
-              className="p-2 min-w-0 bg-gray-200 shadow border-1 dark:bg-dark_bg dark:border-dark_border dark:text-dark_text hover:dark:bg-dark_text"
+              className="p-2 min-w-0 bg-gray-200 shadow border-1 dark:bg-dark_bg dark:border-dark_border dark:text-dark_text hover:dark:bg-dark_text border-none"
               icon_name="PanelRight"
               width={17}
               height={17}

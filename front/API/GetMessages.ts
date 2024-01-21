@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import type { Messages } from "@/interfaces/interfaces";
+import type { MessagesFromDatabase } from "@/interfaces/interfaces";
 import { useQuery } from "@tanstack/react-query";
 
 interface TMessagesQueryKey {
@@ -16,7 +16,7 @@ interface TMessagesQueryKey {
 
 export function GetMessages(
   chat_id: number,
-  cb: (messages: Messages[]) => void
+  cb: (messages: MessagesFromDatabase[]) => void
 ) {
   return useQuery({
     queryKey: [{ key: "messages", params: { chat_id: chat_id } }],

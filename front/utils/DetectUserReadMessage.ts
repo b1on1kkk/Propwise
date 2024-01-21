@@ -5,6 +5,10 @@ import type {
   ServerToClientEvents
 } from "@/socket_io_typings";
 
+// utils
+import { isJsonString } from "./isJsonString";
+import { ExtendMessagesAddingType } from "./ExtendMessagesAddingType";
+
 // interfaces
 import type { Messages, TChat } from "@/interfaces/interfaces";
 
@@ -44,6 +48,6 @@ export function DetectUserReadMessage(
 
   // get answer and rewrite messanges
   socket.on("getUpdatedMessages", (data) => {
-    cb(data.messages);
+    cb(ExtendMessagesAddingType(data.messages));
   });
 }

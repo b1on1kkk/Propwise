@@ -115,6 +115,7 @@ export interface TEventCard {
   time_to: string;
   description: string;
   link: string;
+  onShareClick: () => void;
 }
 
 export interface TShowMoreEventsModal {
@@ -250,7 +251,7 @@ export interface TChatHeader {
   moreAboutUserOnClick: () => void;
 }
 
-export interface Messages {
+export interface MessagesFromDatabase {
   message_id: number;
   name: string;
   lastname: string;
@@ -258,6 +259,10 @@ export interface Messages {
   value: string;
   timestamp: string;
   status: number;
+}
+
+export interface Messages extends MessagesFromDatabase {
+  type: "message" | "shared_event";
 }
 
 export interface TUserInfo {
@@ -269,6 +274,10 @@ export interface TMessageCard {
   message: Messages;
 }
 
+export interface FriendSharedMessageEventCard extends TMessageCard {
+  onAddFriendsEvent: (event: Events) => void;
+}
+
 export interface TChatCard {
   chat: TChat;
   chatStatus: "pinned" | "all";
@@ -276,4 +285,12 @@ export interface TChatCard {
     e: React.MouseEvent<HTMLDivElement>,
     chat: TChat
   ) => void;
+}
+
+export interface TSharingEventModal {
+  isOpen: boolean;
+  chosenEvent: Events | null;
+  detailedModalStatus: boolean;
+  setDetailedModalStatus: (c: boolean) => void;
+  onClose: () => void;
 }

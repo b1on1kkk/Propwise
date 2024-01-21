@@ -2,7 +2,7 @@ import type {
   TNotificationsFromDatabase,
   TFriendsWithoutChat,
   TChat,
-  Messages
+  MessagesFromDatabase
 } from "./interfaces/interfaces";
 
 import type {
@@ -38,7 +38,7 @@ export interface ServerToClientEvents {
 
   updateChats: (data: { chats: TChat[] }) => void;
 
-  getUpdatedMessages: (data: { messages: Messages[] }) => void;
+  getUpdatedMessages: (data: { messages: MessagesFromDatabase[] }) => void;
 
   getUpdatedDataAfterSendingMessage: (
     data: TGetUpdatedDataAfterSendingMessage

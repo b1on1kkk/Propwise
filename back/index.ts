@@ -111,7 +111,6 @@ io.on("connection", (socket: Socket<ClientToServerEvents>) => {
             timestamp: data.timestamp
           });
 
-          // send updated members to client side if socket_id was found
           MAIN_DATA_GETTER(
             data.user_id.toString(),
             GETTER_TYPE.GetUsers,
@@ -571,15 +570,16 @@ app.get("/logged_user", (req: Request, res: Response) => {
 app.get("/events", (req: Request, res: Response) => {
   const { user_id, month } = req.query;
 
-  db.query(
-    "SELECT * FROM events WHERE user_id = ? AND month = ?",
-    [user_id, month],
-    (error: Error, result: any) => {
-      if (error) return res.status(500).send(error);
+  const query =
+    month === "all"
+      ? "SELECT * FROM events WHERE user_id = ? ORDER BY event_id ASC"
+      : "SELECT * FROM events WHERE user_id = ? AND month = ?";
 
-      return res.status(200).json(result);
-    }
-  );
+  db.query(query, [user_id, month], (error: Error, result: any) => {
+    if (error) return res.status(500).send(error);
+
+    return res.status(200).json(result);
+  });
 });
 
 // get all users except logged in user, also get friendship status: accepted, pending, declined

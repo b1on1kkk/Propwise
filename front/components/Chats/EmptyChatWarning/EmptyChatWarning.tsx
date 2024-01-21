@@ -4,7 +4,7 @@ export default function EmptyChatWarning({
   sendFirstMessageGreeting: () => void;
 }) {
   return (
-    <div className="h-[200px] w-[260px] rounded-lg bg-gray-400 px-4 py-4 flex flex-col shadow justify-center gap-5">
+    <div className="h-[200px] w-[260px] rounded-lg bg-gray-400 px-4 py-4 flex flex-col shadow justify-center gap-5 dark:bg-slate-700 text-[#56616b]">
       <div>
         <div className="text-white font-semibold text-center">
           No messages here yet...
@@ -16,7 +16,7 @@ export default function EmptyChatWarning({
       <div className="flex items-center justify-center">
         <div>
           <button
-            className="px-11 py-4 bg-white rounded-lg shadow font-semibold active:translate-y-0.5 text-[#56616b]"
+            className="px-11 py-4 bg-white rounded-lg shadow font-semibold active:translate-y-0.5"
             onClick={sendFirstMessageGreeting}
           >
             HEY!
