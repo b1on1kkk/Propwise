@@ -75,14 +75,7 @@ export default function ShowMoreEventsRightModal({
                 return (
                   <EventCard
                     key={idx}
-                    name={event.event_name}
-                    week_day={event.week_day}
-                    month={event.month}
-                    day={event.day}
-                    time_from={event.time_from}
-                    time_to={event.time_to}
-                    description={event.description}
-                    link={event.link}
+                    event={event}
                     onShareClick={() => {
                       setDetailedModalStatus(!detailedModalStatus);
                       onOpen();

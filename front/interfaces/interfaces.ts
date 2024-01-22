@@ -109,14 +109,7 @@ export interface TCalendarSettings {
 }
 
 export interface TEventCard {
-  name: string;
-  week_day: string;
-  month: string;
-  day: string;
-  time_from: string;
-  time_to: string;
-  description: string;
-  link: string;
+  event: Events;
   onShareClick: () => void;
 }
 
@@ -141,12 +134,6 @@ export interface AddingEventState {
   shortDescription: string;
   link: string;
   status: string;
-}
-
-export interface TSmallEventCard {
-  link: string;
-  name: string;
-  description: string;
 }
 
 export interface ExtendedLocalStorageType extends TCalendarSettings {
@@ -302,7 +289,6 @@ export interface TCheckBoxes {
   id: number;
   text: string;
   checked_status: boolean;
-  status_border_color: string;
   status_checkbox_color: "danger" | "secondary" | "success" | "default";
-  query: string;
+  query: "imp" | "impbnurg" | "nimpburg" | "nimp";
 }

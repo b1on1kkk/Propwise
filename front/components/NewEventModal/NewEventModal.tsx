@@ -63,6 +63,7 @@ export default function NewEventModal({
 
       onClose();
       dispatch({ type: AddingNewEventTypes.CLEAR, payload: "" });
+      setStatusCheckboxes(FILTER_CHECKBOXES);
     }
   }
 

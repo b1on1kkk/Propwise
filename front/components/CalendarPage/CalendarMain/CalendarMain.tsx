@@ -130,14 +130,7 @@ export default function CalendarMain() {
                     ) {
                       if (counter < 1) {
                         counter++;
-                        return (
-                          <SmallEventCard
-                            key={idx}
-                            link={event.link}
-                            name={event.event_name}
-                            description={event.description}
-                          />
-                        );
+                        return <SmallEventCard key={idx} event={event} />;
                       }
                       counter++;
                     }
