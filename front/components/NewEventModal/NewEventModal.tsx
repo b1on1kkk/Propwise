@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer } from "react";
+import { useReducer, useState } from "react";
 
 // components
 import {
@@ -10,7 +10,8 @@ import {
   ModalBody,
   ModalFooter,
   Button,
-  Tooltip
+  Tooltip,
+  Checkbox
 } from "@nextui-org/react";
 import CreateEventInputWrapper from "../CreateEvent/CreateEventInputWrapper/CreateEventInputWrapper";
 import { ArrowRight, Calendar } from "lucide-react";
@@ -32,6 +33,11 @@ import {
   NewEventInitialState
 } from "./NewEventReducer/NewEventReducer";
 import { CheckForEmptyFields } from "@/utils/CheckForEmptyFields";
+
+// constants
+import { FILTER_CHECKBOXES } from "@/constants/FilterCheckboxes";
+
+import type { TCheckBoxes } from "@/interfaces/interfaces";
 
 export default function NewEventModal({
   isOpen,
@@ -58,6 +64,20 @@ export default function NewEventModal({
       onClose();
       dispatch({ type: AddingNewEventTypes.CLEAR, payload: "" });
     }
+  }
+
+  const [statusCheckboxes, setStatusCheckboxes] =
+    useState<TCheckBoxes[]>(FILTER_CHECKBOXES);
+
+  function SelectStatusCheckBox(checkbox: TCheckBoxes) {
+    setStatusCheckboxes([
+      ...statusCheckboxes.map((cb) => {
+        if (cb.id === checkbox.id) {
+          return { ...cb, checked_status: true };
+        }
+        return { ...cb, checked_status: false };
+      })
+    ]);
   }
 
   return (
@@ -134,6 +154,27 @@ export default function NewEventModal({
                 }
                 value={state.link}
               />
+
+              <div className="grid grid-cols-2 grid-rows-2 gap-2 py-2 px-3 border-1 dark:border-dark_border rounded-lg shadow">
+                {statusCheckboxes.map((cb, idx) => {
+                  return (
+                    <Checkbox
+                      key={idx}
+                      color={cb.status_checkbox_color}
+                      isSelected={cb.checked_status}
+                      onValueChange={() => {
+                        SelectStatusCheckBox(cb);
+                        dispatch({
+                          type: AddingNewEventTypes.STATUS,
+                          payload: cb.query
+                        });
+                      }}
+                    >
+                      <span className="dark:text-dark_text">{cb.text}</span>
+                    </Checkbox>
+                  );
+                })}
+              </div>
 
               <div className="mt-3">
                 <CreateEventInputWrapper>

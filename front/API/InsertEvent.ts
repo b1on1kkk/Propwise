@@ -27,7 +27,8 @@ export async function InsertEvent(
       month: chosenDay!.month,
       time_from: state.timeFrom,
       time_to: state.timeTo,
-      link: state.link
+      link: state.link,
+      status: state.status
     });
   } catch (error) {
     console.log(error);

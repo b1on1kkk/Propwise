@@ -18,6 +18,7 @@ export interface TCalendarContent {
   currentMonth: string;
   setCurrentMonth: (c: string) => void;
   setExtendedDays: (c: NewDays[]) => void;
+  setFilterQuery: (c: string) => void;
 }
 
 export const CalendarContext = createContext<TCalendarContent>({
@@ -32,7 +33,8 @@ export const CalendarContext = createContext<TCalendarContent>({
   extendedDays: [],
   currentMonth: "",
   setCurrentMonth: () => {},
-  setExtendedDays: () => {}
+  setExtendedDays: () => {},
+  setFilterQuery: () => {}
 });
 
 export const useGlobalCalendatContext = () => useContext(CalendarContext);

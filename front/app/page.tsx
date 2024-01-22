@@ -25,7 +25,7 @@ import { CreateExtendDays } from "@/utils/CreateExtendDays";
 import { GetEvents } from "@/API/GetEvents";
 
 // interfaces
-import type { NewDays } from "@/interfaces/interfaces";
+import type { Events, NewDays } from "@/interfaces/interfaces";
 import ShowMoreEventsRightModal from "@/components/ShowMoreEventsRightModal/ShowMoreEventsRightModal";
 
 function ShowTypeOfCalendar(type: string): React.ReactNode {
@@ -38,6 +38,8 @@ function ShowTypeOfCalendar(type: string): React.ReactNode {
       return <></>;
   }
 }
+
+import { FilterEvents } from "@/utils/FilterEvents";
 
 export default function Home() {
   // create calendar layout
@@ -58,24 +60,44 @@ export default function Home() {
   const { user, storedLocalStorageValue, chosenToSeeDetailedInfDay } =
     useGlobalModalStatus();
 
+  // fetch events and store another some useful props
   const { data, refetch, isLoading, isError } = GetEvents(user, currentMonth);
+
+  // create storage for events to filter it on client-side
+  const [events, setEvents] = useState<Events[]>([]);
+
+  // set as default value search query string
+  const [filterQuery, setFilterQuery] = useState<string>(
+    window.location.search
+  );
 
   useEffect(() => {
     setExtendedDays(CreateExtendDays(days));
     refetch();
   }, [currentMonth, user]);
 
+  useEffect(() => {
+    if (data) setEvents(data);
+  }, [data]);
+
+  // filter only when filterquery changes or data (fetching events) changes
+  useEffect(() => {
+    FilterEvents(filterQuery, data, setEvents);
+  }, [filterQuery, data]);
+
   return (
     <CalendarContext.Provider
       value={{
-        events: data,
+        events,
         isLoading,
         isError,
         refetch,
         extendedDays,
         currentMonth,
+        // setters
         setCurrentMonth,
-        setExtendedDays
+        setExtendedDays,
+        setFilterQuery
       }}
     >
       <CalendarHeader firstDayCurrentMonth={firstDayCurrentMonth} />

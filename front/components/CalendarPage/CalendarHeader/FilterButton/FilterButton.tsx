@@ -1,3 +1,8 @@
+"use client";
+
+import { useState } from "react";
+
+// components
 import {
   Button,
   Checkbox,
@@ -8,29 +13,23 @@ import {
 } from "@nextui-org/react";
 import { SlidersHorizontalIcon } from "lucide-react";
 
+// utils
+import { SelectCheckbox } from "@/utils/SelectCheckboxFilterQuery";
+
+// context
+import { useGlobalCalendatContext } from "@/context/CalendarContext";
+
+// constants
+import { FILTER_CHECKBOXES } from "@/constants/FilterCheckboxes";
+
+// interfaces
+import type { TCheckBoxes } from "@/interfaces/interfaces";
+
 export default function FilterButton() {
-  const test = [
-    {
-      text: "Property",
-      checked_status: false
-    },
-    {
-      text: "Tenant",
-      checked_status: false
-    },
-    {
-      text: "Event type",
-      checked_status: false
-    },
-    {
-      text: "Time range",
-      checked_status: false
-    },
-    {
-      text: "Custom tags",
-      checked_status: false
-    }
-  ];
+  const [checkBoxesData, setCheckBoxesData] =
+    useState<TCheckBoxes[]>(FILTER_CHECKBOXES);
+
+  const { setFilterQuery } = useGlobalCalendatContext();
 
   return (
     <Dropdown className="w-[230px]" placement="bottom-start">
@@ -45,10 +44,27 @@ export default function FilterButton() {
         variant="flat"
         aria-label="events-filter"
       >
-        {test.map((item) => {
+        {checkBoxesData.map((item) => {
           return (
-            <DropdownItem key={item.text} textValue={item.text}>
-              <Checkbox color="primary" isSelected={item.checked_status}>
+            <DropdownItem
+              key={item.text}
+              textValue={item.text}
+              className={`border-2 border-transparent ${
+                item.checked_status && item.status_border_color
+              }`}
+            >
+              <Checkbox
+                color={item.status_checkbox_color}
+                isSelected={item.checked_status}
+                onValueChange={() =>
+                  SelectCheckbox(
+                    item,
+                    checkBoxesData,
+                    (cb_data) => setCheckBoxesData(cb_data),
+                    (query) => setFilterQuery(query)
+                  )
+                }
+              >
                 <span className="text-[#56616b] font-semibold dark:text-dark_text">
                   {item.text}
                 </span>

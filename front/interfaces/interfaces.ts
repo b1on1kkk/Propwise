@@ -11,6 +11,7 @@ export interface Events {
   time_to: string;
   description: string;
   link: string;
+  status: "imp" | "impbnurg" | "nimpburg" | "nimp";
 }
 
 export interface NewDays {
@@ -28,6 +29,7 @@ export interface TNewEventInitialState {
   timeTo: string;
   shortDescription: string;
   link: string;
+  status: string;
 }
 
 export interface User {
@@ -138,6 +140,7 @@ export interface AddingEventState {
   timeTo: string;
   shortDescription: string;
   link: string;
+  status: string;
 }
 
 export interface TSmallEventCard {
@@ -293,4 +296,13 @@ export interface TSharingEventModal {
   detailedModalStatus: boolean;
   setDetailedModalStatus: (c: boolean) => void;
   onClose: () => void;
+}
+
+export interface TCheckBoxes {
+  id: number;
+  text: string;
+  checked_status: boolean;
+  status_border_color: string;
+  status_checkbox_color: "danger" | "secondary" | "success" | "default";
+  query: string;
 }

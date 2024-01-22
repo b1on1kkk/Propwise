@@ -9,7 +9,8 @@ export const NewEventInitialState: TNewEventInitialState = {
   timeFrom: "",
   timeTo: "",
   shortDescription: "",
-  link: ""
+  link: "",
+  status: ""
 };
 
 export enum AddingNewEventTypes {
@@ -18,7 +19,8 @@ export enum AddingNewEventTypes {
   TIME_TO = "TIME_TO",
   SHORT_DESCRIPTION = "SHORT_DESCRIPTION",
   LINK = "LINK",
-  CLEAR = "CLEAR"
+  CLEAR = "CLEAR",
+  STATUS = "STATUS"
 }
 
 export function AddingEventReducer(
@@ -51,6 +53,11 @@ export function AddingEventReducer(
       return {
         ...state,
         link: payload
+      };
+    case AddingNewEventTypes.STATUS:
+      return {
+        ...state,
+        status: payload
       };
     case AddingNewEventTypes.CLEAR:
       return { ...NewEventInitialState };
