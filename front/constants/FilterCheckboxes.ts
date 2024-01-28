@@ -1,12 +1,5 @@
 import type { TCheckBoxes } from "@/interfaces/interfaces";
 
-export const STATUS_BORDER_COLOR = {
-  imp: "border-danger-300",
-  impbnurg: "border-secondary-500",
-  nimpburg: "border-success-500",
-  nimp: "border-default-200"
-};
-
 export const FILTER_CHECKBOXES: TCheckBoxes[] = [
   {
     id: 0,

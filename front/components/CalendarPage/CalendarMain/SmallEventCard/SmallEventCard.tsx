@@ -12,9 +12,7 @@ import type { Events } from "@/interfaces/interfaces";
 export default function SmallEventCard({ event }: { event: Events }) {
   return (
     <div
-      className={`flex flex-col border-2 shadow p-2 rounded-lg gap-1 ${
-        STATUS_BORDER_COLOR[event.status]
-      }`}
+      className={`flex flex-col border-2 shadow p-2 rounded-lg gap-1 border-green-500 dark:border-dark_text`}
     >
       <div className="flex gap-3 items-center">
         <div>

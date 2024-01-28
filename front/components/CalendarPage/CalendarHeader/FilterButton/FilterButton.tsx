@@ -20,10 +20,7 @@ import { SelectCheckbox } from "@/utils/SelectCheckboxFilterQuery";
 import { useGlobalCalendatContext } from "@/context/CalendarContext";
 
 // constants
-import {
-  FILTER_CHECKBOXES,
-  STATUS_BORDER_COLOR
-} from "@/constants/FilterCheckboxes";
+import { FILTER_CHECKBOXES } from "@/constants/FilterCheckboxes";
 
 // interfaces
 import type { TCheckBoxes } from "@/interfaces/interfaces";
@@ -52,9 +49,7 @@ export default function FilterButton() {
             <DropdownItem
               key={item.text}
               textValue={item.text}
-              className={`border-2 border-transparent ${
-                item.checked_status && STATUS_BORDER_COLOR[item.query]
-              }`}
+              className={`border-2 border-transparent`}
             >
               <Checkbox
                 color={item.status_checkbox_color}

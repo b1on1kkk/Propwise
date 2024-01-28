@@ -4,18 +4,13 @@ import BlockInf from "./BlockInf/BlockInf";
 import { ExternalLink } from "lucide-react";
 import { Button, Tooltip } from "@nextui-org/react";
 
-// constants
-import { STATUS_BORDER_COLOR } from "@/constants/FilterCheckboxes";
-
 // interfaces
 import type { TEventCard } from "@/interfaces/interfaces";
 
 export default function EventCard({ event, onShareClick }: TEventCard) {
   return (
     <div
-      className={`border-2 rounded-lg shadow flex p-3 text-[#56616b] flex-col gap-1 ${
-        STATUS_BORDER_COLOR[event.status]
-      }`}
+      className={`border-2 rounded-lg shadow flex p-3 text-[#56616b] flex-col gap-1 border-green-500 dark:border-dark_text`}
     >
       <div className="text-xl font-semibold text-center flex items-center mb-3">
         <div>
