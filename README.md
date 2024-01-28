@@ -1,5 +1,3 @@
-# Coming soon...
-
 ## Two ways of working
 
 Light:
