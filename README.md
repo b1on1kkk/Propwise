@@ -27,7 +27,7 @@ Interactive events tags:
 
 ![image](https://github.com/b1on1kkk/Propwise/assets/114521829/5ead498c-85ec-4c97-93a7-834a84fc4b37)
 
-Shave events with your frinds:
+Shave events with your friends:
 
 ![image](https://github.com/b1on1kkk/Propwise/assets/114521829/63647964-3d30-4d0f-836d-09683423508f)
 ![image](https://github.com/b1on1kkk/Propwise/assets/114521829/4197ddac-2c6e-486f-bdd9-46b3365ca4ef)
