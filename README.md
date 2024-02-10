@@ -55,6 +55,12 @@ Interesting process of chatting:
 
 ![image](https://github.com/b1on1kkk/Propwise/assets/114521829/4ef17082-5aa9-4fd7-b7b4-c8f3e4ee2417)
 
+## How Socket io in my project was implemented
+
+Schema:
+![image](https://github.com/b1on1kkk/Propwise/assets/114521829/fbb3ea8b-92f6-45f1-b10d-97431ccca600)
+
+
 ## Getting Started
 
 ### Run the database server:
