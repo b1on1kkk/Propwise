@@ -64,6 +64,10 @@ Schema:
 ## Records
 [here](https://drive.google.com/drive/folders/1ZmSQArpNGrze2TB2k7Qc6OVHErQO6tz_?usp=sharing)
 
+## Tables relationships
+
+![image](https://github.com/b1on1kkk/Propwise/assets/114521829/f09ea571-d13f-44fe-bb72-dbdcbcc3a73f)
+
 ## Getting Started
 
 ### Run the database server:
