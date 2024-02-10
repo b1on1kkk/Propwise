@@ -61,6 +61,8 @@ Schema:
 
 ![image](https://github.com/b1on1kkk/Propwise/assets/114521829/fbb3ea8b-92f6-45f1-b10d-97431ccca600)
 
+## Records
+[here](https://drive.google.com/drive/folders/1ZmSQArpNGrze2TB2k7Qc6OVHErQO6tz_?usp=sharing)
 
 ## Getting Started
 
